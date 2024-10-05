@@ -20,7 +20,7 @@ USE `flagfrenzy` ;
 CREATE TABLE IF NOT EXISTS `flagfrenzy`.`Teams` (
   `ID` INT auto_increment Not NULL,
   `Teamname` VARCHAR(50) NOT NULL unique,
-  `Teamkey` VARCHAR(75) NOT NULL,
+  `Teamkey` VARCHAR(75) NOT NULL unique,
   `Points` INT NOT NULL DEFAULT 0,
   `Members` INT NOT NULL Default 0,
   PRIMARY KEY (`ID`))
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `flagfrenzy`.`User` (
   `Class` VARCHAR(45) NOT NULL,
   `TeamsID` INT NULL,
   `Disabled`tinyint NOT Null Default 0,
-  `Email` VARCHAR(50) NOT NULL,
+  `Email` VARCHAR(50) NOT NULL unique,
   PRIMARY KEY (`ID`),
  
   CONSTRAINT `fk_User_Teams`
