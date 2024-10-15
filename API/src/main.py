@@ -4,8 +4,8 @@ from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Text,
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from models import User, Team, Challenge, UserMadeChallenge
-from database import SessionLocal
+from model.models import User, Team, Challenge, UserMadeChallenge
+from model.database import SessionLocal
 
 app = FastAPI()
 
