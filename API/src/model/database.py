@@ -5,8 +5,6 @@ import os
 
 load_dotenv()
 user = os.environ.get("MYSQL_USER")
-database = os.environ.get("MYSQL_DATABASE")
-password = os.environ.get("MYSQL_PASSWORD")
 hostname = os.environ.get("MYSQL_HOST")
 port = os.environ.get("MYSQL_PORT")
 
