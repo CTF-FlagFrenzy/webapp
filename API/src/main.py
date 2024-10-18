@@ -23,6 +23,9 @@ class UserCreate(BaseModel):
     Class: str
     Email: str
 
+class UserUpdate(UserCreate):
+    Disabled: int
+    
 class ChallengeCreate(BaseModel):
     ChallengeName: str
     Categorie: str
@@ -141,7 +144,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 # Update a user by ID and manage team membership
 @app.put("/users/{user_id}")
-def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get_db)):
+def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.ID == user_id).first()
         if not user:
@@ -163,6 +166,8 @@ def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get
     except Exception as ex:
         db.rollback()  
         raise HTTPException(status_code=422, detail=str(ex))
+    
+
 
 @app.put("/users/team/{user_id}")
 def update_user(user_id: int, teamkey: str, db: Session = Depends(get_db)):
