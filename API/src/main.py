@@ -23,8 +23,6 @@ class UserCreate(BaseModel):
     Class: str
     Email: str
 
-class UserUpdate(UserCreate):
-    Disabled: int
     
 class ChallengeCreate(BaseModel):
     ChallengeName: str
@@ -142,9 +140,9 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=422, detail=str(ex))
     return db_user
 
-# Update a user by ID and manage team membership
+# Update a user by ID 
 @app.put("/users/{user_id}")
-def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
+def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.ID == user_id).first()
         if not user:
@@ -202,7 +200,25 @@ def update_user(user_id: int, teamkey: str, db: Session = Depends(get_db)):
         db.rollback()  
         raise HTTPException(status_code=422, detail=str(ex))
 
+@app.put("/users/disabled/{user_id}")
+def update_user(user_id: int, user_disable: int, db: Session = Depends(get_db)):
+    try:
+        user = db.query(User).filter(User.ID == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user.Disabled = user_disable
+       
+        db.commit()
+        db.refresh(user)
+        return user
 
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail='This Nickname already exists.')
+    except Exception as ex:
+        db.rollback()  
+        raise HTTPException(status_code=422, detail=str(ex))
+    
 @app.put("/users/points/{user_id}")
 def put_user_points(user_id: int, points: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.ID == user_id).first()
@@ -322,6 +338,13 @@ def get_user_made_challenges(db: Session = Depends(get_db)):
 @app.get("/user-made-challenges/{user_id}/{challenge_id}")
 def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
     user_made_challenge = db.query(UserMadeChallenge).filter(UserMadeChallenge.User_ID == user_id, UserMadeChallenge.Challenges_ID == challenge_id).first()
+    if not user_made_challenge:
+        raise HTTPException(status_code=404, detail="User-made challenge not found")
+    return user_made_challenge
+
+@app.get("/user-made-challenges/{user_id}")
+def get_user_made_challenge(user_id: int, db: Session = Depends(get_db)):
+    user_made_challenge = db.query(UserMadeChallenge).filter(UserMadeChallenge.User_ID == user_id).first()
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
     return user_made_challenge
