@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from typing import Optional
 from model.models import User, Team, Challenge, UserMadeChallenge
 from model.database import SessionLocal
+import json
 
 app = FastAPI()
 
@@ -386,3 +387,21 @@ def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = De
     db.delete(user_made_challenge)
     db.commit()
     return {"detail": "User-made challenge deleted successfully"}
+
+@app.get("/deploy/{user_id}/{challenge_id}")
+def get_deploy_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+    user = db.query(User).filter(User.ID == user_id).first()
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge was not found")
+    if not user:
+        raise HTTPException(status_code=404, detail="User was not found")
+    
+    return {
+        'challengeName': challenge.ChallengeName,
+        'challengeCategory': challenge.Categorie,
+        'teamName': team.Teamname,
+        'teamKey': team.Teamkey
+    }
