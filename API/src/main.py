@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from typing import Optional
 from model.models import User, Team, Challenge, UserMadeChallenge
 from model.database import SessionLocal
+import json
 
 app = FastAPI()
 
@@ -23,6 +24,7 @@ class UserCreate(BaseModel):
     Class: str
     Email: str
 
+    
 class ChallengeCreate(BaseModel):
     ChallengeName: str
     Categorie: str
@@ -139,7 +141,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=422, detail=str(ex))
     return db_user
 
-# Update a user by ID and manage team membership
+# Update a user by ID 
 @app.put("/users/{user_id}")
 def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get_db)):
     try:
@@ -163,6 +165,8 @@ def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get
     except Exception as ex:
         db.rollback()  
         raise HTTPException(status_code=422, detail=str(ex))
+    
+
 
 @app.put("/users/team/{user_id}")
 def update_user(user_id: int, teamkey: str, db: Session = Depends(get_db)):
@@ -197,7 +201,25 @@ def update_user(user_id: int, teamkey: str, db: Session = Depends(get_db)):
         db.rollback()  
         raise HTTPException(status_code=422, detail=str(ex))
 
+@app.put("/users/disabled/{user_id}")
+def update_user(user_id: int, user_disable: int, db: Session = Depends(get_db)):
+    try:
+        user = db.query(User).filter(User.ID == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user.Disabled = user_disable
+       
+        db.commit()
+        db.refresh(user)
+        return user
 
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail='This Nickname already exists.')
+    except Exception as ex:
+        db.rollback()  
+        raise HTTPException(status_code=422, detail=str(ex))
+    
 @app.put("/users/points/{user_id}")
 def put_user_points(user_id: int, points: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.ID == user_id).first()
@@ -321,6 +343,13 @@ def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depen
         raise HTTPException(status_code=404, detail="User-made challenge not found")
     return user_made_challenge
 
+@app.get("/user-made-challenges/{user_id}")
+def get_user_made_challenge(user_id: int, db: Session = Depends(get_db)):
+    user_made_challenge = db.query(UserMadeChallenge).filter(UserMadeChallenge.User_ID == user_id).first()
+    if not user_made_challenge:
+        raise HTTPException(status_code=404, detail="User-made challenge not found")
+    return user_made_challenge
+
 @app.post("/user-made-challenges/")
 def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db: Session = Depends(get_db)):
     db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict())
@@ -358,3 +387,21 @@ def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = De
     db.delete(user_made_challenge)
     db.commit()
     return {"detail": "User-made challenge deleted successfully"}
+
+@app.get("/deploy/{user_id}/{challenge_id}")
+def get_deploy_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+    user = db.query(User).filter(User.ID == user_id).first()
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge was not found")
+    if not user:
+        raise HTTPException(status_code=404, detail="User was not found")
+    
+    return {
+        'challengeName': challenge.ChallengeName,
+        'challengeCategory': challenge.Categorie,
+        'teamName': team.Teamname,
+        'teamKey': team.Teamkey
+    }
