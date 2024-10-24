@@ -2,7 +2,7 @@ services:
   flagfrenzy-sveltekit:
     build:
       context: ./flagfrenzy-sveltekit
-      dockerfile: DockerFile
+      dockerfile: Dockerfile
     
     ports:
       - 80:80
