@@ -1,0 +1,53 @@
+services:
+  flagfrenzy-sveltekit:
+    build: ./flagfrenzy-sveltekit
+    
+    ports:
+      - 80:80
+    networks:
+      - my-network
+    
+    volumes:
+      - ./flagfrenzy-sveltekit:/app
+      - /app/node_modules
+  db:
+    image: mysql:latest
+    
+    ports:
+      - "3306:3306"
+    networks:
+      - my-network
+    
+    volumes:
+      - my-mysql-data:/var/lib/mysql
+    
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE_PORT: ${MYSQL_PORT}
+  
+  api:
+    build: ./API
+
+    ports:
+      - "8000:8000"
+    networks:
+      - my-network
+
+    env_file: .env
+    environment:
+      ALLOWED_HOSTS: "*"
+
+    working_dir: "/app"
+
+    command: >
+      sh -c "sleep 10 && uvicorn main:app --host 0.0.0.0 --reload"
+
+volumes:
+  my-mysql-data:
+
+networks:
+  my-network:
