@@ -7,10 +7,20 @@ from typing import Optional
 from model.models import User, Team, Challenge, UserMadeChallenge
 from model.database import SessionLocal
 import json
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],          
+    allow_credentials=True,         
+    allow_methods=["*"],            
+    allow_headers=["*"],            
+)
 # --------------------- SCHEMAS -----------------------
 
 class TeamCreate(BaseModel):
