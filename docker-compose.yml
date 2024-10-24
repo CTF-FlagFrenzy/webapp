@@ -1,6 +1,8 @@
 services:
   flagfrenzy-sveltekit:
-    build: ./flagfrenzy-sveltekit
+    build:
+      context: ./flagfrenzy-sveltekit
+      dockerfile: DockerFile
     
     ports:
       - 80:80
@@ -30,7 +32,9 @@ services:
       MYSQL_DATABASE_PORT: ${MYSQL_PORT}
   
   api:
-    build: ./API
+    build: 
+      context: ./API
+      dockerfile: DockerFile
 
     ports:
       - "8000:8000"
