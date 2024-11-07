@@ -41,6 +41,7 @@ class Challenge(Base):
     Hintcount = Column(Integer, default=0)
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
+    Difficulty = Column(String(30), default='Easy')
 
     solved_by_users = relationship("UserMadeChallenge", back_populates="challenge")
 
