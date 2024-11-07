@@ -12,8 +12,6 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],          
@@ -40,6 +38,7 @@ class ChallengeCreate(BaseModel):
     Categorie: str
     Points: int = 100
     Description: str
+    Difficulty: str = 'Easy'
     
 
 class UserMadeChallengeCreate(BaseModel):
@@ -307,6 +306,7 @@ def update_challenge(challenge_id: int, challenge_update: ChallengeCreate, db: S
     challenge.Categorie = challenge_update.Categorie
     challenge.Points = challenge_update.Points
     challenge.Description = challenge_update.Description
+    challenge.Difficulty = challenge_update.Difficulty
     db.commit()
     db.refresh(challenge)
     return challenge
