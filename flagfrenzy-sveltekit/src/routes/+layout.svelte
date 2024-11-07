@@ -3,18 +3,21 @@
 </script>
 
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
-
-<header>
-    <img alt="The project logo" src={Logo} />
-    <nav>
-        <a href="/challenges">Challenges</a>
-        <a href="/scoreboard">Scoreboard</a>
-        <a href="/team">Team</a>
-    </nav>
-    <button>
-        Login
-    </button>
-</header>
+<body>
+    <header>
+        <img alt="The project logo" src={Logo} />
+        <nav>
+            <a href="/challenges">Challenges</a>
+            <a href="/scoreboard">Scoreboard</a>
+            <a href="/team">Team</a>
+        </nav>
+        <button>Login</button>
+    </header>
+    
+    <main>
+        <slot />
+    </main>
+</body>
 
 <style>
     header {
@@ -47,5 +50,9 @@
         max-width: 20%;
         height: auto;
         padding: 0% 2% 0% 2%;
+    }
+    body {
+        background-color: #333640;
+        height: 100%;
     }
 </style>
