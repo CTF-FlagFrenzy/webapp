@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS `flagfrenzy`.`Challenges` (
   `Hintcount` INT NOT NULL DEFAULT 0,
   `Points` INT NOT NULL DEFAULT 100,
   `Description` TEXT(1000) NOT NULL,
+  `Dificulty`VARCHAR(30) NOT NULL,
   PRIMARY KEY (`ID`))
 ENGINE = InnoDB;
 
