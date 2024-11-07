@@ -8,6 +8,7 @@ from model.models import User, Team, Challenge, UserMadeChallenge
 from model.database import SessionLocal
 import json
 from fastapi.middleware.cors import CORSMiddleware
+from collections import defaultdict
 
 app = FastAPI()
 
@@ -270,8 +271,18 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 # Get all challenges
 @app.get("/challenges/")
 def get_challenges(db: Session = Depends(get_db)):
+    # Retrieve all challenges from the database
     challenges = db.query(Challenge).all()
-    return challenges
+
+    # Group challenges by category
+    categorized_challenges = defaultdict(list)
+    for challenge in challenges:
+        categorized_challenges[challenge.Categorie].append(challenge)
+
+    # Convert to JSON format with category names as keys
+    categorized_challenges_json = {category: challenges for category, challenges in categorized_challenges.items()}
+
+    return categorized_challenges_json
 
 # Get a challenge by ID
 @app.get("/challenges/{challenge_id}")
@@ -376,7 +387,7 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
 
 # Update a user-made challenge by user ID and challenge ID
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
-def update_user_made_challenge(user_id: int, challenge_id: int, update_data: UserMadeChallengeCreate, db: Session = Depends(get_db)):
+def update_user_made_challenge(user_id: int, challenge_id: int, update_data: UserMadeChallengeUpdate, db: Session = Depends(get_db)):
     user_made_challenge = db.query(UserMadeChallenge).filter(UserMadeChallenge.User_ID == user_id, UserMadeChallenge.Challenges_ID == challenge_id).first()
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
