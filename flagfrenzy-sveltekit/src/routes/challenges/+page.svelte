@@ -22,6 +22,8 @@
 <div>
     <h1>OTHERS</h1>
 </div>
+{#each Object.keys(challengesByCategory) as category}
+<h2>{category}</h2>
 {#each challengesByCategory[category] as challenge}
     <div class="card">
         <h2>{challenge.ChallengeName}</h2>
@@ -30,6 +32,7 @@
         <h3>Description:</h3>
         <p>{challenge.Description}</p>
     </div>
+{/each}
 {/each}
   <style>
     h1 {
