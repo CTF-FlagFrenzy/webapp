@@ -9,6 +9,8 @@ from model.database import SessionLocal
 import json
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
+import random
+import string
 
 app = FastAPI()
 
@@ -24,7 +26,6 @@ app.add_middleware(
 
 class TeamCreate(BaseModel):
     Teamname: str
-    Teamkey: str
   
 
 class UserCreate(BaseModel):
@@ -40,7 +41,9 @@ class ChallengeCreate(BaseModel):
     Points: int = 100
     Description: str
     Difficulty: str = 'Easy'
-    
+    Hint1:str
+    Hint2:str
+    Hint3:str    
 
 class UserMadeChallengeCreate(BaseModel):
     User_ID: int
@@ -60,7 +63,8 @@ def get_db():
     finally:
         db.close()
 
-
+def generate_random_key(length=24):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 # --------------------- TEAMS -----------------------
 
@@ -80,7 +84,8 @@ def get_team(team_id: int, db: Session = Depends(get_db)):
 
 @app.post("/teams/")
 def create_team(team: TeamCreate, db: Session = Depends(get_db)):
-    db_team = Team(**team.dict())
+    teamkey = generate_random_key()
+    db_team = Team(Teamkey = teamkey,**team.dict())
     try:
         db.add(db_team)
         db.commit()
@@ -100,7 +105,6 @@ def update_team(team_id: int, team_update: TeamCreate, db: Session = Depends(get
         raise HTTPException(status_code=404, detail="Team not found")
     
     team.Teamname = team_update.Teamname
-    team.Teamkey = team_update.Teamkey
     db.commit()
     db.refresh(team)
     return team
@@ -179,13 +183,13 @@ def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get
 
 
 @app.put("/users/team/{user_id}")
-def update_user(user_id: int, teamkey: str, db: Session = Depends(get_db)):
+def update_user(user_id: int, teamname: str, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.ID == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        team = db.query(Team).filter(Team.Teamkey == teamkey).first()
+        team = db.query(Team).filter(Team.Teamname == teamname).first()
         if not team:
             raise HTTPException(status_code=404, detail="Team not found")
         
@@ -292,6 +296,17 @@ def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Challenge not found")
     return challenge
 
+#Get Hints
+@app.get("/challenges/hints/{challenge_id}")
+def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+    return {
+        'Hint1': challenge.Hint1,
+        'Hint2': challenge.Hint2,
+        'Hint3': challenge.Hint3
+    }
 @app.post("/challenges/")
 def create_challenge(challenge: ChallengeCreate, db: Session = Depends(get_db)):
     db_challenge = Challenge(**challenge.dict())
@@ -318,6 +333,9 @@ def update_challenge(challenge_id: int, challenge_update: ChallengeCreate, db: S
     challenge.Points = challenge_update.Points
     challenge.Description = challenge_update.Description
     challenge.Difficulty = challenge_update.Difficulty
+    challenge.Hint1 = challenge_update.Hint1
+    challenge.Hint2 = challenge_update.Hint2
+    challenge.Hint3 = challenge_update.Hint3
     db.commit()
     db.refresh(challenge)
     return challenge
