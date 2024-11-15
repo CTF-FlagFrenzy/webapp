@@ -41,9 +41,9 @@ class ChallengeCreate(BaseModel):
     Points: int = 100
     Description: str
     Difficulty: str = 'Easy'
-    Hint1:str
-    Hint2:str
-    Hint3:str    
+    Hint1: Optional[str] = None
+    Hint2: Optional[str] = None
+    Hint3: Optional[str] = None
 
 class UserMadeChallengeCreate(BaseModel):
     User_ID: int
