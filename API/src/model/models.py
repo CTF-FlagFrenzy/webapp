@@ -9,6 +9,7 @@ class Team(Base):
 
     ID = Column(Integer, primary_key=True, autoincrement=True)
     Teamname = Column(String(50), nullable=False, unique=True)
+    Password = Column(String(50), nullable=False)
     Teamkey = Column(String(75), nullable=False, unique=True)
     Points = Column(Integer, default=0)
     Members = Column(Integer, nullable=False, default=0)

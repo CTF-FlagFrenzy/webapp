@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `flagfrenzy`.`Teams` (
   `ID` INT auto_increment Not NULL,
   `Teamname` VARCHAR(50) NOT NULL unique,
   `Teamkey` VARCHAR(75) NOT NULL unique,
+  `Password`VARCHAR(50) NOT NULL,
   `Points` INT NOT NULL DEFAULT 0,
   `Members` INT NOT NULL Default 0,
   PRIMARY KEY (`ID`))
