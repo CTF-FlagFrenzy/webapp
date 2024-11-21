@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'STIX Two Text', serif;
+  font-weight: 900;
+}
+
+.card h2 {
+  padding-bottom: 10%;
+}
+.card-Easy {
+  @apply shadow-EasyShadow;
+}
+.card-Medium {
+  @apply shadow-MediumShadow;
+}
+.card-Hard {
+  @apply shadow-HardShadow;
+}
+.card-Expert {
+  @apply shadow-ExpertShadow;
+}
+.card-Default {
+  @apply shadow-DefaultShadow;
+}
+.card-Easy span {
+  @apply text-Easy;
+}
+.card-Medium span {
+  @apply text-Medium;
+}
+.card-Hard span {
+  @apply text-Hard;
+}
+.card-Expert span {
+  @apply text-Expert;
+}
+.card-Default span {
+  @apply text-Default;
+}

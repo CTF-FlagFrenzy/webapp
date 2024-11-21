@@ -1,0 +1,21 @@
+[ {
+  "ChallengeName": "Challenge1",
+  "Categorie": "string",
+  "Points": 100,
+  "Description": "string",
+  "Difficulty": "Easy",
+  "Hint1": "string",
+  "Hint2": null,
+  "Hint3": null
+},  
+ {
+  "ChallengeName": "Challenge2",
+  "Categorie": "string",
+  "Points": 100,
+  "Description": "string",
+  "Difficulty": "Easy",
+  "Hint1": "string",
+  "Hint2": null,
+  "Hint3": null
+}
+]

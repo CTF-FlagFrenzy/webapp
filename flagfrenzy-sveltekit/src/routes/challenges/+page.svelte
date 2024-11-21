@@ -1,9 +1,10 @@
 <script>
-  import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
+  import { onMount, onDestroy } from 'svelte';
+  import Card from '$lib/components/card.svelte';
 
   let challengesByCategory = {}; // Object to hold challenges grouped by category
   let error = null;
+  let interval;
 
   async function loadChallenges() {
     try {
@@ -16,36 +17,27 @@
       error = err.message;
     }
   }
-  onMount(loadChallenges);
-</script>
-  
-<div>
-    <h1>OTHERS</h1>
-</div>
-{#each Object.keys(challengesByCategory) as category}
-<h2>{category}</h2>
-{#each challengesByCategory[category] as challenge}
-    <div class="card">
-        <h2>{challenge.ChallengeName}</h2>
-        <h3>Difficulty:</h3>
-        <p>{challenge.Difficulty}</p>
-        <h3>Description:</h3>
-        <p>{challenge.Description}</p>
-    </div>
-{/each}
-{/each}
-  <style>
-    h1 {
-        color: #F3CC59;
-        font-size: 30px;
-        padding-left: 1em;
-        font-family: 'STIX Two Text', serif;
-        font-weight: 700;
-    }
-    .card {
-        background-color: #40424B;
-        color:white;
-        width: 20em
-    }
-  </style>
+  onMount(() => {
+    loadChallenges(); // Initial load
 
+    // Start interval to refresh data
+    interval = setInterval(loadChallenges, 10000); // Refresh every 60 seconds
+
+    return () => {
+      clearInterval(interval); // Clean up interval when component is destroyed
+    };
+  });
+
+  onDestroy(() => {
+    if (interval) clearInterval(interval); // Ensure interval is cleared
+  });
+</script>
+
+{#each Object.keys(challengesByCategory) as category}
+  <h1 class="text-custom-200 text-2xl font-serif font-bold pt-4 pl-4">{category}</h1>
+  <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {#each challengesByCategory[category] as challenge}
+      <Card challenge={challenge} />
+    {/each}
+  </div>
+{/each}

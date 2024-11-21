@@ -1,58 +1,42 @@
 <script>
-	import Logo from '$lib/images/logo.png';
+  import Logo from '$lib/images/logo.png';
+  import Footer from '$lib/components/Footer.svelte';
+  import "../app.css";
+  let isOpen = false;
+
+  function toggleMenu() {
+    isOpen = !isOpen;
+  }
 </script>
+  
+<body class="bg-custom-100 h-auto text-white">
+  <header class="bg-custom-110 text-custom-200 shadow-lg flex justify-between items-center p-4">
+    <a href="/" >
+      <img alt="The project logo" src={Logo} class="w-60 h-auto object-contain" />
+    </a>
+  
+    <nav class="hidden md:flex gap-8 text-3xl">
+      <a href="/challenges">Challenges</a>
+      <a href="/scoreboard">Scoreboard</a>
+      <a href="/team">Team</a>
+    </nav>
+    <button class="hidden md:block text-custom-200 border-2 border-custom-200 rounded-full px-4 py-2 text-lg">Login</button>
 
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
-<body>
-    <header>
-        <img alt="The project logo" src={Logo} />
-        <nav>
-            <a href="/challenges">Challenges</a>
-            <a href="/scoreboard">Scoreboard</a>
-            <a href="/team">Team</a>
-        </nav>
-        <button>Login</button>
-    </header>
-    
-    <main>
-        <slot />
-    </main>
+    <button on:click={toggleMenu} class="md:hidden text-custom-200 focus:outline-none text-3xl">{isOpen ? '✖' : '☰'}</button>
+  </header>
+  
+  {#if isOpen}
+    <nav class="flex flex-col items-center bg-custom-110 text-custom-200 p-4 space-y-4 md:hidden">
+      <a href="/challenges" on:click={() => (isOpen = false)}>Challenges</a>
+      <a href="/scoreboard" on:click={() => (isOpen = false)}>Scoreboard</a>
+      <a href="/team" on:click={() => (isOpen = false)}>Team</a>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-4 py-2 text-lg co">Login</button>
+    </nav>
+  {/if}
+
+  <main class="h-auto">
+    <slot />
+  </main>
+  
+  <Footer />
 </body>
-
-<style>
-    header {
-        background-color: #40424B;
-        display: flex;
-        justify-content: space-between;
-        padding: 1% 1% 1% 1%;
-        color: #F3CC59;
-    }
-    header img {
-        max-width: 20%;
-        height: auto;
-        object-fit: contain;
-    }
-    nav {
-        display: flex;
-        align-items: center;
-        gap: 30%;
-        font-size: 200%;
-        max-width: 20%;
-        height: auto;
-    }
-    header button {
-        color: #F3CC59;
-        border-style: solid;
-        border-width: 3px;
-        border-radius: 30px;
-        border-color: #F3CC59;
-        font-size: 200%;
-        max-width: 20%;
-        height: auto;
-        padding: 0% 2% 0% 2%;
-    }
-    body {
-        background-color: #333640;
-        height: 100%;
-    }
-</style>
