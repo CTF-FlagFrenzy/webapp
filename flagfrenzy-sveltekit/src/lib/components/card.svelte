@@ -22,7 +22,7 @@
 </script>
 
 
-<button on:click={openModal} class="card h-96 w-72 my-4 bg-custom-110 shadow-{colorPicker(challenge.Difficulty)}Shadow text-white rounded-2xl text-left p-2.5">
+<button on:click={openModal} class="card h-96 w-72 my-4 bg-custom-110 shadow-button-{colorPicker(challenge.Difficulty)} text-white rounded-2xl text-left p-2.5">
   <h2 class="text-4xl">{challenge.ChallengeName}</h2>
   <h3 class="text-3xl pb-2">Difficulty: <span class="text-{colorPicker(challenge.Difficulty)}">{challenge.Difficulty}</span></h3>
   <h3 class="text-3xl">Description:</h3>
@@ -35,8 +35,23 @@
 <Modal isOpen={isModalOpen} data={challenge} on:close={closeModal}></Modal>
 
 
-<style>
-    .card h2 {
-      padding-bottom: 10%;
-    }
+<style lang="postcss">
+  .card h2 {
+    padding-bottom: 10%;
+  }
+  .shadow-button-Easy {
+    @apply shadow-EasyShadow;
+  }
+  .shadow-button-Medium {
+    @apply shadow-MediumShadow;
+  }
+  .shadow-button-Hard {
+    @apply shadow-HardShadow;
+  }
+  .shadow-button-Expert {
+    @apply shadow-ExpertShadow;
+  }
+  .shadow-button-Default {
+    @apply shadow-DefaultShadow;
+  }
 </style>
