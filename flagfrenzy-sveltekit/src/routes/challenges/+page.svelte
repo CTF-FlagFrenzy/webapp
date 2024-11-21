@@ -1,9 +1,10 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import Card from '$lib/components/card.svelte';
 
   let challengesByCategory = {}; // Object to hold challenges grouped by category
   let error = null;
+  let interval;
 
   async function loadChallenges() {
     try {
@@ -16,7 +17,20 @@
       error = err.message;
     }
   }
-  onMount(loadChallenges);
+  onMount(() => {
+    loadChallenges(); // Initial load
+
+    // Start interval to refresh data
+    interval = setInterval(loadChallenges, 10000); // Refresh every 60 seconds
+
+    return () => {
+      clearInterval(interval); // Clean up interval when component is destroyed
+    };
+  });
+
+  onDestroy(() => {
+    if (interval) clearInterval(interval); // Ensure interval is cleared
+  });
 </script>
 
 {#each Object.keys(challengesByCategory) as category}

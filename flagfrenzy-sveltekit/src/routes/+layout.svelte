@@ -11,7 +11,9 @@
   
 <body class="bg-custom-100 h-auto text-white">
   <header class="bg-custom-110 text-custom-200 shadow-lg flex justify-between items-center p-4">
-    <img alt="The project logo" src={Logo} class="w-60 h-auto object-contain" />
+    <a href="/" >
+      <img alt="The project logo" src={Logo} class="w-60 h-auto object-contain" />
+    </a>
   
     <nav class="hidden md:flex gap-8 text-3xl">
       <a href="/challenges">Challenges</a>
