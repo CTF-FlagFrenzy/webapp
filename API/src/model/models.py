@@ -43,9 +43,9 @@ class Challenge(Base):
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
     Difficulty = Column(String(30), default='Easy')
-    Hint1 = Column(Text(400), default=None)
-    Hint2 = Column(Text(400), default=None)
-    Hint3 = Column(Text(400), default=None)
+    Hint1 = Column(Text(400), nullable=True)
+    Hint2 = Column(Text(400), nullable=True)
+    Hint3 = Column(Text(400), nullable=True)
 
     solved_by_users = relationship("UserMadeChallenge", back_populates="challenge")
 
