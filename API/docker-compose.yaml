@@ -41,6 +41,8 @@ services:
       - "8000:8000"
     networks:
       - webapp_net
+    volumes:
+      - ./API/src:/app
     env_file: .env
     environment:
       ALLOWED_HOSTS: "*"

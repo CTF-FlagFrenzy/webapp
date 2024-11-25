@@ -26,6 +26,7 @@ app.add_middleware(
 
 class TeamCreate(BaseModel):
     Teamname: str
+    Password: str
   
 
 class UserCreate(BaseModel):
@@ -183,7 +184,7 @@ def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get
 
 
 @app.put("/users/team/{user_id}")
-def update_user(user_id: int, teamname: str, db: Session = Depends(get_db)):
+def update_user(user_id: int, teamname: str, teampassword: str, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.ID == user_id).first()
         if not user:
@@ -192,6 +193,9 @@ def update_user(user_id: int, teamname: str, db: Session = Depends(get_db)):
         team = db.query(Team).filter(Team.Teamname == teamname).first()
         if not team:
             raise HTTPException(status_code=404, detail="Team not found")
+        
+        if team.Password != teampassword:
+            raise HTTPException(status_code=400, detail="Invalid team password") 
         
         if user.TeamsID:
             old_team = db.query(Team).filter(Team.ID == user.TeamsID).first()
@@ -202,19 +206,19 @@ def update_user(user_id: int, teamname: str, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Team already has 4 members")
         
         team.Members += 1
-        
         user.TeamsID = team.ID  
         
-        db.commit()
+        db.commit()  
         db.refresh(user)  
 
         return {"message": "User updated successfully", "user": user}
     
-    
+    except HTTPException as http_ex:
+        raise http_ex 
     except Exception as ex:
         db.rollback()  
-        raise HTTPException(status_code=422, detail=str(ex))
-
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+    
 @app.put("/users/disabled/{user_id}")
 def update_user(user_id: int, user_disable: int, db: Session = Depends(get_db)):
     try:
