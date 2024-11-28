@@ -73,9 +73,9 @@
     "Points": 1000,
     "Description": "In this challenge, you were tasked to find the flag within a picture. Good luck!",
     "Difficulty": "Easy",
-    "Hint1": "",
-    "Hint2": "",
-    "Hint3": "",
+    "Hint1": null,
+    "Hint2": null,
+    "Hint3": null,
     "Static": "Wi3dS#ld!k"
   }
 ]
