@@ -1,7 +1,7 @@
 [
   {
     "ChallengeName": "Solana Assets",
-    "Category": "Web Challenge",
+    "Categorie": "Web Challenge",
     "Points": "1000",
     "Description": "You found the self-hosted website of your neighbor and noticed that it is a crypto wallet. Use basic web knowledge to get access to their wallet.",
     "Difficulty": "Easy",
@@ -11,7 +11,7 @@
   },
   {
     "ChallengeName": "The SQL Heist",
-    "Category": "Web Challenge",
+    "Categorie": "Web Challenge",
     "Points": "1000",
     "Description": "You are on a news webpage but want to access information that is not easily available through the search function.",
     "Difficulty": "Easy",
@@ -21,7 +21,7 @@
   },
   {
     "ChallengeName": "File And Seek",
-    "Category": "Web Challenge",
+    "Categorie": "Web Challenge",
     "Points": "1000",
     "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look.",
     "Difficulty": "Medium",
@@ -31,7 +31,7 @@
   },
   {
     "ChallengeName": "Shadow Files",
-    "Category": "Web Challenge",
+    "Categorie": "Web Challenge",
     "Points": "1000",
     "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look. Some other information might help you assemble the flag.",
     "Difficulty": "Hard",
@@ -41,7 +41,7 @@
   },
   {
     "ChallengeName": "Pixel Spy",
-    "Category": "Web Challenge",
+    "Categorie": "Web Challenge",
     "Points": "1000",
     "Description": "A hacker displays a photo of himself on his page. Find some special information.",
     "Difficulty": "Easy",
@@ -51,7 +51,7 @@
   },
   {
     "ChallengeName": "Mental Overflow",
-    "Category": "Reverse Engineering",
+    "Categorie": "Reverse Engineering",
     "Points": "1000",
     "Description": "You have a special project. Maybe you can figure out what this file does.",
     "Difficulty": "Medium",
