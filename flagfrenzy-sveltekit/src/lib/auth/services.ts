@@ -17,26 +17,6 @@ interface UserRole {
     displayName: string;
 }
 
-// Funktion zum Abrufen der Benutzergrupppe
-const getUserGroups = async (accessToken: string): Promise<string[]> => {
-    const url = 'https://graph.microsoft.com/v1.0/me/memberOf';
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`
-    };
-
-    try {
-        const response = await fetch(url, { headers });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch user groups: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.value.map(group => group.displayName);
-    } catch (error) {
-        console.error('Failed to fetch user groups:', error);
-        throw new Error('Failed to fetch user groups');
-    }
-};
-
 
 export const redirectToAuthCodeUrl = async (event: RequestEvent) => {
 	const { verifier, challenge } = await cryptoProvider.generatePkceCodes();
@@ -89,13 +69,12 @@ export const getUserInfo = async (accessToken: string): Promise<UserInfo> => {
     try {
         const response = await fetch(url, { headers });
         if (!response.ok) {
+            console.log(await response.text())
             throw new Error(`Failed to fetch user info: ${response.status}`);
         }
+        
         let jsonResponse = await response.json();
-        let checksum = jsonResponse.userPrincipalName.split('#EXT#')[1];
-        if (checksum != '@ztvITP.onmicrosoft.com' ){
-            throw new Error("Invalid Active Directory");
-        }
+  
         return jsonResponse;
     } catch (error) {
         console.error(error);
@@ -129,17 +108,7 @@ export const getTokens = async (event: RequestEvent) => {
                     const userInfo = await getUserInfo(tokenResponse.accessToken);
                     console.log('User Info:', userInfo);
                     
-                    // Benutzerrollen abrufen
-                    const userGroups = await getUserGroups(tokenResponse.accessToken);
-                    if (userGroups.includes('Agents')) {
-                        // event.cookies.set('userinfo', JSON.stringify(userInfo), cookiesConfig);
-                        console.log(decodedState.redirectTo)
-                        return decodedState.redirectTo;
-                    }
-                    else {
-                        console.log('Falsche Berechtigung');
-                        return '/falscheBerechtigung'
-                    }
+        
                     
                     
                 } catch (err) {
