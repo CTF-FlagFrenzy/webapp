@@ -12,10 +12,6 @@ const cookiesConfig = {
 	path: '/',
 	secure: !dev
 };
-interface UserRole {
-    id: string;
-    displayName: string;
-}
 
 
 export const redirectToAuthCodeUrl = async (event: RequestEvent) => {
@@ -57,7 +53,7 @@ interface UserInfo {
     givenName: string;
     surname: string;
     mail: string;
-    // Fügen Sie weitere erforderliche Eigenschaften hinzu
+
 }
 
 export const getUserInfo = async (accessToken: string): Promise<UserInfo> => {

@@ -1,7 +1,7 @@
 <script>
   import Logo from '$lib/images/logo.png';
   import Footer from '$lib/components/Footer.svelte';
-  import "../app.css";
+  import "../../app.css";
   let isOpen = false;
 
   function toggleMenu() {
