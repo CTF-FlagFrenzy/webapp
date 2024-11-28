@@ -70,7 +70,6 @@ export const getUserInfo = async (accessToken: string): Promise<UserInfo> => {
         }
         
         let jsonResponse = await response.json();
-  
         return jsonResponse;
     } catch (error) {
         console.error(error);

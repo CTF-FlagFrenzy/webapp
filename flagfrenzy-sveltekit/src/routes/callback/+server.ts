@@ -9,7 +9,7 @@ export const GET: RequestHandler = async (event) => {
         if (!redirectTo) {
             throw new Error('Redirect URL is undefined');
         }
-        throw redirect(302, redirectTo);
+        throw redirect(302, '/');
     } catch (error) {
         console.error('Error during GET:', error);
         throw redirect(302, '/'); 
