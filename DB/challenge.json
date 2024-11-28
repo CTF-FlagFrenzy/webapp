@@ -1,21 +1,62 @@
-[ {
-  "ChallengeName": "Challenge1",
-  "Categorie": "string",
-  "Points": 100,
-  "Description": "string",
-  "Difficulty": "Easy",
-  "Hint1": "string",
-  "Hint2": null,
-  "Hint3": null
-},  
- {
-  "ChallengeName": "Challenge2",
-  "Categorie": "string",
-  "Points": 100,
-  "Description": "string",
-  "Difficulty": "Easy",
-  "Hint1": "string",
-  "Hint2": null,
-  "Hint3": null
-}
+[
+  {
+    "ChallengeName": "Solana Assets",
+    "Category": "Web Challenge",
+    "Points": "XXX",
+    "Description": "You found the self-hosted website of your neighbor and noticed that it is a crypto wallet. Use basic web knowledge to get access to their wallet.",
+    "Difficulty": "Easy",
+    "Hint1": "You can use web tools to view the HTML source code.",
+    "Hint2": "Web tools provide a function to inspect the web storage.",
+    "Hint3": "The web storage function allows you to see the content of all saved cookies."
+  },
+  {
+    "ChallengeName": "The SQL Heist",
+    "Category": "Web Challenge",
+    "Points": "XXX",
+    "Description": "You are on a news webpage but want to access information that is not easily available through the search function.",
+    "Difficulty": "Easy",
+    "Hint1": "You can do something special with the search function.",
+    "Hint2": "Maybe the website uses a database in the backend. Did the developer secure it properly?",
+    "Hint3": "Consider trying an SQL injection."
+  },
+  {
+    "ChallengeName": "File And Seek",
+    "Category": "Web Challenge",
+    "Points": "XXX",
+    "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look.",
+    "Difficulty": "Medium",
+    "Hint1": "The student provides more on their website than you might think.",
+    "Hint2": "There may be hidden files; try changing the URL.",
+    "Hint3": "You can use FUZZ to find hidden files."
+  },
+  {
+    "ChallengeName": "Shadow Files",
+    "Category": "Web Challenge",
+    "Points": "XXX",
+    "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look. Some other information might help you assemble the flag.",
+    "Difficulty": "Hard",
+    "Hint1": "The student provides more on their website than you might think.",
+    "Hint2": "There may be hidden files; try changing the URL.",
+    "Hint3": "The student manipulated the IDs. Another number may provide additional information."
+  },
+  {
+    "ChallengeName": "Pixel Spy",
+    "Category": "Web Challenge",
+    "Points": "XXX",
+    "Description": "A hacker displays a photo of himself on his page. Find some special information.",
+    "Difficulty": "Easy",
+    "Hint1": "You might take a closer look at the image.",
+    "Hint2": "Have you tried using EXIF tools already?",
+    "Hint3": "You can use a web tool to view the metadata."
+  },
+  {
+    "ChallengeName": "Mental Overflow",
+    "Category": "Reverse Engineering",
+    "Points": "XXX",
+    "Description": "You have a special project. Maybe you can figure out what this file does.",
+    "Difficulty": "Medium",
+    "Hint1": "The script is written in Brainfuck.",
+    "Hint2": "The script might be broken.",
+    "Hint3": "The script is broken. Try to fix it on your own :)."
+  }
 ]
