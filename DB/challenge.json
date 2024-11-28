@@ -2,7 +2,7 @@
   {
     "ChallengeName": "Solana Assets",
     "Category": "Web Challenge",
-    "Points": "XXX",
+    "Points": "1000",
     "Description": "You found the self-hosted website of your neighbor and noticed that it is a crypto wallet. Use basic web knowledge to get access to their wallet.",
     "Difficulty": "Easy",
     "Hint1": "You can use web tools to view the HTML source code.",
@@ -12,7 +12,7 @@
   {
     "ChallengeName": "The SQL Heist",
     "Category": "Web Challenge",
-    "Points": "XXX",
+    "Points": "1000",
     "Description": "You are on a news webpage but want to access information that is not easily available through the search function.",
     "Difficulty": "Easy",
     "Hint1": "You can do something special with the search function.",
@@ -22,7 +22,7 @@
   {
     "ChallengeName": "File And Seek",
     "Category": "Web Challenge",
-    "Points": "XXX",
+    "Points": "1000",
     "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look.",
     "Difficulty": "Medium",
     "Hint1": "The student provides more on their website than you might think.",
@@ -32,7 +32,7 @@
   {
     "ChallengeName": "Shadow Files",
     "Category": "Web Challenge",
-    "Points": "XXX",
+    "Points": "1000",
     "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look. Some other information might help you assemble the flag.",
     "Difficulty": "Hard",
     "Hint1": "The student provides more on their website than you might think.",
@@ -42,7 +42,7 @@
   {
     "ChallengeName": "Pixel Spy",
     "Category": "Web Challenge",
-    "Points": "XXX",
+    "Points": "1000",
     "Description": "A hacker displays a photo of himself on his page. Find some special information.",
     "Difficulty": "Easy",
     "Hint1": "You might take a closer look at the image.",
@@ -52,7 +52,7 @@
   {
     "ChallengeName": "Mental Overflow",
     "Category": "Reverse Engineering",
-    "Points": "XXX",
+    "Points": "1000",
     "Description": "You have a special project. Maybe you can figure out what this file does.",
     "Difficulty": "Medium",
     "Hint1": "The script is written in Brainfuck.",
