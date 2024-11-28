@@ -277,8 +277,11 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 # Get all challenges
 @app.get("/challenges/")
 def get_challenges(db: Session = Depends(get_db)):
-    # Retrieve all challenges from the database
     challenges = db.query(Challenge).all()
+
+    difficulty_order = {'Easy': 1, 'Medium': 2, 'Hard': 3, 'Expert': 4}
+
+    challenges.sort(key=lambda ch: difficulty_order.get(ch.Difficulty, 5))
 
     # Group challenges by category
     categorized_challenges = defaultdict(list)
