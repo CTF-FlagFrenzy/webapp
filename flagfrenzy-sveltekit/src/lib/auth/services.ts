@@ -78,7 +78,7 @@ export const getUserInfo = async (accessToken: string): Promise<UserInfo> => {
     }
 };
 
-export const getTokens = async (event: RequestEvent) => {
+export const getTokens = async (event: RequestEvent): Promise<string | null> => {
     const state = event.url.searchParams.get('state');
     if (state) {
         const decodedState = JSON.parse(cryptoProvider.base64Decode(state));
@@ -98,17 +98,15 @@ export const getTokens = async (event: RequestEvent) => {
                     event.cookies.set('accessToken', tokenResponse.accessToken, cookiesConfig);
                     event.cookies.set('idToken', tokenResponse.idToken, cookiesConfig);
                     event.cookies.set('account', JSON.stringify(tokenResponse.account), cookiesConfig);
+
                     console.log('Access Token:', tokenResponse.accessToken);
-                    
-                    // Benutzerinformationen abrufen
                     const userInfo = await getUserInfo(tokenResponse.accessToken);
                     console.log('User Info:', userInfo);
-                    
-        
-                    
-                    
+
+                    return decodedState.redirectTo || '/';
                 } catch (err) {
                     console.log(err);
+                    throw new Error('Token acquisition failed');
                 }
             } else if (error) {
                 throw new Error(error);
@@ -119,6 +117,7 @@ export const getTokens = async (event: RequestEvent) => {
     } else {
         throw new Error('State parameter missing');
     }
+    return null; // Fallback für unerwartete Zustände
 };
 export const getLogoutUri = () => {
     return `${msalConfig.auth.authority}/oauth2/v2.0/logout`;

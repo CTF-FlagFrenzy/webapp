@@ -3,6 +3,15 @@ import type { RequestHandler } from './$types';
 import { getTokens } from '$lib/auth/services';
 
 export const GET: RequestHandler = async (event) => {
-	const redirectTo = await getTokens(event);
-	throw redirect(302, redirectTo);
+    try {
+        const redirectTo = await getTokens(event);
+        console.log('Redirect To:', redirectTo);
+        if (!redirectTo) {
+            throw new Error('Redirect URL is undefined');
+        }
+        throw redirect(302, redirectTo);
+    } catch (error) {
+        console.error('Error during GET:', error);
+        throw redirect(302, '/'); 
+    }
 };
