@@ -66,5 +66,16 @@
     "Hint2": "The script might be broken.",
     "Hint3": "The script is broken. Try to fix it on your own :).",
     "Static": "#8W@3fp5#Y"
+  },
+    {
+    "ChallengeName": "Behind the Pixels",
+    "Categorie": "Forensics",
+    "Points": 1000,
+    "Description": "In this challenge, you were tasked to find the flag within a picture. Good luck!",
+    "Difficulty": "Easy",
+    "Hint1": "",
+    "Hint2": "",
+    "Hint3": "",
+    "Static": "Wi3dS#ld!k"
   }
 ]
