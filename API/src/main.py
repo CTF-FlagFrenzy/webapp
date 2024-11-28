@@ -26,7 +26,6 @@ app.add_middleware(
 
 class TeamCreate(BaseModel):
     Teamname: str
-    Password: str
   
 
 class UserCreate(BaseModel):
@@ -42,6 +41,8 @@ class ChallengeCreate(BaseModel):
     Points: int = 100
     Description: str
     Difficulty: str = 'Easy'
+    Static: str
+    Chain: Optional[str] = None
     Hint1: Optional[str] = None
     Hint2: Optional[str] = None
     Hint3: Optional[str] = None
@@ -184,7 +185,7 @@ def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get
 
 
 @app.put("/users/team/{user_id}")
-def update_user(user_id: int, teamname: str, teampassword: str, db: Session = Depends(get_db)):
+def update_user(user_id: int, teamname: str, db: Session = Depends(get_db)):
     try:
         user = db.query(User).filter(User.ID == user_id).first()
         if not user:
@@ -193,9 +194,6 @@ def update_user(user_id: int, teamname: str, teampassword: str, db: Session = De
         team = db.query(Team).filter(Team.Teamname == teamname).first()
         if not team:
             raise HTTPException(status_code=404, detail="Team not found")
-        
-        if team.Password != teampassword:
-            raise HTTPException(status_code=400, detail="Invalid team password") 
         
         if user.TeamsID:
             old_team = db.query(Team).filter(Team.ID == user.TeamsID).first()
@@ -206,19 +204,19 @@ def update_user(user_id: int, teamname: str, teampassword: str, db: Session = De
             raise HTTPException(status_code=400, detail="Team already has 4 members")
         
         team.Members += 1
+        
         user.TeamsID = team.ID  
         
-        db.commit()  
+        db.commit()
         db.refresh(user)  
 
         return {"message": "User updated successfully", "user": user}
     
-    except HTTPException as http_ex:
-        raise http_ex 
+    
     except Exception as ex:
         db.rollback()  
-        raise HTTPException(status_code=500, detail="An unexpected error occurred")
-    
+        raise HTTPException(status_code=422, detail=str(ex))
+
 @app.put("/users/disabled/{user_id}")
 def update_user(user_id: int, user_disable: int, db: Session = Depends(get_db)):
     try:
@@ -322,8 +320,10 @@ def create_challenge(challenge: ChallengeCreate, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=400, detail="Challenge with this name already exists.")
     except Exception as ex:
+        db.rollback()
         raise HTTPException(status_code=422, detail=str(ex))
     return db_challenge
+
 
 # Update a challenge by ID
 @app.put("/challenges/{challenge_id}")
@@ -331,18 +331,28 @@ def update_challenge(challenge_id: int, challenge_update: ChallengeCreate, db: S
     challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
-    
     challenge.ChallengeName = challenge_update.ChallengeName
     challenge.Categorie = challenge_update.Categorie
     challenge.Points = challenge_update.Points
     challenge.Description = challenge_update.Description
     challenge.Difficulty = challenge_update.Difficulty
+    challenge.Static = challenge_update.Static
+    challenge.Chain = challenge_update.Chain
     challenge.Hint1 = challenge_update.Hint1
     challenge.Hint2 = challenge_update.Hint2
     challenge.Hint3 = challenge_update.Hint3
-    db.commit()
-    db.refresh(challenge)
+
+    try:
+        db.commit()
+        db.refresh(challenge)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Challenge with this name already exists.")
+    except Exception as ex:
+        db.rollback()
+        raise HTTPException(status_code=422, detail=str(ex))
     return challenge
+
 
 # Delete a challenge by ID
 @app.delete("/challenges/{challenge_id}")
