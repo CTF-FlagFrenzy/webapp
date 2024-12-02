@@ -95,9 +95,7 @@ export const getTokens = async (event: RequestEvent): Promise<string | null> => 
                 try {
                     const tokenResponse = await msalInstance.acquireTokenByCode(authCodeRequest);
                     event.cookies.set('accessToken', tokenResponse.accessToken, cookiesConfig);
-                    event.cookies.set('idToken', tokenResponse.idToken, cookiesConfig);
-                    event.cookies.set('account', JSON.stringify(tokenResponse.account), cookiesConfig);
-
+                
                     console.log('Access Token:', tokenResponse.accessToken);
                     const userInfo = await getUserInfo(tokenResponse.accessToken);
                     console.log('User Info:', userInfo);
