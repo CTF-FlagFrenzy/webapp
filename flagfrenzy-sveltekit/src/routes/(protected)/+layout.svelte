@@ -7,6 +7,7 @@
   function toggleMenu() {
     isOpen = !isOpen;
   }
+  export let data;
 </script>
   
 <body class="bg-custom-100 h-auto text-white">
@@ -37,6 +38,7 @@
   <main class="h-auto">
     <slot />
   </main>
+  <p>{data.username}, {data.email}, {data.givenname}, {data.surname}</p>
   
   <Footer />
 </body>
