@@ -61,6 +61,7 @@ class Challenge(Base):
     Hint2 = Column(Text(400), nullable=True, default=None)
     Hint3 = Column(Text(400), nullable=True, default=None)
 
+
     made_by_users = relationship("UserMadeChallenge", back_populates="challenge")
 
 
