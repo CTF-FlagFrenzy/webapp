@@ -1,12 +1,38 @@
 <script>
+  import { onMount } from 'svelte';
   import Logo from '$lib/images/logo.png';
   import Footer from '$lib/components/Footer.svelte';
   import "../../app.css";
   let isOpen = false;
+  export let data;
 
   function toggleMenu() {
     isOpen = !isOpen;
   }
+  async function addEvent() {
+      try {
+        const response = await fetch("/api/user/", {
+          method: "POST",
+          body: JSON.stringify({
+            name: data.username,
+            email: data.email,
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          }
+        });
+  
+        console.log(response);
+  
+       
+      } catch (error) {
+        console.error("Fehler beim Fetchen:", error);
+      } 
+    } 
+
+    onMount(() => {
+    addEvent();
+  });
 </script>
   
 <body class="bg-custom-100 h-auto text-white">

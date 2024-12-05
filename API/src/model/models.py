@@ -29,11 +29,9 @@ class User(Base):
     """
     __tablename__ = "User"
 
-    ID = Column(Integer, primary_key=True, autoincrement=True)
+    ID = Column(String(150), primary_key=True)
     Nickname = Column(String(50), nullable=False)
-    Name = Column(String(200), nullable=False)
     Points = Column(Integer, default=0)
-    Class = Column(String(45), nullable=False)
     TeamsID = Column(Integer, ForeignKey("Teams.ID"), nullable=True)
     Disabled = Column(Integer, nullable=False, default=0)
     Email = Column(String(50), nullable=False)
@@ -71,7 +69,7 @@ class UserMadeChallenge(Base):
     """
     __tablename__ = "User_made_Challenges"
 
-    User_ID = Column(Integer, ForeignKey("User.ID"), primary_key=True)
+    User_ID = Column(String(150), ForeignKey("User.ID"), primary_key=True)
     Challenges_ID = Column(Integer, ForeignKey("Challenges.ID"), primary_key=True)
     Firstblood = Column(Integer, default=0)
     Solved = Column(Integer, default=0)

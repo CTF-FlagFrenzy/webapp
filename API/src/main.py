@@ -39,9 +39,7 @@ class UserCreate(BaseModel):
     """
     Schema for creating a new user.
     """
-    Nickname: str
-    Name: str
-    Class: str
+    ID: str
     Email: str
 
 
@@ -63,7 +61,7 @@ class UserMadeChallengeCreate(BaseModel):
     """
     Schema for creating a new user-made challenge.
     """
-    User_ID: int
+    User_ID: str
     Challenges_ID: int
 
 
@@ -93,6 +91,26 @@ def generate_random_key(length: int = 24) -> str:
     """
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
+def generate_random_username(length=8):
+    """
+    Generates a random username.
+    
+    :param length: The length of the random part of the name. Default is 8 characters.
+    :return: A randomly generated username.
+    """
+    # Lists of possible prefixes and suffixes for more variation
+    prefixes = ["Cool", "Dark", "Fast", "Lucky", "Swift", "Epic", "Nova"]
+    suffixes = ["Hunter", "Rider", "Slayer", "Master", "Player", "Wizard", "Shadow"]
+    
+    # Randomly select a prefix and suffix
+    prefix = random.choice(prefixes)
+    suffix = random.choice(suffixes)
+    
+
+    # Combine prefix, random string, and suffix
+    username = f"{prefix}{suffix}"
+    
+    return username
 
 # --------------------- TEAMS -----------------------
 @app.get("/teams/")
@@ -181,7 +199,7 @@ def get_users(db: Session = Depends(get_db)):
 
 
 @app.get("/users/{user_id}")
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(user_id: str, db: Session = Depends(get_db)):
     """
     Retrieve a specific user by ID.
     """
@@ -196,7 +214,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     """
     Create a new user.
     """
-    db_user = User(**user.dict())
+    nickname = generate_random_username()
+    db_user = User(Nickname=nickname, **user.dict())
     try:
         db.add(db_user)
         db.commit()
@@ -212,7 +231,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.put("/users/{user_id}")
-def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get_db)):
+def update_user(user_id: str, user_nickname:str, db: Session = Depends(get_db)):
     """
     Update an existing user's details by ID.
     """
@@ -221,11 +240,8 @@ def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        user.Nickname = user_update.Nickname
-        user.Name = user_update.Name
-        user.Class = user_update.Class
-        user.Email = user_update.Email
-
+        user.Nickname = user_nickname
+      
         db.commit()
         db.refresh(user)
         return user
@@ -238,7 +254,7 @@ def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get
 
 @app.put("/users/team/{user_id}")
 def update_user_team(
-    user_id: int, teamname: str, teampassword: str, db: Session = Depends(get_db)
+    user_id: str, teamname: str, teampassword: str, db: Session = Depends(get_db)
 ):
     """
     Assign or update the team membership of a user, validating the team password.
@@ -281,7 +297,7 @@ def update_user_team(
 
 
 @app.put("/users/disabled/{user_id}")
-def update_user_disabled(user_id: int, user_disable: int, db: Session = Depends(get_db)):
+def update_user_disabled(user_id: str, user_disable: int, db: Session = Depends(get_db)):
     """
     Enable or disable a user's account.
     """
@@ -303,7 +319,7 @@ def update_user_disabled(user_id: int, user_disable: int, db: Session = Depends(
 
 
 @app.put("/users/points/{user_id}")
-def update_user_points(user_id: int, points: int, db: Session = Depends(get_db)):
+def update_user_points(user_id: str, points: int, db: Session = Depends(get_db)):
     """
     Update a user's and their team's points.
     """
@@ -324,7 +340,7 @@ def update_user_points(user_id: int, points: int, db: Session = Depends(get_db))
 
 
 @app.delete("/users/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(user_id: str, db: Session = Depends(get_db)):
     """
     Delete a user by ID and clean up related data.
     """
