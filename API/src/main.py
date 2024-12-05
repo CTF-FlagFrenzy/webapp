@@ -231,7 +231,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.put("/users/{user_id}")
-def update_user(user_id: str, user_nickname:str, db: Session = Depends(get_db)):
+def update_user(user_id: str, user_nickname:str, user_avatar:str, db: Session = Depends(get_db)):
     """
     Update an existing user's details by ID.
     """
