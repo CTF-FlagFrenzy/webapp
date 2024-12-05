@@ -20,7 +20,7 @@
       <a href="/scoreboard">Scoreboard</a>
       <a href="/team">Team</a>
     </nav>
-    <button class="hidden md:block text-custom-200 border-2 border-custom-200 rounded-full px-4 py-2 text-lg">Login</button>
+    <button class="hidden md:block text-custom-200 border-2 border-custom-200 rounded-full px-4 py-2 text-lg"on:click={()=>window.location.href="/logout"}>Logout</button>
 
     <button on:click={toggleMenu} class="md:hidden text-custom-200 focus:outline-none text-3xl">{isOpen ? '✖' : '☰'}</button>
   </header>
@@ -30,7 +30,7 @@
       <a href="/challenges" on:click={() => (isOpen = false)}>Challenges</a>
       <a href="/scoreboard" on:click={() => (isOpen = false)}>Scoreboard</a>
       <a href="/team" on:click={() => (isOpen = false)}>Team</a>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-4 py-2 text-lg co">Login</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-4 py-2 text-lg co"on:click={()=>window.location.href="/logout"}>Logout</button>
     </nav>
   {/if}
 
