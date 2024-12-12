@@ -35,7 +35,7 @@ class User(Base):
     TeamsID = Column(Integer, ForeignKey("Teams.ID"), nullable=True)
     Disabled = Column(Integer, nullable=False, default=0)
     Email = Column(String(50), nullable=False)
-    avatar = Column(String(100), nullable=True, default=None)
+    Avatar = Column(String(100), nullable=True, default=None)
 
     team = relationship("Team", back_populates="users")
     challenges = relationship("UserMadeChallenge", back_populates="user")

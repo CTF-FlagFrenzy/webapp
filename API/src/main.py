@@ -215,7 +215,9 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     Create a new user.
     """
     nickname = generate_random_username()
-    db_user = User(Nickname=nickname, **user.dict())
+    images = ["Anonymous.png", "Hacker.png", "Hero.png", "logo.png", "Queen.png", "Spy.png", "Warrior.png"]
+    avatar = random.choice(images)
+    db_user = User(Nickname=nickname, Avatar=avatar, **user.dict())
     try:
         db.add(db_user)
         db.commit()
@@ -241,6 +243,7 @@ def update_user(user_id: str, user_nickname:str, user_avatar:str, db: Session = 
             raise HTTPException(status_code=404, detail="User not found")
 
         user.Nickname = user_nickname
+        user.Avatar = user_avatar
       
         db.commit()
         db.refresh(user)
