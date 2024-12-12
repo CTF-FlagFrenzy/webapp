@@ -2,25 +2,12 @@ import { error } from "@sveltejs/kit";
 
 const API_BASE_URL = 'http://api:8000';
 
-export async function GET() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/teams/`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch challenges');
-        }
-
-        const data = await response.json();
-            
-        return jsonResponse(data, response.status);
-    } catch (err) {
-        return jsonResponse({ message: "An error occurred", error: err.message }, 500);
-    }
-}
-export async function POST({ request }) {
+export async function PUT({ request, url }) {
+    const id = url.searchParams.get('id');
     const { Password, Teamname} = await request.json();
 
     try {
-        const response = await fetch(`${API_BASE_URL}/teams`, {
+        const response = await fetch(`${API_BASE_URL}/users/team/${id}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',

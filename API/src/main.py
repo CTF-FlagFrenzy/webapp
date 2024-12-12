@@ -42,7 +42,13 @@ class UserCreate(BaseModel):
     ID: str
     Email: str
 
-
+class TeamJoin(BaseModel):
+    """
+    Schema for teamjoin .
+    """
+    Teamname: str
+    Password: str
+    
 class ChallengeCreate(BaseModel):
     """
     Schema for creating a new challenge.
@@ -257,7 +263,7 @@ def update_user(user_id: str, user_nickname:str, user_avatar:str, db: Session = 
 
 @app.put("/users/team/{user_id}")
 def update_user_team(
-    user_id: str, teamname: str, teampassword: str, db: Session = Depends(get_db)
+    user_id: str, userInput:TeamJoin, db: Session = Depends(get_db)
 ):
     """
     Assign or update the team membership of a user, validating the team password.
@@ -267,11 +273,11 @@ def update_user_team(
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        team = db.query(Team).filter(Team.Teamname == teamname).first()
+        team = db.query(Team).filter(Team.Teamname == userInput.Teamname).first()
         if not team:
             raise HTTPException(status_code=404, detail="Team not found")
 
-        if team.Password != teampassword:
+        if team.Password != userInput.Password:
             raise HTTPException(status_code=400, detail="Invalid team password")
 
         if user.TeamsID:
