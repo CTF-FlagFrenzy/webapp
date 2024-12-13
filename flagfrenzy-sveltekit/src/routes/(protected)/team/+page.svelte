@@ -4,6 +4,26 @@
     let teamname = '';
     let password = '';
     export let data;
+    async function joinTeam() {
+      try {
+        const response = await fetch(`/api/user/team?id=${data.username}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            Teamname: teamname,
+            Password: password
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          }
+        });
+  
+        console.log(response.text());
+  
+  
+      } catch (error) {
+        console.error("Fehler beim Fetchen:", error);
+      } 
+    } 
     async function addTeam() {
       try {
         const response = await fetch("/api/teams", {
@@ -16,7 +36,7 @@
             "Content-Type": "application/json; charset=UTF-8",
           }
         });
-  
+        joinTeam()
         console.log(response);
   
   
@@ -24,26 +44,7 @@
         console.error("Fehler beim Fetchen:", error);
       } 
     } 
-    async function joinTeam() {
-      try {
-        const response = await fetch("/api/user/team?id=${data.username}", {
-          method: "PUT",
-          body: JSON.stringify({
-            Teamname: teamname,
-            Password: password
-          }),
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          }
-        });
-  
-        console.log(response);
-  
-  
-      } catch (error) {
-        console.error("Fehler beim Fetchen:", error);
-      } 
-    } 
+    
 
 
 </script>
@@ -63,7 +64,7 @@
         <input type="text" bind:value={password} required>
     </label>
     <br>
-        <button type="submit">Add Team</button>
+        <button type="submit">Join Team</button>
 
     </form>
   <div>

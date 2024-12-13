@@ -8,7 +8,7 @@ export async function PUT({ request, url }) {
 
     try {
         const response = await fetch(`${API_BASE_URL}/users/team/${id}`, {
-            method: "POST",
+            method: "PUT",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -18,7 +18,7 @@ export async function PUT({ request, url }) {
                 Password: Password
             })
         });
-
+        
         return jsonResponse(response, response.status);
     } catch (error) {
         return jsonResponse({ message: "An error occurred", error }, 500);
