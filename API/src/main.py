@@ -106,7 +106,7 @@ def generate_random_username(length=8):
     """
     # Lists of possible prefixes and suffixes for more variation
     prefixes = ["Cool", "Dark", "Fast", "Lucky", "Swift", "Epic", "Nova"]
-    suffixes = ["Hunter", "Rider", "Slayer", "Master", "Player", "Wizard", "Shadow"]
+    suffixes = [" Hunter", " Rider", " Slayer", " Master", " Player", " Wizard", " Shadow"]
     
     # Randomly select a prefix and suffix
     prefix = random.choice(prefixes)

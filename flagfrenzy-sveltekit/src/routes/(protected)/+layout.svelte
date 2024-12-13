@@ -5,11 +5,34 @@
   import "../../app.css";
   let isOpen = false;
   export let data;
-
+  let user;
   function toggleMenu() {
     isOpen = !isOpen;
   }
-  async function addEvent() {
+async function getUser() {
+  try {
+    const response = await fetch(`/api/user/details?id=${data.username}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP-Error! Status: ${response.status}`);
+    }
+
+    const userData = await response.json();
+    console.log(userData.ID); 
+
+    user = userData;
+
+  } catch (error) {
+    console.error("Fehler beim Fetchen:", error);
+  }
+}
+
+  async function addUser() {
       try {
         const response = await fetch("/api/user/", {
           method: "POST",
@@ -22,7 +45,6 @@
           }
         });
   
-        console.log(response);
   
        
       } catch (error) {
@@ -31,7 +53,9 @@
     } 
 
     onMount(() => {
-    addEvent();
+    getUser();
+    addUser();
+    
   });
 </script>
   
@@ -40,7 +64,14 @@
     <a href="/" >
       <img alt="The project logo" src={Logo} class="w-60 h-auto object-contain" />
     </a>
-  
+    {#if user}
+    <p>ID: {user.ID}</p>
+    <p>Nickname:{user.Nickname}</p>
+    <p>Points:{user.Points}</p>
+
+  {:else}
+    <p>Loading user data...</p>
+  {/if}
     <nav class="hidden md:flex gap-8 text-3xl">
       <a href="/challenges">Challenges</a>
       <a href="/scoreboard">Scoreboard</a>
