@@ -138,6 +138,28 @@ def get_team(team_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Team not found")
     return team
 
+@app.get("/teams/members/{user_id}")
+def get_team_members(user_id: str, db: Session = Depends(get_db)):
+    """
+    Retrieve the IDs and Nicknames of all members of the team of the given user.
+    """
+    # Find the user by ID
+    user = db.query(User).filter(User.ID == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check if the user belongs to a team
+    if not user.TeamsID:
+        raise HTTPException(status_code=400, detail="User is not in a team")
+
+    # Retrieve all members of the user's team
+    team_members = db.query(User.ID, User.Nickname).filter(User.TeamsID == user.TeamsID).all()
+
+    # Convert the result to a list of dictionaries
+    members_list = [{"ID": member.ID, "Nickname": member.Nickname} for member in team_members]
+
+    return members_list
+
 
 @app.post("/teams/")
 def create_team(team: TeamCreate, db: Session = Depends(get_db)):

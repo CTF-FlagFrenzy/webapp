@@ -4,6 +4,7 @@
     let teamname = '';
     let password = '';
     let teams;
+    let teamMembers;
     export let data;
     async function joinTeam() {
       try {
@@ -57,8 +58,20 @@
       error = err.message;
     }
   }
+    async function loadTeamMember() {
+    try {
+      const response = await fetch(`/api/teams/members?user_id=${data.username}`);
+      if (!response.ok) throw new Error("Failed to load teams");
+
+      teamMembers = await response.json();
+      console.log(teamMembers)
+    } catch (err) {
+      error = err.message;
+    }
+  }
       onMount(() => {
    loadTeams();
+   loadTeamMember();
     
   });
 
@@ -83,7 +96,8 @@
 
     </form>
   <div>
-  <p>Team</p>
+  <br>
+  <h4>Teams</h4>
       {#if teams}
     <table class="styled-table">
             <thead>
@@ -104,6 +118,29 @@
         </table>
           {:else}
     <p>Loading teams data...</p>
+  {/if}
+<br>
+  <h4>TeamMembers <h4>
+  {#if teamMembers}
+    <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Nickname</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each teamMembers as member}
+                    <tr>
+                        <td>{member.ID}</td> 
+                        <td>{member.Nickname}</td>
+                
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+          {:else}
+    <p>Loading Members data...</p>
   {/if}
   </div>
   
