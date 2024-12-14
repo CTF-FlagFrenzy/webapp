@@ -56,11 +56,13 @@ class ChallengeCreate(BaseModel):
     ChallengeName: str
     Categorie: str
     Points: int = 100
+    Static: str
     Description: str
     Difficulty: str = 'Easy'
     Hint1: Optional[str] = None
     Hint2: Optional[str] = None
     Hint3: Optional[str] = None
+    Chain: Optional[str] = None
 
 
 class UserMadeChallengeCreate(BaseModel):
@@ -84,6 +86,17 @@ class TeamResponse(BaseModel):
     Points: int
     Members: int
 
+class ChallengeResponse(BaseModel):
+    ID: int
+    ChallengeName: str
+    Categorie: str
+    Hintcount: int
+    Points: int
+    Description: str
+    Difficulty: str
+    Chain: Optional[str] = None
+    class Config:
+        from_attributes = True
    
 
 # --------------------- DEPENDENCIES -----------------------
@@ -136,7 +149,7 @@ def get_teams(db: Session = Depends(get_db)):
     return teams
 
 
-@app.get("/teams/{team_id}", response_model=list[TeamResponse])
+@app.get("/teams/{team_id}", response_model=TeamResponse)
 def get_team(team_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific team by ID.
@@ -169,7 +182,7 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
     return members_list
 
 
-@app.post("/teams/")
+@app.post("/teams/", response_model=TeamResponse)
 def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     """
     Create a new team with a unique key.
@@ -190,14 +203,17 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     return db_team
 
 
-@app.put("/teams/{team_id}")
+@app.put("/teams/{team_id}", response_model=TeamResponse)
 def update_team(team_id: int, team_update: TeamCreate, db: Session = Depends(get_db)):
     """
     Update an existing team's details by ID.
     """
     team = db.query(Team).filter(Team.ID == team_id).first()
+    sameName = db.query(Team).filter(Team.Teamname == team_update.Teamname).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
+    if sameName:
+        raise HTTPException(status_code=400, detail="Team already exists")
 
     team.Teamname = team_update.Teamname
     team.Password = team_update.Password
@@ -404,7 +420,6 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
 
 # --------------------- CHALLENGES -----------------------
 
-
 @app.get("/challenges/")
 def get_challenges(db: Session = Depends(get_db)):
     """
@@ -412,24 +427,23 @@ def get_challenges(db: Session = Depends(get_db)):
     """
     challenges = db.query(Challenge).all()
 
-    # Define difficulty order for sorting
     difficulty_order = {'Easy': 1, 'Medium': 2, 'Hard': 3, 'Expert': 4}
     challenges.sort(key=lambda ch: difficulty_order.get(ch.Difficulty, 5))
 
-    # Group challenges by category
     categorized_challenges = defaultdict(list)
     for challenge in challenges:
-        categorized_challenges[challenge.Categorie].append(challenge)
+        challenge_data = ChallengeResponse.from_orm(challenge)
+        categorized_challenges[challenge.Categorie].append(challenge_data)
 
-    # Convert to JSON format with category names as keys
     categorized_challenges_json = {
-        category: challenges for category, challenges in categorized_challenges.items()
+        category: [challenge.dict() for challenge in challenge_list]
+        for category, challenge_list in categorized_challenges.items()
     }
 
     return categorized_challenges_json
 
 
-@app.get("/challenges/{challenge_id}")
+@app.get("/challenges/{challenge_id}", response_model=ChallengeResponse)
 def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific challenge by ID.
@@ -455,7 +469,7 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     }
 
 
-@app.post("/challenges/")
+@app.post("/challenges/", response_model=ChallengeResponse)
 def create_challenge(challenge: ChallengeCreate, db: Session = Depends(get_db)):
     db_challenge = Challenge(**challenge.dict())
     try:
@@ -470,7 +484,7 @@ def create_challenge(challenge: ChallengeCreate, db: Session = Depends(get_db)):
     return db_challenge
 
 
-@app.put("/challenges/{challenge_id}")
+@app.put("/challenges/{challenge_id}", response_model=ChallengeResponse)
 def update_challenge(
     challenge_id: int, challenge_update: ChallengeCreate, db: Session = Depends(get_db)
 ):
