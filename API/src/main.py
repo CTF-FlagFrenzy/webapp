@@ -77,6 +77,14 @@ class UserMadeChallengeUpdate(BaseModel):
     """
     Firstblood: int
     Solved: int
+    
+class TeamResponse(BaseModel):
+    ID: int
+    Teamname: str
+    Points: int
+    Members: int
+
+   
 
 # --------------------- DEPENDENCIES -----------------------
 
@@ -119,7 +127,7 @@ def generate_random_username(length=8):
     return username
 
 # --------------------- TEAMS -----------------------
-@app.get("/teams/")
+@app.get("/teams/", response_model=list[TeamResponse])
 def get_teams(db: Session = Depends(get_db)):
     """
     Retrieve all teams from the database.
@@ -128,7 +136,7 @@ def get_teams(db: Session = Depends(get_db)):
     return teams
 
 
-@app.get("/teams/{team_id}")
+@app.get("/teams/{team_id}", response_model=list[TeamResponse])
 def get_team(team_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific team by ID.
