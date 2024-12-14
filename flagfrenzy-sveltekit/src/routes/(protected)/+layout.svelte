@@ -53,8 +53,9 @@ async function getUser() {
     } 
 
     onMount(() => {
-    getUser();
     addUser();
+    getUser();
+
     
   });
 </script>

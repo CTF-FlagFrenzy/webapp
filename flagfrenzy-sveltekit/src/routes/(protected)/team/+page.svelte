@@ -3,6 +3,7 @@
     import { writable } from 'svelte/store';
     let teamname = '';
     let password = '';
+    let teams;
     export let data;
     async function joinTeam() {
       try {
@@ -45,7 +46,21 @@
       } 
     } 
     
+  async function loadTeams() {
+    try {
+      const response = await fetch('/api/teams');
+      if (!response.ok) throw new Error("Failed to load teams");
 
+      teams = await response.json();
+      console.log(teams)
+    } catch (err) {
+      error = err.message;
+    }
+  }
+      onMount(() => {
+   loadTeams();
+    
+  });
 
 </script>
 
@@ -69,6 +84,27 @@
     </form>
   <div>
   <p>Team</p>
+      {#if teams}
+    <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each teams as team}
+                    <tr>
+                        <td>{team.ID}</td> 
+                        <td>{team.Teamname}</td>
+                
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+          {:else}
+    <p>Loading teams data...</p>
+  {/if}
   </div>
   
   <style>
