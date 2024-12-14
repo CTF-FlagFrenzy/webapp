@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
-  font-family: 'STIX Two Text', serif;
+  font-family: 'Akhand';
   font-weight: 900;
 }
 
@@ -39,4 +40,23 @@ body {
 }
 .card-Default span {
   @apply text-Default;
+}
+
+.avatar-Hero {
+  @apply bg-Hero;
+}
+.avatar-Hacker {
+  @apply bg-Hacker;
+}
+.avatar-Anonymous {
+  @apply bg-Anonymous;
+}
+.avatar-Queen {
+  @apply bg-Queen;
+}
+.avatar-Spy {
+  @apply bg-Spy;
+}
+.avatar-Warrior {
+  @apply bg-Warrior;
 }
