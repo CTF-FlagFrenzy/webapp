@@ -57,9 +57,9 @@
       } 
     } 
 
-    onMount(() => {
-    addUser();
-    getUser();
+    onMount(async () => {
+    await addUser(); 
+    await getUser(); 
   });
 </script>
   
