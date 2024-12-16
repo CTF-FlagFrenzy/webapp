@@ -427,17 +427,18 @@ def get_challenges(db: Session = Depends(get_db)):
     """
     challenges = db.query(Challenge).all()
 
+    # Define difficulty order for sorting
     difficulty_order = {'Easy': 1, 'Medium': 2, 'Hard': 3, 'Expert': 4}
     challenges.sort(key=lambda ch: difficulty_order.get(ch.Difficulty, 5))
 
+    # Group challenges by category
     categorized_challenges = defaultdict(list)
     for challenge in challenges:
-        challenge_data = ChallengeResponse.from_orm(challenge)
-        categorized_challenges[challenge.Categorie].append(challenge_data)
+        categorized_challenges[challenge.Categorie].append(challenge)
 
+    # Convert to JSON format with category names as keys
     categorized_challenges_json = {
-        category: [challenge.dict() for challenge in challenge_list]
-        for category, challenge_list in categorized_challenges.items()
+        category: challenges for category, challenges in categorized_challenges.items()
     }
 
     return categorized_challenges_json
