@@ -90,7 +90,7 @@ class ChallengeResponse(BaseModel):
     ID: int
     ChallengeName: str
     Categorie: str
-    Hintcount: int
+    Hintcount: Optional[int] = 0
     Points: int
     Description: str
     Difficulty: str
@@ -267,7 +267,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     Create a new user.
     """
     nickname = generate_random_username()
-    images = ["Anonymous.png", "Hacker.png", "Hero.png", "logo.png", "Queen.png", "Spy.png", "Warrior.png"]
+    images = ["Anonymous", "Hacker", "Hero", "logo", "Queen", "Spy", "Warrior"]
     avatar = random.choice(images)
     db_user = User(Nickname=nickname, Avatar=avatar, **user.dict())
     try:
@@ -419,6 +419,7 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
     return {"detail": "User deleted successfully"}
 
 # --------------------- CHALLENGES -----------------------
+
 
 @app.get("/challenges/")
 def get_challenges(db: Session = Depends(get_db)):

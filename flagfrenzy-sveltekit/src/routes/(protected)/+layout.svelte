@@ -31,7 +31,7 @@
       }
 
       const userData = await response.json();
-      console.log(userData.ID); 
+      console.log(userData); 
 
       user = userData;
 
