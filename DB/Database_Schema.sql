@@ -34,9 +34,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `flagfrenzy`.`User` (
   `ID` INT auto_increment Not NULL,
   `Nickname` VARCHAR(50) NOT NULL Unique,
-  `Name` varchar(200) Not Null,
+  `Avatar` varchar(200) Null,
   `Points` INT NOT NULL Default 0,
-  `Class` VARCHAR(45) NOT NULL,
   `TeamsID` INT NULL,
   `Disabled`tinyint NOT Null Default 0,
   `Email` VARCHAR(50) NOT NULL unique,
@@ -60,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `flagfrenzy`.`Challenges` (
   `Description` TEXT(1000) NOT NULL,
   `Dificulty`VARCHAR(30) NOT NULL,
   `Static`VARCHAR(50) NOT NULL,
+  `Chain` VARCHAR(100) NULL,
   `Hint1`TEXT(400),
   `Hint2`TEXT(400),
   `Hint3`TEXT(400)

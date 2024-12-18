@@ -77,7 +77,7 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "Wi3dS#ld!k"
-  },
+  },{
     "ChallengeName": "Profile Prodigy",
     "Categorie": "OSINT",
     "Points": 1000,
@@ -87,7 +87,7 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "ToBeDefined"
-  },
+  },{
     "ChallengeName": "Time Traveler's Hunt - Part 1",
     "Categorie": "OSINT",
     "Points": 1000,
@@ -97,7 +97,7 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "YouPassedTheTest"
-  },
+  }, {
     "ChallengeName": "Time Traveler's Hunt - Part 2",
     "Categorie": "OSINT",
     "Points": 1000,
@@ -107,7 +107,7 @@
     "Hint2": "Have a look at the hidden directories.",
     "Hint3": "dirbuster is a great tool.",
     "Static": "timemachine1"
-  },
+  }, {
     "ChallengeName": "Time Traveler's Hunt - Part 3",
     "Categorie": "OSINT",
     "Points": 1000,
@@ -117,7 +117,7 @@
     "Hint2": "Everyone knows Jack the Ripper.",
     "Hint3": null,
     "Static": "itsasecret"
-  },
+  },{
     "ChallengeName": "Git Secrets: Layers of Discovery - Part 1",
     "Categorie": "OSINT",
     "Points": 1000,
@@ -127,4 +127,5 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "Wi3dS#ld!k"
+  }
 ]
