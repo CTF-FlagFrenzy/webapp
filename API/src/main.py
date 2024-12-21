@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
+import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
@@ -41,6 +42,13 @@ class UserCreate(BaseModel):
     """
     ID: str
     Email: str
+    
+class UserUpdate(BaseModel):
+    """
+    Schema for creating a new user.
+    """
+    Nickname: str
+    Avatar: str
 
 class TeamJoin(BaseModel):
     """
@@ -187,8 +195,10 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     """
     Create a new team with a unique key.
     """
+    hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
-    db_team = Team(Teamkey=team_key, **team.dict())
+    db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
+
     try:
         db.add(db_team)
         db.commit()
@@ -285,7 +295,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.put("/users/{user_id}")
-def update_user(user_id: str, user_nickname:str, user_avatar:str, db: Session = Depends(get_db)):
+def update_user(user_id: str, user_update:UserUpdate, db: Session = Depends(get_db)):
     """
     Update an existing user's details by ID.
     """
@@ -294,8 +304,8 @@ def update_user(user_id: str, user_nickname:str, user_avatar:str, db: Session = 
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        user.Nickname = user_nickname
-        user.Avatar = user_avatar
+        user.Nickname = user_update.Nickname
+        user.Avatar = user_update.Avatar
       
         db.commit()
         db.refresh(user)
@@ -323,7 +333,9 @@ def update_user_team(
         if not team:
             raise HTTPException(status_code=404, detail="Team not found")
 
-        if team.Password != userInput.Password:
+        if team.Password != hashlib.sha256(userInput.Password.encode()).hexdigest():
+            print(team.Password )
+            print(hashlib.sha256(userInput.Password.encode()).hexdigest())
             raise HTTPException(status_code=400, detail="Invalid team password")
 
         if user.TeamsID:
