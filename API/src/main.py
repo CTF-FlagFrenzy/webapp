@@ -13,6 +13,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 import random
 import string
+from datetime import datetime, time
+
+
+start_time = time(8, 0)  
+end_time = time(14, 0)  
+
+def is_not_allowed_time():
+    current_time = datetime.utcnow().time()  
+    print(current_time)
+    return start_time <= current_time <= end_time
 
 app = FastAPI()
 
@@ -195,6 +205,8 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     """
     Create a new team with a unique key.
     """
+    if is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event started")
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
     db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
@@ -325,6 +337,8 @@ def update_user_team(
     Assign or update the team membership of a user, validating the team password.
     """
     try:
+        if is_not_allowed_time():
+            raise HTTPException(status_code=403, detail="The Event started")
         user = db.query(User).filter(User.ID == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -438,6 +452,8 @@ def get_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
+    if not is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     challenges = db.query(Challenge).all()
 
     # Define difficulty order for sorting
