@@ -42,6 +42,13 @@ class UserCreate(BaseModel):
     """
     ID: str
     Email: str
+    
+class UserUpdate(BaseModel):
+    """
+    Schema for creating a new user.
+    """
+    Nickname: str
+    Avatar: str
 
 class TeamJoin(BaseModel):
     """
@@ -288,7 +295,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @app.put("/users/{user_id}")
-def update_user(user_id: str, user_nickname:str, user_avatar:str, db: Session = Depends(get_db)):
+def update_user(user_id: str, user_update:UserUpdate, db: Session = Depends(get_db)):
     """
     Update an existing user's details by ID.
     """
@@ -297,8 +304,8 @@ def update_user(user_id: str, user_nickname:str, user_avatar:str, db: Session = 
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        user.Nickname = user_nickname
-        user.Avatar = user_avatar
+        user.Nickname = user_update.Nickname
+        user.Avatar = user_update.Avatar
       
         db.commit()
         db.refresh(user)
