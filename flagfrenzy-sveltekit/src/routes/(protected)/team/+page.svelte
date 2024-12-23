@@ -73,6 +73,7 @@
       if (!response.ok) throw new Error("Failed to load team members");
 
       teamMembers = await response.json();
+      console.log(teamMembers)
     } catch (err) {
       errorMessageTeamMembers = err.message;
     }
@@ -137,6 +138,7 @@
     <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4">TeamMembers</h1>
     <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl">
       {#if teamMembers}
+      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4"> {teamMembers.TeamsID}  {teamMembers.Teamname} </h1>
         <table class="styled-table w-full">
           <thead class="text-custom-200 text-xl border-b border-custom-200">
             <tr>
@@ -145,7 +147,7 @@
             </tr>
           </thead>
           <tbody class="text-white text-sm">
-            {#each teamMembers as member}
+            {#each teamMembers.Members as member}
               <tr class="border-b border-custom-100">
                 <td class="pt-2 align-top">{member.ID}</td> 
                 <td class="pt-2 align-top">{member.Nickname}</td>
