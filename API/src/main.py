@@ -13,16 +13,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 import random
 import string
-from datetime import datetime, time
+from datetime import datetime, time, date
 
 
-start_time = time(8, 0)  
-end_time = time(14, 0)  
+start_time = time(7, 0)  
+end_time = time(14, 0) 
+allowed_date = date(2025, 3, 20)
 
 def is_not_allowed_time():
     current_time = datetime.utcnow().time()  
-    print(current_time)
-    return start_time <= current_time <= end_time
+    current_date = datetime.utcnow().date()  
+    print(current_date)
+    if current_date == allowed_date and (start_time <= current_time <= end_time):
+        return True  
 
 app = FastAPI()
 
