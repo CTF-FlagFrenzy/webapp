@@ -228,7 +228,7 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     return db_team
 
 
-@app.put("/teams/{team_id}/{user_id}", response_model=TeamResponse)
+@app.put("/teams/{team_id}/{user_id}",  response_model=TeamResponse)
 def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session = Depends(get_db)):
     """
     Update an existing team's details by ID.
@@ -238,14 +238,17 @@ def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session
     team = db.query(Team).filter(Team.ID == team_id).first()
     user = db.query(User).filter(User.ID == user_id).first()
     userTeam = db.query(User).filter(team.ID == user.TeamsID).first()
-    sameName = db.query(Team).filter(Team.Teamname == team_update.Teamname).first()
+    sameName = db.query(Team).filter(
+    Team.Teamname == team_update.Teamname,
+    Team.ID != team_id
+    ).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
-    if sameName:
+    if sameName :
         raise HTTPException(status_code=400, detail="Team already exists")
     if userTeam:
         team.Teamname = team_update.Teamname
-        team.Password = team_update.Password
+        team.Password = hashlib.sha256(team_update.Password.encode()).hexdigest()
         db.commit()
         db.refresh(team)
     return team
