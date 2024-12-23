@@ -228,42 +228,53 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     return db_team
 
 
-@app.put("/teams/{team_id}", response_model=TeamResponse)
-def update_team(team_id: int, team_update: TeamCreate, db: Session = Depends(get_db)):
+@app.put("/teams/{team_id}/{user_id}", response_model=TeamResponse)
+def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session = Depends(get_db)):
     """
     Update an existing team's details by ID.
     """
+    if is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event started")
     team = db.query(Team).filter(Team.ID == team_id).first()
+    user = db.query(User).filter(User.ID == user_id).first()
+    userTeam = db.query(User).filter(team.ID == user.TeamsID).first()
     sameName = db.query(Team).filter(Team.Teamname == team_update.Teamname).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     if sameName:
         raise HTTPException(status_code=400, detail="Team already exists")
-
-    team.Teamname = team_update.Teamname
-    team.Password = team_update.Password
-    db.commit()
-    db.refresh(team)
+    if userTeam:
+        team.Teamname = team_update.Teamname
+        team.Password = team_update.Password
+        db.commit()
+        db.refresh(team)
     return team
 
 
-@app.delete("/teams/{team_id}")
-def delete_team(team_id: int, db: Session = Depends(get_db)):
+@app.delete("/teams/{team_id}/{user_id}")
+def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
     """
     Delete a team by ID and update associated users' TeamsID to null.
     """
+    if is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event started")
     team = db.query(Team).filter(Team.ID == team_id).first()
+    user = db.query(User).filter(User.ID == user_id).first()
+    userTeam = db.query(User).filter(team.ID == user.TeamsID).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
 
-    # Set TeamsID to null for all users in the team
-    users_in_team = db.query(User).filter(User.TeamsID == team_id).all()
-    for user in users_in_team:
-        user.TeamsID = None
+    if userTeam:
+        # Set TeamsID to null for all users in the team
+        users_in_team = db.query(User).filter(User.TeamsID == team_id).all()
+        for user in users_in_team:
+            user.TeamsID = None
 
-    db.delete(team)
-    db.commit()
-    return {"detail": "Team deleted successfully and associated users' team ID set to null"}
+        db.delete(team)
+        db.commit()
+        return {"detail": "Team deleted successfully and associated users' team ID set to null"}
+    else:
+        return {"detail": "You have no permission to delete this team"}
 
 # --------------------- USERS -----------------------
 @app.get("/users/")
