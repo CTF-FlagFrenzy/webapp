@@ -153,10 +153,10 @@ def generate_random_username(length=8):
     # Randomly select a prefix and suffix
     prefix = random.choice(prefixes)
     suffix = random.choice(suffixes)
-    
+    random_number = random.randint(1, 10000)
 
     # Combine prefix, random string, and suffix
-    username = f"{prefix}{suffix}"
+    username = f"{prefix}{suffix} {random_number}"
     
     return username
 
