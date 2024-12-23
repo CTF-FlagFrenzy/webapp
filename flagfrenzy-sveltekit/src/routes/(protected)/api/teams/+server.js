@@ -19,9 +19,9 @@ export async function GET() {
 export async function DELETE({ url }) {
     const id = url.searchParams.get('id');
     const userId = url.searchParams.get('userId')
-
+    console.log(userId)
     if (!id) {
-        return jsonResponse({ message: "Student ID is required" }, 400);
+        return jsonResponse({ message: "Team ID is required" }, 400);
     }
 
     try {
@@ -41,7 +41,7 @@ export async function DELETE({ url }) {
     } catch (error) {
         return jsonResponse({ message: "An error occurred", error }, 500);
     }
-}}
+}
 
 export async function POST({ request }) {
     const { Password, Teamname} = await request.json();
