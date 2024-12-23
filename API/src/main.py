@@ -13,6 +13,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 import random
 import string
+from datetime import datetime, time, date
+
+
+start_time = time(7, 0)  
+end_time = time(14, 0) 
+allowed_date = date(2025, 3, 20)
+
+def is_not_allowed_time():
+    current_time = datetime.utcnow().time()  
+    current_date = datetime.utcnow().date()  
+    print(current_date)
+    if current_date == allowed_date and (start_time <= current_time <= end_time):
+        return True  
 
 app = FastAPI()
 
@@ -140,10 +153,10 @@ def generate_random_username(length=8):
     # Randomly select a prefix and suffix
     prefix = random.choice(prefixes)
     suffix = random.choice(suffixes)
-    
+    random_number = random.randint(1, 10000)
 
     # Combine prefix, random string, and suffix
-    username = f"{prefix}{suffix}"
+    username = f"{prefix}{suffix}#{random_number}"
     
     return username
 
@@ -170,7 +183,8 @@ def get_team(team_id: int, db: Session = Depends(get_db)):
 @app.get("/teams/members/{user_id}")
 def get_team_members(user_id: str, db: Session = Depends(get_db)):
     """
-    Retrieve the IDs and Nicknames of all members of the team of the given user.
+    Retrieve the IDs and Nicknames of all members of the team of the given user,
+    along with the TeamsID and Teamname of the team.
     """
     # Find the user by ID
     user = db.query(User).filter(User.ID == user_id).first()
@@ -181,13 +195,23 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
     if not user.TeamsID:
         raise HTTPException(status_code=400, detail="User is not in a team")
 
+    # Retrieve the team information
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+
     # Retrieve all members of the user's team
     team_members = db.query(User.ID, User.Nickname).filter(User.TeamsID == user.TeamsID).all()
 
     # Convert the result to a list of dictionaries
     members_list = [{"ID": member.ID, "Nickname": member.Nickname} for member in team_members]
 
-    return members_list
+    # Return the response including team details
+    return {
+        "TeamsID": team.ID,
+        "Teamname": team.Teamname,
+        "Members": members_list
+    }
 
 
 @app.post("/teams/", response_model=TeamResponse)
@@ -195,6 +219,8 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     """
     Create a new team with a unique key.
     """
+    if is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event started")
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
     db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
@@ -213,42 +239,56 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     return db_team
 
 
-@app.put("/teams/{team_id}", response_model=TeamResponse)
-def update_team(team_id: int, team_update: TeamCreate, db: Session = Depends(get_db)):
+@app.put("/teams/{team_id}/{user_id}",  response_model=TeamResponse)
+def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session = Depends(get_db)):
     """
     Update an existing team's details by ID.
     """
+    if is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event started")
     team = db.query(Team).filter(Team.ID == team_id).first()
-    sameName = db.query(Team).filter(Team.Teamname == team_update.Teamname).first()
+    user = db.query(User).filter(User.ID == user_id).first()
+    userTeam = db.query(User).filter(team.ID == user.TeamsID).first()
+    sameName = db.query(Team).filter(
+    Team.Teamname == team_update.Teamname,
+    Team.ID != team_id
+    ).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
-    if sameName:
+    if sameName :
         raise HTTPException(status_code=400, detail="Team already exists")
-
-    team.Teamname = team_update.Teamname
-    team.Password = team_update.Password
-    db.commit()
-    db.refresh(team)
+    if userTeam:
+        team.Teamname = team_update.Teamname
+        team.Password = hashlib.sha256(team_update.Password.encode()).hexdigest()
+        db.commit()
+        db.refresh(team)
     return team
 
 
-@app.delete("/teams/{team_id}")
-def delete_team(team_id: int, db: Session = Depends(get_db)):
+@app.delete("/teams/{team_id}/{user_id}")
+def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
     """
     Delete a team by ID and update associated users' TeamsID to null.
     """
+    if is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event started")
     team = db.query(Team).filter(Team.ID == team_id).first()
+    user = db.query(User).filter(User.ID == user_id).first()
+    userTeam = db.query(User).filter(team.ID == user.TeamsID).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
 
-    # Set TeamsID to null for all users in the team
-    users_in_team = db.query(User).filter(User.TeamsID == team_id).all()
-    for user in users_in_team:
-        user.TeamsID = None
+    if userTeam:
+        # Set TeamsID to null for all users in the team
+        users_in_team = db.query(User).filter(User.TeamsID == team_id).all()
+        for user in users_in_team:
+            user.TeamsID = None
 
-    db.delete(team)
-    db.commit()
-    return {"detail": "Team deleted successfully and associated users' team ID set to null"}
+        db.delete(team)
+        db.commit()
+        return {"detail": "Team deleted successfully and associated users' team ID set to null"}
+    else:
+        return {"detail": "You have no permission to delete this team"}
 
 # --------------------- USERS -----------------------
 @app.get("/users/")
@@ -325,6 +365,8 @@ def update_user_team(
     Assign or update the team membership of a user, validating the team password.
     """
     try:
+        if is_not_allowed_time():
+            raise HTTPException(status_code=403, detail="The Event started")
         user = db.query(User).filter(User.ID == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
@@ -438,6 +480,8 @@ def get_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
+    if not is_not_allowed_time():
+        raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     challenges = db.query(Challenge).all()
 
     # Define difficulty order for sorting

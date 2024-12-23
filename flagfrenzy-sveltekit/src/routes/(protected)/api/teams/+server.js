@@ -16,6 +16,33 @@ export async function GET() {
         return jsonResponse({ message: "An error occurred", error: err.message }, 500);
     }
 }
+export async function DELETE({ url }) {
+    const id = url.searchParams.get('id');
+    const userId = url.searchParams.get('userId')
+    console.log(userId)
+    if (!id) {
+        return jsonResponse({ message: "Team ID is required" }, 400);
+    }
+
+    try {
+        const response = await fetch(`http://api:8000/teams/${id}/${userId}`, {
+            method: "DELETE",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            return jsonResponse({ message: "Team deleted successfully" }, 200);
+        } else {
+            return jsonResponse({ message: "Failed to delete team" }, response.status);
+        }
+    } catch (error) {
+        return jsonResponse({ message: "An error occurred", error }, 500);
+    }
+}
+
 export async function POST({ request }) {
     const { Password, Teamname} = await request.json();
 
