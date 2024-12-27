@@ -15,7 +15,7 @@ export async function PUT({ request, url }) {
             },
          
         });
-        console.log(response.json())
+       
         return jsonResponse(response, response.status);
     } catch (error) {
         return jsonResponse({ message: "An error occurred", error }, 500);

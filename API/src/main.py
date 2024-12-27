@@ -15,7 +15,7 @@ from collections import defaultdict
 import random
 import string
 from datetime import datetime, time, date
-
+from typing import Dict
 
 start_time = time(7, 0)  
 end_time = time(14, 0) 
@@ -493,7 +493,7 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
 
 # --------------------- CHALLENGES -----------------------
 
-@app.get("/challenges/")
+@app.get("/challenges/",  response_model=Dict[str,list[ChallengeResponse]])
 def get_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
@@ -519,7 +519,7 @@ def get_challenges(db: Session = Depends(get_db)):
     return categorized_challenges_json
 
 
-@app.get("/challenges/{challenge_id}", response_model=ChallengeResponse)
+@app.get("/challenges/{challenge_id}")
 def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific challenge by ID.
