@@ -497,8 +497,8 @@ def get_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
-    if not is_not_allowed_time():
-        raise HTTPException(status_code=403, detail="The Event hasn't started yet")
+    # if not is_not_allowed_time():
+    #     raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     challenges = db.query(Challenge).all()
 
     # Define difficulty order for sorting
@@ -647,7 +647,7 @@ def get_user_made_challenges(db: Session = Depends(get_db)):
 
 
 @app.get("/user-made-challenges/{user_id}/{challenge_id}")
-def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def get_user_made_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific user-made challenge by user ID and challenge ID.
     """
@@ -661,7 +661,7 @@ def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depen
 
 
 @app.get("/user-made-challenges/{user_id}")
-def get_user_made_challenges_by_user(user_id: int, db: Session = Depends(get_db)):
+def get_user_made_challenges_by_user(user_id: str, db: Session = Depends(get_db)):
     """
     Retrieve all challenges made by a specific user.
     """
@@ -695,7 +695,7 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
 
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
 def update_user_made_challenge(
-    user_id: int,
+    user_id: str,
     challenge_id: int,
     update_data: UserMadeChallengeUpdate,
     db: Session = Depends(get_db)
@@ -720,7 +720,7 @@ def update_user_made_challenge(
 
 
 @app.delete("/user-made-challenges/{user_id}/{challenge_id}")
-def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Delete a specific user-made challenge by user ID and challenge ID.
     """
@@ -737,7 +737,7 @@ def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = De
 
 
 @app.get("/deploy/{user_id}/{challenge_id}")
-def get_deploy_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve deployment details for a specific challenge and user.
     """
