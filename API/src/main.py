@@ -169,6 +169,23 @@ def get_teams(db: Session = Depends(get_db)):
     teams = db.query(Team).all()
     return teams
 
+@app.get("/teams/top10", response_model=list[TeamResponse])
+def get_top_teams(db: Session = Depends(get_db)):
+    """
+    Retrieve the top 10 teams with the most points from the database.
+    """
+    # Query teams ordered by points in descending order and limit to 10
+    top_teams = (
+        db.query(Team)
+        .order_by(Team.Points.desc())  # Assuming 'Points' is the field representing team points
+        .limit(10)
+        .all()
+    )
+    
+    if not top_teams:
+        raise HTTPException(status_code=404, detail="No teams found")
+    
+    return top_teams
 
 @app.get("/teams/{team_id}", response_model=TeamResponse)
 def get_team(team_id: int, db: Session = Depends(get_db)):
@@ -210,6 +227,7 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
     return {
         "TeamsID": team.ID,
         "Teamname": team.Teamname,
+        "Points": team.Points,
         "Members": members_list
     }
 
@@ -473,7 +491,6 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
     return {"detail": "User deleted successfully"}
 
 # --------------------- CHALLENGES -----------------------
-
 
 @app.get("/challenges/")
 def get_challenges(db: Session = Depends(get_db)):
