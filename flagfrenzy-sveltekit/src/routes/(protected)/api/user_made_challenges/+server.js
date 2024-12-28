@@ -2,9 +2,10 @@ import { error } from "@sveltejs/kit";
 
 const API_BASE_URL = 'http://api:8000';
 
-export async function GET() {
+export async function GET({ request, url }) {
+    const user_id = url.searchParams.get('id');
     try {
-        const response = await fetch(`${API_BASE_URL}/user-made-challenges/`);
+        const response = await fetch(`${API_BASE_URL}/user-made-challenges/${user_id}`);
         if (!response.ok) {
             throw new Error('Failed to fetch users');
         }
@@ -19,7 +20,7 @@ export async function GET() {
     }
 }
 export async function POST({ request }) {
-    const { user_id, challenge_id} = await request.json();
+    const { User_ID, Challenges_ID} = await request.json();
 
     try {
         const response = await fetch(`${API_BASE_URL}/user-made-challenges`, {
@@ -29,8 +30,8 @@ export async function POST({ request }) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                User_ID: user_id,
-                Challenge_ID: challenge_id
+                User_ID: User_ID,
+                Challenges_ID: Challenges_ID
             })
         });
 
@@ -42,7 +43,8 @@ export async function POST({ request }) {
 export async function PUT({ request, url }) {
     const user_id = url.searchParams.get('id');
     const challenge_id = url.searchParams.get('challenge_id')
-    const { Solved, Firstblood} = await request.json();
+    console.log(user_id)
+    const { Solved} = await request.json();
 
     try {
         const response = await fetch(`${API_BASE_URL}/user-made-challenges/${user_id}/${challenge_id}`, {
@@ -52,8 +54,8 @@ export async function PUT({ request, url }) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                Solved: Solved,
-                Firstblood: Firstblood
+                Solved: Solved
+        
             })
         });
         
