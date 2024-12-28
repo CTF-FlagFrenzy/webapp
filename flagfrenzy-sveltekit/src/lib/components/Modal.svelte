@@ -5,13 +5,14 @@
   export let data;
   let flagToSubmit;
   let hintUsed = false;
+   export let user;
 
   const dispatch = createEventDispatcher();
 
   function close() {
     dispatch('close');
   }
-        async function hintCount() {
+    async function hintCount() {
        if (hintUsed) {
       console.log("Hint already used for this modal session.");
       return;
@@ -35,6 +36,45 @@
       console.log(error.message || "Es ist ein Fehler aufgetreten.");
     }
   }
+  async function startChallenge() {
+      try {
+        const response = await fetch("/api/user_made_challenges", {
+          method: "POST",
+          body: JSON.stringify({
+            Challenges_ID: data.ID,
+            User_ID: user.username
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          }
+        });
+      
+        if (!response.ok) {
+          throw new Error("Challenge konnte nicht gestartet werden. ");
+        }
+      } catch (error) {
+        console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+      } 
+    } 
+    async function submitChallenge() {
+      try {
+        const response = await fetch(`/api/user_made_challenges?id=${user.username}&challenge_id=${data.ID}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            Solved: 1
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          }
+        });
+      
+        if (!response.ok) {
+          throw new Error("Challenge konnte nicht gestartet werden. ");
+        }
+      } catch (error) {
+        console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+      } 
+    } 
 </script>
 
 {#if isOpen}
@@ -54,8 +94,8 @@
     <p class=" text-lg">{data.Hint3}</p>
     <div class="flex justify-between items-center mt-auto pt-4 border-t border-custom-200">
       <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base">Submit</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base">Deploy</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitChallenge}>Submit</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
     </div>
   </div>

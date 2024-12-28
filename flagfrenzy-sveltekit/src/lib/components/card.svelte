@@ -2,6 +2,7 @@
   import Modal from '$lib/components/Modal.svelte';
 
   export let challenge;
+  export let user;
   let isModalOpen = false;
 
   function openModal() {
@@ -19,6 +20,7 @@
       return difficulty;
     }
   }
+
 </script>
 
 
@@ -32,4 +34,4 @@
   </div>
 </button>
 
-<Modal isOpen={isModalOpen} data={challenge} on:close={closeModal}></Modal>
+<Modal isOpen={isModalOpen} data={challenge} user={user} on:close={closeModal}></Modal>
