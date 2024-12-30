@@ -125,7 +125,9 @@
     <p class=" text-Hard text-lg font-bold col-span-2">{errorMessage}</p>
   {/if}
   <div class="">
-    <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4">Teams</h1>
+    <div class="pb-4">
+      <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Teams</h1>
+    </div>
     <div class="h-80 max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-full px-4 rounded-2xl">
       {#if teams}
         <table class="styled-table w-full bg-custom-110 mt-4">
@@ -152,11 +154,18 @@
     </div>
   </div>
   <div class="">
-    <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4">TeamMembers</h1>
+    {#if teamMembers}
+      <div class="flex gap-3.5 pb-4">
+        <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">{teamMembers.Teamname}</h1>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5" on:click={deleteTeam}>Delete Team</button>
+      </div>
+    {:else}
+      <div class="pb-4">
+        <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Join a Team</h1>
+      </div>
+    {/if}
     <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl">
       {#if teamMembers}
-      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4"> {teamMembers.TeamsID}  {teamMembers.Teamname} </h1>
-<button on:click={deleteTeam}>Delete</button>
         <table class="styled-table w-full">
           <thead class="text-custom-200 text-xl border-b border-custom-200">
             <tr>
