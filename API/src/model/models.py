@@ -1,7 +1,8 @@
 from sqlalchemy import (
-    create_engine, Column, String, Integer, ForeignKey, Text, Table
+    create_engine, Column, String, Integer, ForeignKey, Text, Table, DateTime
 )
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -19,6 +20,7 @@ class Team(Base):
     Teamkey = Column(String(75), nullable=False, unique=True)
     Points = Column(Integer, default=0)
     Members = Column(Integer, nullable=False, default=0)
+    SharedFlag = Column(Integer, nullable=False, default=0)
 
     users = relationship("User", back_populates="team")
 
@@ -77,3 +79,21 @@ class UserMadeChallenge(Base):
 
     user = relationship("User", back_populates="challenges")
     challenge = relationship("Challenge", back_populates="made_by_users")
+
+class FlagSubmission(Base):
+    __tablename__ = 'flag_submissions'
+
+    id = Column(Integer, primary_key=True, index=True)
+    flag = Column(String(255), index=True)
+    team_id = Column(Integer, index=True)
+    status = Column(String(50), index=True)
+    submission_time = Column(DateTime(timezone=True), server_default=func.now())
+
+class SharedFlagSubmission(Base):
+    __tablename__ = 'shared_flag_submissions'
+
+    id = Column(Integer, primary_key=True, index=True)
+    flag = Column(String(255), index=True)
+    team_id = Column(Integer, index=True)
+    original_team_id = Column(Integer, index=True)
+    submission_time = Column(DateTime(timezone=True), server_default=func.now())

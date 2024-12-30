@@ -3,11 +3,12 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
+
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from model.models import User, Team, Challenge, UserMadeChallenge
+from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission
 from model.database import SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
@@ -480,8 +481,8 @@ def get_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
-    if not is_not_allowed_time():
-        raise HTTPException(status_code=403, detail="The Event hasn't started yet")
+    # if not is_not_allowed_time():
+    #     raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     challenges = db.query(Challenge).all()
 
     # Define difficulty order for sorting
@@ -740,4 +741,72 @@ def get_deploy_challenge(user_id: int, challenge_id: int, db: Session = Depends(
         "challengeStatic": challenge.Static,
         "teamName": team.Teamname if team else None,
         "teamKey": team.Teamkey if team else None,
+    }
+    
+def generate_flag(team_key, challenge_flag):
+    combined = team_key + challenge_flag
+    return hashlib.sha256(combined.encode()).hexdigest()
+
+@app.post("/submit_flag")
+async def submit_flag(team_id: int, flag: str, db: Session = Depends(get_db)):
+
+    # Fetch the team key and challenge flag from the database
+    team = db.query(Team).filter(Team.ID == team_id).first()
+    challenge = db.query(Challenge).first()  # Assuming a single challenge for simplicity
+
+    if not team or not challenge:
+        return { "status": "invalid"}
+
+    # Generate the flag
+    generated_flag = generate_flag(team.Teamkey, challenge.Static)
+    print(f"Generated flag: {generated_flag}")
+
+    # Validate the submitted flag
+    if flag == generated_flag:
+        status = 'successful'
+        # Log the successful flag submission
+        new_submission = FlagSubmission(flag=flag, team_id=team_id, status=status, submission_time=datetime.utcnow())
+        db.add(new_submission)
+        db.commit()
+        print(f"Logged flag submission: {new_submission}")
+    else:
+        # Check if the flag already exists in the database
+        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+        if existing_submission and existing_submission.team_id != team_id:
+            status = 'shared'
+            # Log the shared flag submission in the new table
+            new_shared_submission = SharedFlagSubmission(
+                flag=flag,
+                team_id=team_id,
+                original_team_id=existing_submission.team_id,
+                submission_time=datetime.utcnow()
+            )
+            db.add(new_shared_submission)
+            db.commit()
+        else:
+            status = 'invalid'
+
+    return { "status": status}
+
+# @app.get("/submit_flags")
+# async def submit_flag_form():
+   
+#     return {"request": request}
+
+@app.get("/admin_panel")
+async def admin_panel(db: Session = Depends(get_db)):
+    # Fetch valid flag submissions
+    valid_flags = db.query(FlagSubmission).filter(FlagSubmission.status == 'successful').all()
+    
+    # Fetch shared flag submissions
+    shared_flags = db.query(SharedFlagSubmission).all()
+
+    # Fetch team names for shared flags
+    for shared_flag in shared_flags:
+        shared_flag.team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.team_id).first()[0]
+        shared_flag.original_team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.original_team_id).first()[0]
+
+    return  {
+        "valid_flags": valid_flags,
+        "shared_flags": shared_flags
     }
