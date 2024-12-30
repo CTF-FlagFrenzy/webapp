@@ -15,7 +15,7 @@ from collections import defaultdict
 import random
 import string
 from datetime import datetime, time, date
-
+from typing import Dict
 
 start_time = time(7, 0)  
 end_time = time(14, 0) 
@@ -99,7 +99,6 @@ class UserMadeChallengeUpdate(BaseModel):
     """
     Schema for updating a user-made challenge.
     """
-    Firstblood: int
     Solved: int
     
 class TeamResponse(BaseModel):
@@ -170,6 +169,23 @@ def get_teams(db: Session = Depends(get_db)):
     teams = db.query(Team).all()
     return teams
 
+@app.get("/teams/top10", response_model=list[TeamResponse])
+def get_top_teams(db: Session = Depends(get_db)):
+    """
+    Retrieve the top 10 teams with the most points from the database.
+    """
+    # Query teams ordered by points in descending order and limit to 10
+    top_teams = (
+        db.query(Team)
+        .order_by(Team.Points.desc())  # Assuming 'Points' is the field representing team points
+        .limit(10)
+        .all()
+    )
+    
+    if not top_teams:
+        raise HTTPException(status_code=404, detail="No teams found")
+    
+    return top_teams
 
 @app.get("/teams/{team_id}", response_model=TeamResponse)
 def get_team(team_id: int, db: Session = Depends(get_db)):
@@ -211,6 +227,7 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
     return {
         "TeamsID": team.ID,
         "Teamname": team.Teamname,
+        "Points": team.Points,
         "Members": members_list
     }
 
@@ -475,8 +492,7 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
 
 # --------------------- CHALLENGES -----------------------
 
-
-@app.get("/challenges/")
+@app.get("/challenges/",  response_model=Dict[str,list[ChallengeResponse]])
 def get_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
@@ -502,7 +518,7 @@ def get_challenges(db: Session = Depends(get_db)):
     return categorized_challenges_json
 
 
-@app.get("/challenges/{challenge_id}", response_model=ChallengeResponse)
+@app.get("/challenges/{challenge_id}")
 def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific challenge by ID.
@@ -622,7 +638,7 @@ def update_challenge_hintcount(challenge_id: int, db: Session = Depends(get_db))
 # --------------------- USER MADE CHALLENGES -----------------------
 
 @app.get("/user-made-challenges/")
-def get_user_made_challenges(db: Session = Depends(get_db)):
+def get_users_made_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all user-made challenges.
     """
@@ -631,7 +647,7 @@ def get_user_made_challenges(db: Session = Depends(get_db)):
 
 
 @app.get("/user-made-challenges/{user_id}/{challenge_id}")
-def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def get_user_made_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific user-made challenge by user ID and challenge ID.
     """
@@ -645,7 +661,7 @@ def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depen
 
 
 @app.get("/user-made-challenges/{user_id}")
-def get_user_made_challenges_by_user(user_id: int, db: Session = Depends(get_db)):
+def get_user_made_challenges(user_id: str, db: Session = Depends(get_db)):
     """
     Retrieve all challenges made by a specific user.
     """
@@ -676,10 +692,11 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
         raise HTTPException(status_code=422, detail=str(ex))
     return db_user_made_challenge
 
-
+import logging
+logger = logging.getLogger(__name__)
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
 def update_user_made_challenge(
-    user_id: int,
+    user_id: str,
     challenge_id: int,
     update_data: UserMadeChallengeUpdate,
     db: Session = Depends(get_db)
@@ -687,24 +704,36 @@ def update_user_made_challenge(
     """
     Update a specific user-made challenge by user ID and challenge ID.
     """
+    # Retrieve the user-made challenge
     user_made_challenge = db.query(UserMadeChallenge).filter(
         UserMadeChallenge.User_ID == user_id,
         UserMadeChallenge.Challenges_ID == challenge_id
     ).first()
+
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
 
-    # Update fields
-    user_made_challenge.Firstblood = update_data.Firstblood
+    # Check if Firstblood is already assigned
+    firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
+                                                    UserMadeChallenge.Firstblood == 1).first()
+    logger.debug(f"Firstblood exists: {bool(firstblood)}")
+    logger.debug(f"Update data solved: {update_data.Solved}")
+
+    if not firstblood and update_data.Solved == 1:
+        logger.debug("Assigning Firstblood to the current challenge")
+        user_made_challenge.Firstblood = 1
+
+    # Update the Solved field
     user_made_challenge.Solved = update_data.Solved
 
+    # Commit changes
     db.commit()
     db.refresh(user_made_challenge)
     return user_made_challenge
 
 
 @app.delete("/user-made-challenges/{user_id}/{challenge_id}")
-def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Delete a specific user-made challenge by user ID and challenge ID.
     """
@@ -721,7 +750,7 @@ def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = De
 
 
 @app.get("/deploy/{user_id}/{challenge_id}")
-def get_deploy_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve deployment details for a specific challenge and user.
     """

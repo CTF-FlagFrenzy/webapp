@@ -155,7 +155,7 @@
     <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4">TeamMembers</h1>
     <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl">
       {#if teamMembers}
-      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4"> {teamMembers.TeamsID}  {teamMembers.Teamname} </h1>
+      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-4"> {teamMembers.TeamsID}  {teamMembers.Teamname} Points: {teamMembers.Points} </h1>
 <button on:click={deleteTeam}>Delete</button>
         <table class="styled-table w-full">
           <thead class="text-custom-200 text-xl border-b border-custom-200">
