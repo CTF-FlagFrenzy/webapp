@@ -776,12 +776,12 @@ def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
 
-@app.post("/submit_flag")
-async def submit_flag(team_id: int, flag: str, db: Session = Depends(get_db)):
+@app.post("/submit_flag/{team_id}/{challenge_id}")
+async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = Depends(get_db)):
 
     # Fetch the team key and challenge flag from the database
     team = db.query(Team).filter(Team.ID == team_id).first()
-    challenge = db.query(Challenge).first()  # Assuming a single challenge for simplicity
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()  # Assuming a single challenge for simplicity
 
     if not team or not challenge:
         return { "status": "invalid"}
@@ -794,7 +794,7 @@ async def submit_flag(team_id: int, flag: str, db: Session = Depends(get_db)):
     if flag == generated_flag:
         status = 'successful'
         # Log the successful flag submission
-        new_submission = FlagSubmission(flag=flag, team_id=team_id, status=status, submission_time=datetime.utcnow())
+        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
@@ -807,6 +807,7 @@ async def submit_flag(team_id: int, flag: str, db: Session = Depends(get_db)):
             new_shared_submission = SharedFlagSubmission(
                 flag=flag,
                 team_id=team_id,
+                challenge_id=challenge_id,
                 original_team_id=existing_submission.team_id,
                 submission_time=datetime.utcnow()
             )
