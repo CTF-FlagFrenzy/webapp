@@ -85,6 +85,7 @@ class FlagSubmission(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     flag = Column(String(255), index=True)
+    challenge_id = Column(Integer, index=True)
     team_id = Column(Integer, index=True)
     status = Column(String(50), index=True)
     submission_time = Column(DateTime(timezone=True), server_default=func.now())
@@ -94,6 +95,7 @@ class SharedFlagSubmission(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     flag = Column(String(255), index=True)
+    challenge_id = Column(Integer, index=True)
     team_id = Column(Integer, index=True)
     original_team_id = Column(Integer, index=True)
     submission_time = Column(DateTime(timezone=True), server_default=func.now())
