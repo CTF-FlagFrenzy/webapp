@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
-
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
