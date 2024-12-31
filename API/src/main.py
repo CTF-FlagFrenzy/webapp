@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
+
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
@@ -775,6 +776,7 @@ def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
 
+
 @app.post("/submit_flag/{team_id}/{challenge_id}")
 async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = Depends(get_db)):
 
@@ -794,6 +796,7 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
         status = 'successful'
         # Log the successful flag submission
         new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
+
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
