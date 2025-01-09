@@ -8,7 +8,7 @@ import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission
+from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, TeamPoints
 from model.database import SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
@@ -76,6 +76,7 @@ class ChallengeCreate(BaseModel):
     Schema for creating a new challenge.
     """
     ChallengeName: str
+    FormatedChallengeName: str
     Categorie: str
     Points: int = 100
     Static: str
@@ -106,7 +107,12 @@ class TeamResponse(BaseModel):
     Teamname: str
     Points: int
     Members: int
+    SharedFlag: int
 
+class TeamPointsCreate(BaseModel):
+    TeamID: int
+    Points: int
+    
 class ChallengeResponse(BaseModel):
     ID: int
     ChallengeName: str
@@ -692,8 +698,7 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
         raise HTTPException(status_code=422, detail=str(ex))
     return db_user_made_challenge
 
-import logging
-logger = logging.getLogger(__name__)
+
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
 def update_user_made_challenge(
     user_id: str,
@@ -716,11 +721,8 @@ def update_user_made_challenge(
     # Check if Firstblood is already assigned
     firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
                                                     UserMadeChallenge.Firstblood == 1).first()
-    logger.debug(f"Firstblood exists: {bool(firstblood)}")
-    logger.debug(f"Update data solved: {update_data.Solved}")
 
     if not firstblood and update_data.Solved == 1:
-        logger.debug("Assigning Firstblood to the current challenge")
         user_made_challenge.Firstblood = 1
 
     # Update the Solved field
@@ -748,7 +750,38 @@ def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = De
     db.commit()
     return {"detail": "User-made challenge deleted successfully"}
 
+# --------------------- TEAM POINTS -----------------------
 
+@app.get("/teamPoints/")
+def get_users_made_challenges(db: Session = Depends(get_db)):
+    """
+    Retrieve all teamPoints over time.
+    """
+    teamPoints = db.query(TeamPoints).all()
+    return teamPoints
+
+
+
+# POST endpoint for creating TeamPoints
+@app.post("/teampoints/")
+def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
+    # Validate the time format
+     
+    # Create a new TeamPoints object
+    new_teampoints = TeamPoints(
+        TeamID=teampoints.TeamID,
+        Points=teampoints.Points,
+        Time=datetime.utcnow()
+    )
+    
+    # Add and commit to the database
+    db.add(new_teampoints)
+    db.commit()
+    db.refresh(new_teampoints)
+    
+    return new_teampoints
+
+# --------------------- DEPLOY -----------------------
 @app.get("/deploy/{user_id}/{challenge_id}")
 def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
@@ -765,17 +798,16 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
     return {
-        "challengeName": challenge.ChallengeName,
-        "challengeCategory": challenge.Categorie,
-        "challengeStatic": challenge.Static,
-        "teamName": team.Teamname if team else None,
+        "challengeName": challenge.FormatedChallengeName,
         "teamKey": team.Teamkey if team else None,
     }
     
+    
+# --------------------- ANTI CHEAT -----------------------
+
 def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
-
 
 @app.post("/submit_flag/{team_id}/{challenge_id}")
 async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = Depends(get_db)):
@@ -796,7 +828,6 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
         status = 'successful'
         # Log the successful flag submission
         new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
-
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")

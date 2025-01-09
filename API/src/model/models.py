@@ -7,7 +7,6 @@ from sqlalchemy.sql import func
 Base = declarative_base()
 
 # --------------------- MODELS -----------------------
-
 class Team(Base):
     """
     Database model for teams.
@@ -23,8 +22,21 @@ class Team(Base):
     SharedFlag = Column(Integer, nullable=False, default=0)
 
     users = relationship("User", back_populates="team")
+    currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
 
+class TeamPoints(Base):
+    """
+    Database model for team points.
+    """
+    __tablename__ = "TeamPoints"
 
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    TeamID = Column(Integer, ForeignKey('Teams.ID'), nullable=False)
+    Time = Column(DateTime, nullable=False)
+    Points = Column(Integer, nullable=False)
+
+    team = relationship("Team", back_populates="currentPoints")
+    
 class User(Base):
     """
     Database model for users.
@@ -51,6 +63,7 @@ class Challenge(Base):
 
     ID = Column(Integer, primary_key=True, autoincrement=True)
     ChallengeName = Column(String(100), nullable=False, unique=True)
+    FormatedChallengeName =  Column(String(100), nullable=False, unique=True)
     Categorie = Column(String(45), nullable=False)
     Hintcount = Column(Integer, default=0)
     Points = Column(Integer, default=100)
