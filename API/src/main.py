@@ -8,7 +8,7 @@ import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission
+from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, StaticFlag
 from model.database import SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
@@ -41,6 +41,10 @@ app.add_middleware(
 )
 
 # --------------------- SCHEMAS -----------------------
+
+class StaticFlagCreate(BaseModel):
+    flag: str
+    challenge_id: int
 
 class TeamCreate(BaseModel):
     """
@@ -792,7 +796,7 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
     print(f"Generated flag: {generated_flag}")
 
     # Validate the submitted flag
-    if flag == generated_flag:
+    if flag == "FF{"+ generated_flag +"}":
         status = 'successful'
         # Log the successful flag submission
         new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
@@ -842,3 +846,35 @@ async def admin_panel(db: Session = Depends(get_db)):
         "valid_flags": valid_flags,
         "shared_flags": shared_flags
     }
+    
+@app.post("/validate_flag/{challenge_id}")
+async def validate_flag(flag: str, challenge_id: int, db: Session = Depends(get_db)):
+    # Fetch the static flag from the database
+    static_flag = db.query(StaticFlag).filter(StaticFlag.flag == flag, StaticFlag.challenge_id == challenge_id).first()
+    
+    if static_flag:
+        return {"status": "success", "message": "Flag is valid!"}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid flag")
+    
+@app.post("/add_static_flag")
+async def add_static_flag(flag_data: StaticFlagCreate, db: Session = Depends(get_db)):
+    # Check if the flag already exists
+    existing_flag = db.query(StaticFlag).filter(StaticFlag.flag == flag_data.flag, StaticFlag.challenge_id == flag_data.challenge_id).first()
+    if existing_flag:
+        raise HTTPException(status_code=400, detail="Flag already exists")
+
+    # Create a new static flag
+    new_flag = StaticFlag(
+        flag=flag_data.flag,
+        challenge_id=flag_data.challenge_id
+    )
+    db.add(new_flag)
+    db.commit()
+    db.refresh(new_flag)
+    return {"status": "success", "flag": new_flag}
+
+@app.get("/get_flags")
+async def get_flags(db: Session = Depends(get_db)):
+    flags = db.query(StaticFlag).all()
+    return flags

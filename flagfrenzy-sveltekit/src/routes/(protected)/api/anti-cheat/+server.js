@@ -27,3 +27,26 @@ function jsonResponse(data, status) {
         }
     });
 }
+
+export async function POST({ request }) {
+    const { id, challenge_id, Solved } = await request.json();
+
+    // Here you would add your logic to handle the flag submission
+    // For example, you might call your FastAPI backend to save the submission
+
+    // Example response data
+    const data = {
+        status: 'success',
+        message: 'Flag submitted successfully',
+        id,
+        challenge_id,
+        Solved
+    };
+
+    return json(data, {
+        status: 200,
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+}

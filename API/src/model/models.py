@@ -99,3 +99,10 @@ class SharedFlagSubmission(Base):
     team_id = Column(Integer, index=True)
     original_team_id = Column(Integer, index=True)
     submission_time = Column(DateTime(timezone=True), server_default=func.now())
+    
+class StaticFlag(Base):
+    __tablename__ = 'static_flags'
+
+    id = Column(Integer, primary_key=True, index=True)
+    flag = Column(String(255), unique=True, nullable=False)
+    challenge_id = Column(Integer, index=True, nullable=False)
