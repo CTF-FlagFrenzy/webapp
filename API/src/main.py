@@ -85,7 +85,7 @@ class ChallengeCreate(BaseModel):
     Hint1: Optional[str] = None
     Hint2: Optional[str] = None
     Hint3: Optional[str] = None
-    Chain: Optional[str] = None
+    Chain: Optional[int] = None
 
 
 class UserMadeChallengeCreate(BaseModel):
@@ -121,7 +121,7 @@ class ChallengeResponse(BaseModel):
     Points: int
     Description: str
     Difficulty: str
-    Chain: Optional[str] = None
+    Chain: Optional[int] = None
     class Config:
         from_attributes = True
    
@@ -165,6 +165,21 @@ def generate_random_username(length=8):
     username = f"{prefix}{suffix}#{random_number}"
     
     return username
+
+def is_challenge_solved_by_team(team_id: int, challenge_id: int, db: Session):
+    """
+    Check if the referenced challenge is solved by any team member.
+    """
+    team_members = db.query(User).filter(User.TeamsID == team_id).all()
+    for member in team_members:
+        solved_challenge = db.query(UserMadeChallenge).filter(
+            UserMadeChallenge.User_ID == member.ID,
+            UserMadeChallenge.Challenges_ID == challenge_id,
+            UserMadeChallenge.Solved == 1
+        ).first()
+        if solved_challenge:
+            return True
+    return False
 
 # --------------------- TEAMS -----------------------
 @app.get("/teams/", response_model=list[TeamResponse])
@@ -709,7 +724,18 @@ def update_user_made_challenge(
     """
     Update a specific user-made challenge by user ID and challenge ID.
     """
-    # Retrieve the user-made challenge
+    user = db.query(User).filter(User.ID == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    if challenge.Chain:
+        if not is_challenge_solved_by_team(user.TeamsID, challenge.Chain, db):
+            raise HTTPException(status_code=400, detail="Referenced challenge in the chain is not solved yet")
+
     user_made_challenge = db.query(UserMadeChallenge).filter(
         UserMadeChallenge.User_ID == user_id,
         UserMadeChallenge.Challenges_ID == challenge_id
@@ -718,17 +744,14 @@ def update_user_made_challenge(
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
 
-    # Check if Firstblood is already assigned
     firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
                                                     UserMadeChallenge.Firstblood == 1).first()
 
     if not firstblood and update_data.Solved == 1:
         user_made_challenge.Firstblood = 1
 
-    # Update the Solved field
     user_made_challenge.Solved = update_data.Solved
 
-    # Commit changes
     db.commit()
     db.refresh(user_made_challenge)
     return user_made_challenge
