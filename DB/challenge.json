@@ -9,7 +9,8 @@
     "Hint2": "Web tools provide a function to inspect the web storage.",
     "Hint3": "The web storage function allows you to see the content of all saved cookies.",
     "Static": "R^@LgvG5QD",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "solana-assets"
 
   },
   {
