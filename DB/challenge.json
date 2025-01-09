@@ -10,7 +10,8 @@
     "Hint3": "The web storage function allows you to see the content of all saved cookies.",
     "Static": "R^@LgvG5QD",
     "Hintcount": 0,
-    "FormatedChallengeName": "solana-assets"
+    "FormatedChallengeName": "solana-assets",
+    "Chain": null
 
   },
   {
@@ -23,7 +24,9 @@
     "Hint2": "Maybe the website uses a database in the backend. Did the developer secure it properly?",
     "Hint3": "Consider trying an SQL injection.",
     "Static": "NQ^D@zd$q6",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "the-sql-heist",
+    "Chain": 1
   },
   {
     "ChallengeName": "File And Seek",
@@ -35,7 +38,9 @@
     "Hint2": "There may be hidden files; try changing the URL.",
     "Hint3": "You can use FUZZ to find hidden files.",
     "Static": "#74q$j&zcB",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": " file-and-seek",
+    "Chain": null
   },
   {
     "ChallengeName": "Shadow Files",
@@ -47,7 +52,9 @@
     "Hint2": "There may be hidden files; try changing the URL.",
     "Hint3": "The student manipulated the IDs. Another number may provide additional information.",
     "Static": "t9gE6@W!Nz",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "shadow-files",
+    "Chain": null
     
   },
   {
@@ -60,7 +67,9 @@
     "Hint2": "Have you tried using EXIF tools already?",
     "Hint3": "You can use a web tool to view the metadata.",
     "Static": "T1#mXeG24B",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "pixel-spy",
+    "Chain": null
   },
   {
     "ChallengeName": "Mental Overflow",
@@ -72,7 +81,9 @@
     "Hint2": "The script might be broken.",
     "Hint3": "The script is broken. Try to fix it on your own :).",
     "Static": "#8W@3fp5#Y",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "mental-overflow",
+    "Chain": null
   },
     {
     "ChallengeName": "Behind the Pixels",
@@ -84,7 +95,9 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "Wi3dS#ld!k",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "behind-the-pixels",
+    "Chain": null
   },{
     "ChallengeName": "Profile Prodigy",
     "Categorie": "OSINT",
@@ -95,7 +108,9 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "ToBeDefined",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "profile-prodigy",
+    "Chain": null
   },{
     "ChallengeName": "Time Traveler's Hunt - Part 1",
     "Categorie": "OSINT",
@@ -106,7 +121,9 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "YouPassedTheTest",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "time-travelers-hunt-part-1",
+    "Chain": null
   }, {
     "ChallengeName": "Time Traveler's Hunt - Part 2",
     "Categorie": "OSINT",
@@ -117,7 +134,9 @@
     "Hint2": "Have a look at the hidden directories.",
     "Hint3": "dirbuster is a great tool.",
     "Static": "timemachine1",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "time-travelers-hunt-part-2",
+    "Chain": null
   }, {
     "ChallengeName": "Time Traveler's Hunt - Part 3",
     "Categorie": "OSINT",
@@ -128,7 +147,9 @@
     "Hint2": "Everyone knows Jack the Ripper.",
     "Hint3": null,
     "Static": "itsasecret",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "time-travelers-hunt-part-3",
+    "Chain": null
   },{
     "ChallengeName": "Git Secrets: Layers of Discovery - Part 1",
     "Categorie": "OSINT",
@@ -139,6 +160,8 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "Wi3dS#ld!k",
-    "Hintcount": 0
+    "Hintcount": 0,
+    "FormatedChallengeName": "git-secrets-layers-of-discovery-part-1",
+    "Chain": null
   }
 ]
