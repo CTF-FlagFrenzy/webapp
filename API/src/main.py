@@ -75,8 +75,8 @@ class ChallengeCreate(BaseModel):
     """
     Schema for creating a new challenge.
     """
-    ChallengeName: str
-    FormatedChallengeName: str
+    ChallengeName: str = "Challenge 1"
+    FormatedChallengeName: str = "challenge-1"
     Categorie: str
     Points: int = 100
     Static: str
@@ -786,7 +786,7 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
 
 
 # POST endpoint for creating TeamPoints
-@app.post("/teampoints/")
+@app.post("/teamPoints/")
 def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
     # Validate the time format
      
