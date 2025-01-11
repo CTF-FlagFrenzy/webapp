@@ -1,8 +1,9 @@
 <script>
     import { onMount } from 'svelte';
     import { writable } from 'svelte/store';
-    let teams, teamMembers;
+    let teams, teamMembers, teamPoints;
     let errorMessageTeams = '';
+
     async function loadTeams() {
     try {
       errorMessageTeams, teams = '';
@@ -14,8 +15,21 @@
       errorMessageTeams = err.message;
     }
   }
+   async function loadGraphValue() {
+    try {
+      errorMessageTeams, teamPoints = '';
+      const response = await fetch('/api/teampoints');
+      if (!response.ok) throw new Error("Failed to load values");
+
+      teamPoints = await response.json();
+      console.log(teamPoints)
+    } catch (err) {
+      errorMessageTeams = err.message;
+    }
+  }
 onMount(() => {
     loadTeams();
+    loadGraphValue();
   
     
     const interval = setInterval(() => {

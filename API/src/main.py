@@ -767,7 +767,7 @@ def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = De
 # --------------------- TEAM POINTS -----------------------
 
 @app.get("/teamPoints/")
-def get_users_made_challenges(db: Session = Depends(get_db)):
+def get_teampoints(db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time.
     """
