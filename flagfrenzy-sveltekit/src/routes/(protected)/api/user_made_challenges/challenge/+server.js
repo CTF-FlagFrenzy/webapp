@@ -3,10 +3,10 @@ import { error } from "@sveltejs/kit";
 const API_BASE_URL = 'http://api:8000';
 
 export async function GET({ request, url }) {
-    const user_id = url.searchParams.get('id');
+    const team_id = url.searchParams.get('id');
     const challenge_id = url.searchParams.get('challenge_id');
     try {
-        const response = await fetch(`${API_BASE_URL}/user-made-challenges/${user_id}/${challenge_id}`);
+        const response = await fetch(`${API_BASE_URL}/user-made-challenges/${challenge_id}/solved_by_team/${team_id}`);
         if (!response.ok) {
             throw new Error('Failed to fetch users');
         }
