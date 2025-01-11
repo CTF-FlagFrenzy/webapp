@@ -1,12 +1,12 @@
 from sqlalchemy import (
-    create_engine, Column, String, Integer, ForeignKey, Text, Table
+    create_engine, Column, String, Integer, ForeignKey, Text, Table, DateTime
 )
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
 # --------------------- MODELS -----------------------
-
 class Team(Base):
     """
     Database model for teams.
@@ -19,10 +19,24 @@ class Team(Base):
     Teamkey = Column(String(75), nullable=False, unique=True)
     Points = Column(Integer, default=0)
     Members = Column(Integer, nullable=False, default=0)
+    SharedFlag = Column(Integer, nullable=False, default=0)
 
     users = relationship("User", back_populates="team")
+    currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
 
+class TeamPoints(Base):
+    """
+    Database model for team points.
+    """
+    __tablename__ = "TeamPoints"
 
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    TeamID = Column(Integer, ForeignKey('Teams.ID'), nullable=False)
+    Time = Column(DateTime, nullable=False)
+    Points = Column(Integer, nullable=False)
+
+    team = relationship("Team", back_populates="currentPoints")
+    
 class User(Base):
     """
     Database model for users.
@@ -49,13 +63,14 @@ class Challenge(Base):
 
     ID = Column(Integer, primary_key=True, autoincrement=True)
     ChallengeName = Column(String(100), nullable=False, unique=True)
+    FormatedChallengeName =  Column(String(100), nullable=False, unique=True)
     Categorie = Column(String(45), nullable=False)
     Hintcount = Column(Integer, default=0)
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
     Difficulty = Column(String(30), default="Easy")
     Static = Column(String(50), nullable=False)
-    Chain = Column(String(100), nullable=True, default=None)
+    Chain = Column(Integer, nullable=True, default=None)
     Hint1 = Column(Text(400), nullable=True, default=None)
     Hint2 = Column(Text(400), nullable=True, default=None)
     Hint3 = Column(Text(400), nullable=True, default=None)
@@ -77,3 +92,23 @@ class UserMadeChallenge(Base):
 
     user = relationship("User", back_populates="challenges")
     challenge = relationship("Challenge", back_populates="made_by_users")
+
+class FlagSubmission(Base):
+    __tablename__ = 'flag_submissions'
+
+    id = Column(Integer, primary_key=True, index=True)
+    flag = Column(String(255), index=True)
+    challenge_id = Column(Integer, index=True)
+    team_id = Column(Integer, index=True)
+    status = Column(String(50), index=True)
+    submission_time = Column(DateTime(timezone=True), server_default=func.now())
+
+class SharedFlagSubmission(Base):
+    __tablename__ = 'shared_flag_submissions'
+
+    id = Column(Integer, primary_key=True, index=True)
+    flag = Column(String(255), index=True)
+    challenge_id = Column(Integer, index=True)
+    team_id = Column(Integer, index=True)
+    original_team_id = Column(Integer, index=True)
+    submission_time = Column(DateTime(timezone=True), server_default=func.now())

@@ -3,18 +3,19 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
+
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from model.models import User, Team, Challenge, UserMadeChallenge
+from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, TeamPoints
 from model.database import SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 import random
 import string
 from datetime import datetime, time, date
-
+from typing import Dict
 
 start_time = time(7, 0)  
 end_time = time(14, 0) 
@@ -74,7 +75,8 @@ class ChallengeCreate(BaseModel):
     """
     Schema for creating a new challenge.
     """
-    ChallengeName: str
+    ChallengeName: str = "Challenge 1"
+    FormatedChallengeName: str = "challenge-1"
     Categorie: str
     Points: int = 100
     Static: str
@@ -83,7 +85,7 @@ class ChallengeCreate(BaseModel):
     Hint1: Optional[str] = None
     Hint2: Optional[str] = None
     Hint3: Optional[str] = None
-    Chain: Optional[str] = None
+    Chain: Optional[int] = None
 
 
 class UserMadeChallengeCreate(BaseModel):
@@ -98,7 +100,6 @@ class UserMadeChallengeUpdate(BaseModel):
     """
     Schema for updating a user-made challenge.
     """
-    Firstblood: int
     Solved: int
     
 class TeamResponse(BaseModel):
@@ -106,7 +107,12 @@ class TeamResponse(BaseModel):
     Teamname: str
     Points: int
     Members: int
+    SharedFlag: int
 
+class TeamPointsCreate(BaseModel):
+    TeamID: int
+    Points: int
+    
 class ChallengeResponse(BaseModel):
     ID: int
     ChallengeName: str
@@ -115,7 +121,7 @@ class ChallengeResponse(BaseModel):
     Points: int
     Description: str
     Difficulty: str
-    Chain: Optional[str] = None
+    Chain: Optional[int] = None
     class Config:
         from_attributes = True
    
@@ -160,6 +166,21 @@ def generate_random_username(length=8):
     
     return username
 
+def is_challenge_solved_by_team(team_id: int, challenge_id: int, db: Session):
+    """
+    Check if the referenced challenge is solved by any team member.
+    """
+    team_members = db.query(User).filter(User.TeamsID == team_id).all()
+    for member in team_members:
+        solved_challenge = db.query(UserMadeChallenge).filter(
+            UserMadeChallenge.User_ID == member.ID,
+            UserMadeChallenge.Challenges_ID == challenge_id,
+            UserMadeChallenge.Solved == 1
+        ).first()
+        if solved_challenge:
+            return True
+    return False
+
 # --------------------- TEAMS -----------------------
 @app.get("/teams/", response_model=list[TeamResponse])
 def get_teams(db: Session = Depends(get_db)):
@@ -169,6 +190,23 @@ def get_teams(db: Session = Depends(get_db)):
     teams = db.query(Team).all()
     return teams
 
+@app.get("/teams/top10", response_model=list[TeamResponse])
+def get_top_teams(db: Session = Depends(get_db)):
+    """
+    Retrieve the top 10 teams with the most points from the database.
+    """
+    # Query teams ordered by points in descending order and limit to 10
+    top_teams = (
+        db.query(Team)
+        .order_by(Team.Points.desc())  # Assuming 'Points' is the field representing team points
+        .limit(10)
+        .all()
+    )
+    
+    if not top_teams:
+        raise HTTPException(status_code=404, detail="No teams found")
+    
+    return top_teams
 
 @app.get("/teams/{team_id}", response_model=TeamResponse)
 def get_team(team_id: int, db: Session = Depends(get_db)):
@@ -210,6 +248,7 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
     return {
         "TeamsID": team.ID,
         "Teamname": team.Teamname,
+        "Points": team.Points,
         "Members": members_list
     }
 
@@ -474,14 +513,13 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
 
 # --------------------- CHALLENGES -----------------------
 
-
-@app.get("/challenges/")
+@app.get("/challenges/",  response_model=Dict[str,list[ChallengeResponse]])
 def get_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
-    if not is_not_allowed_time():
-        raise HTTPException(status_code=403, detail="The Event hasn't started yet")
+    # if not is_not_allowed_time():
+    #     raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     challenges = db.query(Challenge).all()
 
     # Define difficulty order for sorting
@@ -501,7 +539,7 @@ def get_challenges(db: Session = Depends(get_db)):
     return categorized_challenges_json
 
 
-@app.get("/challenges/{challenge_id}", response_model=ChallengeResponse)
+@app.get("/challenges/{challenge_id}")
 def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific challenge by ID.
@@ -621,7 +659,7 @@ def update_challenge_hintcount(challenge_id: int, db: Session = Depends(get_db))
 # --------------------- USER MADE CHALLENGES -----------------------
 
 @app.get("/user-made-challenges/")
-def get_user_made_challenges(db: Session = Depends(get_db)):
+def get_users_made_challenges(db: Session = Depends(get_db)):
     """
     Retrieve all user-made challenges.
     """
@@ -630,7 +668,7 @@ def get_user_made_challenges(db: Session = Depends(get_db)):
 
 
 @app.get("/user-made-challenges/{user_id}/{challenge_id}")
-def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def get_user_made_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve a specific user-made challenge by user ID and challenge ID.
     """
@@ -644,7 +682,7 @@ def get_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depen
 
 
 @app.get("/user-made-challenges/{user_id}")
-def get_user_made_challenges_by_user(user_id: int, db: Session = Depends(get_db)):
+def get_user_made_challenges(user_id: str, db: Session = Depends(get_db)):
     """
     Retrieve all challenges made by a specific user.
     """
@@ -678,7 +716,7 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
 
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
 def update_user_made_challenge(
-    user_id: int,
+    user_id: str,
     challenge_id: int,
     update_data: UserMadeChallengeUpdate,
     db: Session = Depends(get_db)
@@ -686,15 +724,32 @@ def update_user_made_challenge(
     """
     Update a specific user-made challenge by user ID and challenge ID.
     """
+    user = db.query(User).filter(User.ID == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    if challenge.Chain:
+        if not is_challenge_solved_by_team(user.TeamsID, challenge.Chain, db):
+            raise HTTPException(status_code=400, detail="Referenced challenge in the chain is not solved yet")
+
     user_made_challenge = db.query(UserMadeChallenge).filter(
         UserMadeChallenge.User_ID == user_id,
         UserMadeChallenge.Challenges_ID == challenge_id
     ).first()
+
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
 
-    # Update fields
-    user_made_challenge.Firstblood = update_data.Firstblood
+    firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
+                                                    UserMadeChallenge.Firstblood == 1).first()
+
+    if not firstblood and update_data.Solved == 1:
+        user_made_challenge.Firstblood = 1
+
     user_made_challenge.Solved = update_data.Solved
 
     db.commit()
@@ -703,7 +758,7 @@ def update_user_made_challenge(
 
 
 @app.delete("/user-made-challenges/{user_id}/{challenge_id}")
-def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Delete a specific user-made challenge by user ID and challenge ID.
     """
@@ -718,9 +773,40 @@ def delete_user_made_challenge(user_id: int, challenge_id: int, db: Session = De
     db.commit()
     return {"detail": "User-made challenge deleted successfully"}
 
+# --------------------- TEAM POINTS -----------------------
 
+@app.get("/teamPoints/")
+def get_users_made_challenges(db: Session = Depends(get_db)):
+    """
+    Retrieve all teamPoints over time.
+    """
+    teamPoints = db.query(TeamPoints).all()
+    return teamPoints
+
+
+
+# POST endpoint for creating TeamPoints
+@app.post("/teamPoints/")
+def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
+    # Validate the time format
+     
+    # Create a new TeamPoints object
+    new_teampoints = TeamPoints(
+        TeamID=teampoints.TeamID,
+        Points=teampoints.Points,
+        Time=datetime.utcnow()
+    )
+    
+    # Add and commit to the database
+    db.add(new_teampoints)
+    db.commit()
+    db.refresh(new_teampoints)
+    
+    return new_teampoints
+
+# --------------------- DEPLOY -----------------------
 @app.get("/deploy/{user_id}/{challenge_id}")
-def get_deploy_challenge(user_id: int, challenge_id: int, db: Session = Depends(get_db)):
+def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
     Retrieve deployment details for a specific challenge and user.
     """
@@ -735,9 +821,78 @@ def get_deploy_challenge(user_id: int, challenge_id: int, db: Session = Depends(
     team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
     return {
-        "challengeName": challenge.ChallengeName,
-        "challengeCategory": challenge.Categorie,
-        "challengeStatic": challenge.Static,
-        "teamName": team.Teamname if team else None,
+        "challengeName": challenge.FormatedChallengeName,
         "teamKey": team.Teamkey if team else None,
+    }
+    
+    
+# --------------------- ANTI CHEAT -----------------------
+
+def generate_flag(team_key, challenge_flag):
+    combined = team_key + challenge_flag
+    return hashlib.sha256(combined.encode()).hexdigest()
+
+@app.post("/submit_flag/{team_id}/{challenge_id}")
+async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = Depends(get_db)):
+
+    # Fetch the team key and challenge flag from the database
+    team = db.query(Team).filter(Team.ID == team_id).first()
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()  # Assuming a single challenge for simplicity
+
+    if not team or not challenge:
+        return { "status": "invalid"}
+
+    # Generate the flag
+    generated_flag = generate_flag(team.Teamkey, challenge.Static)
+    print(f"Generated flag: {generated_flag}")
+
+    # Validate the submitted flag
+    if flag == generated_flag:
+        status = 'successful'
+        # Log the successful flag submission
+        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
+        db.add(new_submission)
+        db.commit()
+        print(f"Logged flag submission: {new_submission}")
+    else:
+        # Check if the flag already exists in the database
+        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+        if existing_submission and existing_submission.team_id != team_id:
+            status = 'shared'
+            # Log the shared flag submission in the new table
+            new_shared_submission = SharedFlagSubmission(
+                flag=flag,
+                team_id=team_id,
+                challenge_id=challenge_id,
+                original_team_id=existing_submission.team_id,
+                submission_time=datetime.utcnow()
+            )
+            db.add(new_shared_submission)
+            db.commit()
+        else:
+            status = 'invalid'
+
+    return { "status": status}
+
+# @app.get("/submit_flags")
+# async def submit_flag_form():
+   
+#     return {"request": request}
+
+@app.get("/admin_panel")
+async def admin_panel(db: Session = Depends(get_db)):
+    # Fetch valid flag submissions
+    valid_flags = db.query(FlagSubmission).filter(FlagSubmission.status == 'successful').all()
+    
+    # Fetch shared flag submissions
+    shared_flags = db.query(SharedFlagSubmission).all()
+
+    # Fetch team names for shared flags
+    for shared_flag in shared_flags:
+        shared_flag.team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.team_id).first()[0]
+        shared_flag.original_team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.original_team_id).first()[0]
+
+    return  {
+        "valid_flags": valid_flags,
+        "shared_flags": shared_flags
     }
