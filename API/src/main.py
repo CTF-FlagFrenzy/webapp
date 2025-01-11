@@ -672,9 +672,6 @@ def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Sessi
         return {"solved": True}
     return {"solved": False}
 
-
-
-
 @app.get("/user-made-challenges/{user_id}")
 def get_user_made_challenges(user_id: str, db: Session = Depends(get_db)):
     """
@@ -780,7 +777,7 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
 
 
 # POST endpoint for creating TeamPoints
-@app.post("/teampoints/")
+@app.post("/teamPoints/")
 def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
     # Validate the time format
      
