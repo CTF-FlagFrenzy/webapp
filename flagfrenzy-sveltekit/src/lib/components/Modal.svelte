@@ -24,6 +24,7 @@ async function checkChainCondition() {
       return;
     }
     try {
+
         const teamResponse = await fetch(`/api/user_made_challenges/challenge?id=${user.TeamsID}&challenge_id=${data.Chain}`);
         if (teamResponse.ok) {
           const teamChallenge = await teamResponse.json();
@@ -31,6 +32,7 @@ async function checkChainCondition() {
         } else {
           canSubmit = false;
         }
+
     } catch (error) {
       console.error("Error checking chain condition:", error);
       canSubmit = false;
@@ -78,6 +80,26 @@ async function checkChainCondition() {
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
         }
+
+      } catch (error) {
+        console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+      } 
+    } 
+
+    async function SubmitButton() {
+      try {
+        const response = await fetch(`/api/submit_flag?id=${user.ID}&challenge_id=${data.ID}`, {
+          method: "GET",
+          body: JSON.stringify({
+            Solved: 1
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          }
+        });
+
+      if (!response.ok) {
+        throw new Error("Flag konnte nicht eingereicht werden.");
       });
       checkChainCondition();
       if (!response.ok) {
@@ -87,7 +109,6 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
-
   async function submitChallenge() {
     try {
       const response = await fetch(`/api/user_made_challenges?id=${user.ID}&challenge_id=${data.ID}`, {
@@ -157,3 +178,4 @@ async function checkChainCondition() {
     @apply shadow-DefaultShadow;
   }
 </style>
+
