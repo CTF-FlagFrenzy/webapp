@@ -8,7 +8,7 @@ import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, StaticFlag
+from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, StaticFlag, TeamPoints
 from model.database import SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
@@ -79,7 +79,8 @@ class ChallengeCreate(BaseModel):
     """
     Schema for creating a new challenge.
     """
-    ChallengeName: str
+    ChallengeName: str = "Challenge 1"
+    FormatedChallengeName: str = "challenge-1"
     Categorie: str
     Points: int = 100
     Static: str
@@ -88,7 +89,7 @@ class ChallengeCreate(BaseModel):
     Hint1: Optional[str] = None
     Hint2: Optional[str] = None
     Hint3: Optional[str] = None
-    Chain: Optional[str] = None
+    Chain: Optional[int] = None
 
 
 class UserMadeChallengeCreate(BaseModel):
@@ -110,7 +111,12 @@ class TeamResponse(BaseModel):
     Teamname: str
     Points: int
     Members: int
+    SharedFlag: int
 
+class TeamPointsCreate(BaseModel):
+    TeamID: int
+    Points: int
+    
 class ChallengeResponse(BaseModel):
     ID: int
     ChallengeName: str
@@ -119,7 +125,7 @@ class ChallengeResponse(BaseModel):
     Points: int
     Description: str
     Difficulty: str
-    Chain: Optional[str] = None
+    Chain: Optional[int] = None
     class Config:
         from_attributes = True
    
@@ -163,6 +169,21 @@ def generate_random_username(length=8):
     username = f"{prefix}{suffix}#{random_number}"
     
     return username
+
+def is_challenge_solved_by_team(team_id: int, challenge_id: int, db: Session):
+    """
+    Check if the referenced challenge is solved by any team member.
+    """
+    team_members = db.query(User).filter(User.TeamsID == team_id).all()
+    for member in team_members:
+        solved_challenge = db.query(UserMadeChallenge).filter(
+            UserMadeChallenge.User_ID == member.ID,
+            UserMadeChallenge.Challenges_ID == challenge_id,
+            UserMadeChallenge.Solved == 1
+        ).first()
+        if solved_challenge:
+            return True
+    return False
 
 # --------------------- TEAMS -----------------------
 @app.get("/teams/", response_model=list[TeamResponse])
@@ -696,8 +717,7 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
         raise HTTPException(status_code=422, detail=str(ex))
     return db_user_made_challenge
 
-import logging
-logger = logging.getLogger(__name__)
+
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
 def update_user_made_challenge(
     user_id: str,
@@ -708,7 +728,18 @@ def update_user_made_challenge(
     """
     Update a specific user-made challenge by user ID and challenge ID.
     """
-    # Retrieve the user-made challenge
+    user = db.query(User).filter(User.ID == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    if challenge.Chain:
+        if not is_challenge_solved_by_team(user.TeamsID, challenge.Chain, db):
+            raise HTTPException(status_code=400, detail="Referenced challenge in the chain is not solved yet")
+
     user_made_challenge = db.query(UserMadeChallenge).filter(
         UserMadeChallenge.User_ID == user_id,
         UserMadeChallenge.Challenges_ID == challenge_id
@@ -717,20 +748,14 @@ def update_user_made_challenge(
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
 
-    # Check if Firstblood is already assigned
     firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
                                                     UserMadeChallenge.Firstblood == 1).first()
-    logger.debug(f"Firstblood exists: {bool(firstblood)}")
-    logger.debug(f"Update data solved: {update_data.Solved}")
 
     if not firstblood and update_data.Solved == 1:
-        logger.debug("Assigning Firstblood to the current challenge")
         user_made_challenge.Firstblood = 1
 
-    # Update the Solved field
     user_made_challenge.Solved = update_data.Solved
 
-    # Commit changes
     db.commit()
     db.refresh(user_made_challenge)
     return user_made_challenge
@@ -752,7 +777,38 @@ def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = De
     db.commit()
     return {"detail": "User-made challenge deleted successfully"}
 
+# --------------------- TEAM POINTS -----------------------
 
+@app.get("/teamPoints/")
+def get_users_made_challenges(db: Session = Depends(get_db)):
+    """
+    Retrieve all teamPoints over time.
+    """
+    teamPoints = db.query(TeamPoints).all()
+    return teamPoints
+
+
+
+# POST endpoint for creating TeamPoints
+@app.post("/teamPoints/")
+def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
+    # Validate the time format
+     
+    # Create a new TeamPoints object
+    new_teampoints = TeamPoints(
+        TeamID=teampoints.TeamID,
+        Points=teampoints.Points,
+        Time=datetime.utcnow()
+    )
+    
+    # Add and commit to the database
+    db.add(new_teampoints)
+    db.commit()
+    db.refresh(new_teampoints)
+    
+    return new_teampoints
+
+# --------------------- DEPLOY -----------------------
 @app.get("/deploy/{user_id}/{challenge_id}")
 def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
     """
@@ -769,17 +825,16 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
     return {
-        "challengeName": challenge.ChallengeName,
-        "challengeCategory": challenge.Categorie,
-        "challengeStatic": challenge.Static,
-        "teamName": team.Teamname if team else None,
+        "challengeName": challenge.FormatedChallengeName,
         "teamKey": team.Teamkey if team else None,
     }
     
+    
+# --------------------- ANTI CHEAT -----------------------
+
 def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
-
 
 @app.post("/submit_flag/{team_id}/{challenge_id}")
 async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = Depends(get_db)):
@@ -800,7 +855,6 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
         status = 'successful'
         # Log the successful flag submission
         new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
-
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
