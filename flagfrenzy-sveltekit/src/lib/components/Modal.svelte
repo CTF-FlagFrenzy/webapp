@@ -106,6 +106,47 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
+     async function SubmitButton() {
+      try {
+        const response = await fetch(`/api/submit_flag?id=${user.username}&challenge_id=${data.ID}`, {
+          method: "GET",
+          body: JSON.stringify({
+            Solved: 1
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          }
+        });
+
+     async function SubmitButton() {
+    try {
+      const response = await fetch('/api/submit_flags', {
+        method: "POST",
+        body: JSON.stringify({
+          id: user.username,
+          challenge_id: data.ID,
+          Solved: 1
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Flag konnte nicht eingereicht werden.");
+      }
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+    }
+  }
+
+        if (!response.ok) {
+          throw new Error("Challenge konnte nicht gestartet werden. ");
+        }
+      } catch (error) {
+        console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+      } 
+    } 
 </script>
 
 {#if isOpen}
