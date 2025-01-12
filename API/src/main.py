@@ -79,8 +79,8 @@ class ChallengeCreate(BaseModel):
     """
     Schema for creating a new challenge.
     """
-    ChallengeName: str = "Challenge 1"
-    FormatedChallengeName: str = "challenge-1"
+    ChallengeName: str
+    FormatedChallengeName: str
     Categorie: str
     Points: int = 100
     Static: str
@@ -670,20 +670,11 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
     user_made_challenges = db.query(UserMadeChallenge).all()
     return user_made_challenges
 
-
-@app.get("/user-made-challenges/{user_id}/{challenge_id}")
-def get_user_made_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
-    """
-    Retrieve a specific user-made challenge by user ID and challenge ID.
-    """
-    user_made_challenge = db.query(UserMadeChallenge).filter(
-        UserMadeChallenge.User_ID == user_id,
-        UserMadeChallenge.Challenges_ID == challenge_id
-    ).first()
-    if not user_made_challenge:
-        raise HTTPException(status_code=404, detail="User-made challenge not found")
-    return user_made_challenge
-
+@app.get("/user-made-challenges/{challenge_id}/solved_by_team/{team_id}")
+def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
+    if is_challenge_solved_by_team(team_id, challenge_id, db):
+        return {"solved": True}
+    return {"solved": False}
 
 @app.get("/user-made-challenges/{user_id}")
 def get_user_made_challenges(user_id: str, db: Session = Depends(get_db)):
@@ -780,7 +771,7 @@ def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = De
 # --------------------- TEAM POINTS -----------------------
 
 @app.get("/teamPoints/")
-def get_users_made_challenges(db: Session = Depends(get_db)):
+def get_teampoints(db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time.
     """

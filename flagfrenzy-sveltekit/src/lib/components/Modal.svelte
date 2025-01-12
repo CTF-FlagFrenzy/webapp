@@ -16,23 +16,23 @@
     dispatch('close');
   }
 
-  async function checkChainCondition() {
+async function checkChainCondition() {
     console.log(data.Chain);
     if (!data.Chain) {
       canSubmit = true;
       console.log(canSubmit);
       return;
     }
-
     try {
-      const response = await fetch(`/api/user_made_challenges/challenge?id=${user.ID}&challenge_id=${data.Chain}`);
-      if (response.ok) {
-        const challenge = await response.json();
-        console.log(challenge);
-        canSubmit = challenge.Solved == 1;
-      } else {
-        canSubmit = false;
-      }
+
+        const teamResponse = await fetch(`/api/user_made_challenges/challenge?id=${user.TeamsID}&challenge_id=${data.Chain}`);
+        if (teamResponse.ok) {
+          const teamChallenge = await teamResponse.json();
+          canSubmit = teamChallenge.solved;
+        } else {
+          canSubmit = false;
+        }
+
     } catch (error) {
       console.error("Error checking chain condition:", error);
       canSubmit = false;
