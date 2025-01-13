@@ -562,11 +562,21 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
-    return {
-        'Hint1': challenge.Hint1,
-        'Hint2': challenge.Hint2,
-        'Hint3': challenge.Hint3
+
+    current_time = datetime.now().time()
+    
+    # Define the times when hints are available
+    hint1_time = datetime.strptime("10:00", "%H:%M").time()
+    hint2_time = datetime.strptime("11:00", "%H:%M").time()
+    hint3_time = datetime.strptime("12:00", "%H:%M").time()
+
+    hints = {
+        'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 is not available yet.",
+        'Hint2': challenge.Hint2 if current_time >= hint2_time else "Hint2 is not available yet.",
+        'Hint3': challenge.Hint3 if current_time >= hint3_time else "Hint3 is not available yet."
     }
+    
+    return hints
 
 
 @app.post("/challenges/", response_model=ChallengeResponse)
@@ -671,7 +681,7 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
     return user_made_challenges
 
 @app.get("/user-made-challenges/{challenge_id}/solved_by_team/{team_id}")
-def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
+def is_challenge_solved_by_team(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
     if is_challenge_solved_by_team(team_id, challenge_id, db):
         return {"solved": True}
     return {"solved": False}
@@ -868,11 +878,6 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
             status = 'invalid'
 
     return { "status": status}
-
-# @app.get("/submit_flags")
-# async def submit_flag_form():
-   
-#     return {"request": request}
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
