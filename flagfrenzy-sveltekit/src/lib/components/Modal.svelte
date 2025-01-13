@@ -52,6 +52,7 @@ async function checkChainCondition() {
   $: if (isOpen) {
     // Call the function to check conditions when modal opens
     checkChainCondition();
+    loadHints(); 
   }
 
   async function hintCount() {
@@ -172,9 +173,9 @@ async function checkChainCondition() {
     <h3 class="text-2xl">Description:</h3>
     <p class="text-lg">{data.Description}</p>
     <h3 class="text-2xl">Hint:</h3>
-    <p class="text-lg">{data.Hint1}</p>
-    <p class="text-lg">{data.Hint2}</p>
-    <p class="text-lg">{data.Hint3}</p>
+    <p class="text-lg">{hints.Hint1}</p>
+    <p class="text-lg">{hints.Hint2}</p>
+    <p class="text-lg">{hints.Hint3}</p>
     <div class="flex justify-between items-center mt-auto pt-4 border-t border-custom-200">
       <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
       {#if canSubmit}

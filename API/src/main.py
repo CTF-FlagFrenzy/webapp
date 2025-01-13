@@ -571,9 +571,9 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     hint3_time = datetime.strptime("12:00", "%H:%M").time()
 
     hints = {
-        'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 is not available yet.",
-        'Hint2': challenge.Hint2 if current_time >= hint2_time else "Hint2 is not available yet.",
-        'Hint3': challenge.Hint3 if current_time >= hint3_time else "Hint3 is not available yet."
+        'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 ist noch nicht verfügbar.",
+        'Hint2': challenge.Hint2 if current_time >= hint2_time else "Hint2 ist noch nicht verfügbar.",
+        'Hint3': challenge.Hint3 if current_time >= hint3_time else "Hint3 ist noch nicht verfügbar."
     }
     
     return hints
@@ -681,7 +681,7 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
     return user_made_challenges
 
 @app.get("/user-made-challenges/{challenge_id}/solved_by_team/{team_id}")
-def is_challenge_solved_by_team(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
+def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
     if is_challenge_solved_by_team(team_id, challenge_id, db):
         return {"solved": True}
     return {"solved": False}
