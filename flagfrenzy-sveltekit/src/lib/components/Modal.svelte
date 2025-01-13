@@ -23,6 +23,7 @@
   
         
         hints = await response.json();
+        console.log(hints);
       } catch (err) {
         error = err.message;
       }
