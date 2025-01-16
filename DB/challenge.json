@@ -99,18 +99,44 @@
     "FormatedChallengeName": "behind-the-pixels",
     "Chain": null
   },{
-    "ChallengeName": "Profile Prodigy",
+    "ChallengeName": "Profile Prodigy - Part 1",
     "Categorie": "OSINT",
     "Points": 1000,
-    "Description": "Tanja Alina Weiss has left behind a trail of digital breadcrumbs. Your mission? Dive deep into the web and uncover her secrets!",
+    "Description": "Your mission is to uncover the first flag hidden within information related to Tanja Alina Weiss. Somewhere in the details provided, a flag is subtly concealed. The flag could appear in unexpected places, so stay sharp!",
     "Difficulty": "Easy",
     "Hint1": null,
     "Hint2": null,
     "Hint3": null,
-    "Static": "ToBeDefined",
+    "Static": "dogmom_adventure",
     "Hintcount": 0,
-    "FormatedChallengeName": "profile-prodigy",
-    "Chain": null
+    "FormatedChallengeName": "profile-prodigy-part-1",
+    "Chain": 2
+  },{
+    "ChallengeName": "Profile Prodigy - Part 2",
+    "Categorie": "OSINT",
+    "Points": 1000,
+    "Description": "Identify the destination that Tanja considers her most favorite place she has visited so far.",
+    "Difficulty": "Easy",
+    "Hint1": null,
+    "Hint2": null,
+    "Hint3": null,
+    "Static": "Budapest",
+    "Hintcount": 0,
+    "FormatedChallengeName": "profile-prodigy-part-2",
+    "Chain": 3
+  },{
+    "ChallengeName": "Profile Prodigy - Part 3",
+    "Categorie": "OSINT",
+    "Points": 1000,
+    "Description": "Uncover her birthday. The answer may require careful deduction and attention to detail. Submit your findings in the format FF{DD-MM-YYYY}.",
+    "Difficulty": "Easy",
+    "Hint1": null,
+    "Hint2": null,
+    "Hint3": null,
+    "Static": "07-06-1999",
+    "Hintcount": 0,
+    "FormatedChallengeName": "profile-prodigy-part-3",
+    "Chain": 4
   },{
     "ChallengeName": "Time Traveler's Hunt - Part 1",
     "Categorie": "OSINT",
@@ -121,9 +147,9 @@
     "Hint2": null,
     "Hint3": null,
     "Static": "YouPassedTheTest",
-    "Hintcount": 0,
+    "Hintcount": 1,
     "FormatedChallengeName": "time-travelers-hunt-part-1",
-    "Chain": null
+    "Chain": 5
   }, {
     "ChallengeName": "Time Traveler's Hunt - Part 2",
     "Categorie": "OSINT",
@@ -134,9 +160,9 @@
     "Hint2": "Have a look at the hidden directories.",
     "Hint3": "dirbuster is a great tool.",
     "Static": "timemachine1",
-    "Hintcount": 0,
+    "Hintcount": 3,
     "FormatedChallengeName": "time-travelers-hunt-part-2",
-    "Chain": null
+    "Chain": 6
   }, {
     "ChallengeName": "Time Traveler's Hunt - Part 3",
     "Categorie": "OSINT",
@@ -147,9 +173,9 @@
     "Hint2": "Everyone knows Jack the Ripper.",
     "Hint3": null,
     "Static": "itsasecret",
-    "Hintcount": 0,
+    "Hintcount": 3,
     "FormatedChallengeName": "time-travelers-hunt-part-3",
-    "Chain": null
+    "Chain": 7
   },{
     "ChallengeName": "Git Secrets: Layers of Discovery - Part 1",
     "Categorie": "OSINT",
@@ -162,6 +188,6 @@
     "Static": "Wi3dS#ld!k",
     "Hintcount": 0,
     "FormatedChallengeName": "git-secrets-layers-of-discovery-part-1",
-    "Chain": null
+    "Chain": 8
   }
 ]
