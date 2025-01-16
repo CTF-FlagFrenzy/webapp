@@ -2,9 +2,10 @@ import { error } from "@sveltejs/kit";
 
 const API_BASE_URL = 'http://api:8000';
 
-export async function GET() {
+export async function GET({ url }) {
+    const id = url.searchParams.get('id');
     try {
-        const response = await fetch(`${API_BASE_URL}/challenges/`);
+        const response = await fetch(`${API_BASE_URL}/challenges/${id}`);
         if (!response.ok) {
             throw new Error('Failed to fetch challenges');
         }

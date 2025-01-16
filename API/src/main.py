@@ -517,8 +517,8 @@ def delete_user(user_id: str, db: Session = Depends(get_db)):
 
 # --------------------- CHALLENGES -----------------------
 
-@app.get("/challenges/",  response_model=Dict[str,list[ChallengeResponse]])
-def get_challenges(db: Session = Depends(get_db)):
+@app.get("/challenges/{teams_id}")
+def get_challenges(teams_id: int,db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
@@ -535,10 +535,41 @@ def get_challenges(db: Session = Depends(get_db)):
     for challenge in challenges:
         categorized_challenges[challenge.Categorie].append(challenge)
 
-    # Convert to JSON format with category names as keys
-    categorized_challenges_json = {
-        category: challenges for category, challenges in categorized_challenges.items()
-    }
+    # Get all users in the team
+    users = db.query(User).filter(User.TeamsID == teams_id).all()
+    user_ids = [user.ID for user in users]
+
+    # Get all user-made challenges solved by these users
+    solved_challenges = db.query(UserMadeChallenge).filter(
+        UserMadeChallenge.User_ID.in_(user_ids),
+        UserMadeChallenge.Solved == True  # Assuming there's a Solved column indicating if the challenge is solved
+    ).all()
+    solved_challenge_ids = {umc.Challenges_ID for umc in solved_challenges}
+
+    # Convert to JSON format with category names as keys and include 'solved' status
+    categorized_challenges_json = {}
+    for category, challenges in categorized_challenges.items():
+        challenges_json = [
+            {
+                "ID": challenge.ID,
+                "ChallengeName": challenge.ChallengeName,
+                "Difficulty": challenge.Difficulty,
+                "Category": challenge.Categorie,
+                "Hint1": challenge.Hint1,
+                "Hint2": challenge.Hint2,
+                "Hint3": challenge.Hint3,
+                "Description": challenge.Description,
+                "Chain": challenge.Chain,
+                "Points": challenge.Points,
+                "Solved": challenge.ID in solved_challenge_ids
+            }
+            for challenge in challenges
+        ]
+        
+        # Sort challenges so that solved ones come last
+        challenges_json.sort(key=lambda ch: ch['Solved'])
+
+        categorized_challenges_json[category] = challenges_json
 
     return categorized_challenges_json
 
@@ -686,16 +717,21 @@ def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Sessi
         return {"solved": True}
     return {"solved": False}
 
-@app.get("/user-made-challenges/{user_id}")
-def get_user_made_challenges(user_id: str, db: Session = Depends(get_db)):
+@app.get("/user-made-challenges/{teams_id}")
+def get_user_made_challenges(teams_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve all challenges made by a specific user.
+    Retrieve all challenges made by users in a specific team.
     """
+    # Get all users in the team
+    users = db.query(User).filter(User.TeamsID == teams_id).all()
+    user_ids = [user.ID for user in users]
+
+    # Get all challenges made by these users
     user_made_challenges = db.query(UserMadeChallenge).filter(
-        UserMadeChallenge.User_ID == user_id
+        UserMadeChallenge.User_ID.in_(user_ids)
     ).all()
-    if not user_made_challenges:
-        raise HTTPException(status_code=404, detail="User-made challenges not found")
+
+
     return user_made_challenges
 
 
