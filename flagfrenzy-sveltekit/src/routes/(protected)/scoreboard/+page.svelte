@@ -1,9 +1,12 @@
 <script>
-    import { onMount } from 'svelte';
-    import { writable } from 'svelte/store';
-    let teams, teamMembers;
-    let errorMessageTeams = '';
-    async function loadTeams() {
+  import { onMount } from 'svelte';
+  import { writable } from 'svelte/store';
+  import Graph from '$lib/components/graph.svelte';
+
+  let teams, teamMembers;
+  let errorMessageTeams = '';
+
+  async function loadTeams() {
     try {
       errorMessageTeams, teams = '';
       const response = await fetch('/api/teams/scoreboard');
@@ -50,10 +53,5 @@ onMount(() => {
       {:else}
         <p>Loading teams data...</p>
       {/if}
+      <Graph />
   </div>
-  
-  <style>
-    h2 {
-        text-align: center;
-    }
-  </style>
