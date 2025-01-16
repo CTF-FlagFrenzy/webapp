@@ -827,7 +827,7 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
 
     return {
         "challengeName": challenge.FormatedChallengeName,
-        "teamKey": team.Teamkey if team else None,
+        "teamID": team.ID if team else None,
     }
     
     
