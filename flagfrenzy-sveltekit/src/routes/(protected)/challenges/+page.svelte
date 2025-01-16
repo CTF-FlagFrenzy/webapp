@@ -45,7 +45,7 @@
   }
   async function loadChallenges() {
     try {
-      const response = await fetch('/api/challenges');
+      const response = await fetch(`/api/challenges?id=${user.TeamsID}`);
       if (!response.ok) throw new Error("Failed to load challenges");
 
       // Set the categorized response directly to challengesByCategory
