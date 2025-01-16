@@ -14,6 +14,7 @@
       errorMessageTeams = err.message;
     }
   }
+  
 onMount(() => {
     loadTeams();
   
