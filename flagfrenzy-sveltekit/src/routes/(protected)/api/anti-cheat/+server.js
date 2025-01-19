@@ -4,9 +4,9 @@ const API_BASE_URL = 'http://api:8000';
 
 export async function GET() {
     try {
-        const response = await fetch(`${API_BASE_URL}/challenges/`);
+        const response = await fetch(`${API_BASE_URL}/admin_panel/`);
         if (!response.ok) {
-            throw new Error('Failed to fetch challenges');
+            throw new Error('Failed to fetch flags');
         }
 
         // Parse the JSON response
@@ -18,33 +18,31 @@ export async function GET() {
         return jsonResponse({ message: "An error occurred", error: err.message }, 500);
     }
 }
+export async function POST({ request }) {
+    
+    const { TeamsID, ChallengeID, Flag} = await request.json();
 
+    try {
+        const response = await fetch(`${API_BASE_URL}/submit_flag/${TeamsID}/${ChallengeID}?flag=${Flag}`, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                team_id: TeamsID,
+                challenge_id: ChallengeID
+            })
+        });
+        const data = await response.json();
+        return jsonResponse(data, response.status);
+    } catch (error) {
+        return jsonResponse({ message: "An error occurred", error }, 500);
+    }
+}
 function jsonResponse(data, status) {
     return new Response(JSON.stringify(data), {
         status: status,
-        headers: {
-            "Content-Type": "application/json",
-        }
-    });
-}
-
-export async function POST({ request }) {
-    const { id, challenge_id, Solved } = await request.json();
-
-    // Here you would add your logic to handle the flag submission
-    // For example, you might call your FastAPI backend to save the submission
-
-    // Example response data
-    const data = {
-        status: 'success',
-        message: 'Flag submitted successfully',
-        id,
-        challenge_id,
-        Solved
-    };
-
-    return json(data, {
-        status: 200,
         headers: {
             "Content-Type": "application/json",
         }

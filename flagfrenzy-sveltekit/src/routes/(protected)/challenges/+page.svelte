@@ -33,10 +33,11 @@
   
     async function loadUsermadeChallenges() {
       try {
-        const response = await fetch(`/api/user_made_challenges?id=${data.username}`);
+        const response = await fetch(`/api/user_made_challenges?id=${user.TeamsID}`);
         if (!response.ok) throw new Error("Failed to load user_made_challenges");
   
         user_made_challenges = await response.json();
+        console.log(user_made_challenges)
       } catch (err) {
         error = err.message;
       }
@@ -52,8 +53,8 @@
         error = err.message;
       }
     }
-    onMount(() => {
-      getUser();
+    onMount(async () => {
+      await getUser();
       loadChallenges(); // Initial load
       loadUsermadeChallenges();
       // Start interval to refresh data

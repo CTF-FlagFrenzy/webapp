@@ -9,6 +9,8 @@
   export let user;
   let hints = {};
   let canSubmit;
+  let allFlags;
+  let flagStatus;
 
   const dispatch = createEventDispatcher();
 
@@ -72,7 +74,7 @@ async function checkChainCondition() {
         throw new Error("Hint wurde bereits benutzt.");
       }
 
-      hintUsed = true; // Mark hint as used
+  
       hintUsed = true; // Mark hint as used
       console.log("Hint used successfully.");
     } catch (error) {
@@ -92,6 +94,7 @@ async function checkChainCondition() {
         }
       });
       checkChainCondition();
+      loadFlags()
       if (!response.ok) {
         throw new Error("Challenge konnte nicht gestartet werden.");
       }
@@ -100,19 +103,21 @@ async function checkChainCondition() {
     }
   }
   async function submitChallenge() {
+    let solved = 0;
+    if (flagStatus.status === "successful") {
+      solved = 1;
+    } 
     try {
-      const response = await fetch('/api/submit_flags', {
-        method: "POST",
+      const response = await fetch(`/api/user_made_challenges?id=${user.ID}&challenge_id=${data.ID}`, {
+        method: "PUT",
         body: JSON.stringify({
-          id: user.username,
-          challenge_id: data.ID,
-          Solved: 1
+          Solved: solved
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
         }
       });
-
+    
       if (!response.ok) {
         throw new Error("Challenge konnte nicht gestartet werden.");
       }
@@ -120,32 +125,17 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
-     async function SubmitButton() {
+     async function loadFlags() {
       try {
-        const response = await fetch(`/api/submit_flag?id=${user.username}&challenge_id=${data.ID}`, {
+        const response = await fetch(`/api/anti-cheat`, {
           method: "GET",
-          body: JSON.stringify({
-            Solved: 1
-          }),
+      
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
           }
-        });
-
-     async function SubmitButton() {
-    try {
-      const response = await fetch('/api/submit_flags', {
-        method: "POST",
-        body: JSON.stringify({
-          id: user.username,
-          challenge_id: data.ID,
-          Solved: 1
-        }),
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        }
-      });
-
+     });
+    allFlags = await response.json();
+    console.log(allFlags);
       if (!response.ok) {
         throw new Error("Flag konnte nicht eingereicht werden.");
       }
@@ -154,13 +144,29 @@ async function checkChainCondition() {
     }
   }
 
-        if (!response.ok) {
-          throw new Error("Challenge konnte nicht gestartet werden. ");
+ async function submitButton() {
+    try {
+      const response = await fetch("/api/anti-cheat", {
+        method: "POST",
+        body: JSON.stringify({
+          ChallengeID: data.ID,
+          TeamsID: user.TeamsID,
+          Flag: flagToSubmit
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
         }
-      } catch (error) {
-        console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
-      } 
-    } 
+      });
+      flagStatus = await response.json();
+      console.log(flagStatus);
+      submitChallenge();
+      if (!response.ok) {
+        throw new Error("Challenge konnte nicht gestartet werden.");
+      }
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+    }
+  }
 </script>
 
 {#if isOpen}
@@ -183,10 +189,8 @@ async function checkChainCondition() {
     <p class="text-lg">{hints.Hint3}</p>
     <div class="flex justify-between items-center mt-auto pt-4 border-t border-custom-200">
       <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitChallenge}>Submit</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitChallenge}>Submit</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
     </div>
   </div>
