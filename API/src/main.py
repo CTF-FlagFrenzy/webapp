@@ -939,9 +939,9 @@ async def validate_flag(flag: str, challenge_id: int, db: Session = Depends(get_
     static_flag = db.query(StaticFlag).filter(StaticFlag.flag == flag, StaticFlag.challenge_id == challenge_id).first()
     
     if static_flag:
-        return {"detail": "success", "message": "Flag is valid!"}
+        return {"status": "successful", "message": "Flag is valid!"}
     else:
-        raise HTTPException(status_code=400, detail="Invalid flag")
+        raise {"status": "invalid", "message": "Flag is invalid!"}
     
 @app.post("/add_static_flag")
 async def add_static_flag(flag_data: StaticFlagCreate, db: Session = Depends(get_db)):

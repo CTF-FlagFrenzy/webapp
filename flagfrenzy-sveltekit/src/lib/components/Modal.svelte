@@ -94,7 +94,6 @@ async function checkChainCondition() {
         }
       });
       checkChainCondition();
-      loadFlags()
       if (!response.ok) {
         throw new Error("Challenge konnte nicht gestartet werden.");
       }
@@ -137,7 +136,7 @@ async function checkChainCondition() {
     allFlags = await response.json();
     console.log(allFlags);
       if (!response.ok) {
-        throw new Error("Flag konnte nicht eingereicht werden.");
+        throw new Error("Flags konnten nicht geladen werden.");
       }
     } catch (error) {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
@@ -161,7 +160,7 @@ async function checkChainCondition() {
       console.log(flagStatus);
       submitChallenge();
       if (!response.ok) {
-        throw new Error("Challenge konnte nicht gestartet werden.");
+        throw new Error("Flag konnte nicht abgegeben werden.");
       }
     } catch (error) {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
@@ -184,7 +183,7 @@ async function checkChainCondition() {
       console.log(flagStatus);
       submitChallenge();
       if (!response.ok) {
-        throw new Error("Challenge konnte nicht gestartet werden.");
+        throw new Error(".");
       }
     } catch (error) {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
