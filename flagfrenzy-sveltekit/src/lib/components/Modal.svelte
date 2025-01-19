@@ -167,6 +167,29 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
+
+  async function submitStatic() {
+    try {
+      const response = await fetch("/api/anti-cheat/static_flags", {
+        method: "POST",
+        body: JSON.stringify({
+          ChallengeID: data.ID,
+          Flag: flagToSubmit
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }
+      });
+      flagStatus = await response.json();
+      console.log(flagStatus);
+      submitChallenge();
+      if (!response.ok) {
+        throw new Error("Challenge konnte nicht gestartet werden.");
+      }
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+    }
+  }
 </script>
 
 {#if isOpen}
@@ -192,6 +215,8 @@ async function checkChainCondition() {
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
+
     </div>
   </div>
 {/if}
