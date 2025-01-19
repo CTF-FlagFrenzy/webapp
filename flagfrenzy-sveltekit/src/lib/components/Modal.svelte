@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   
+  
   export let isOpen = false;
   export let data;
   let flagToSubmit;
@@ -71,6 +72,7 @@ async function checkChainCondition() {
         throw new Error("Hint wurde bereits benutzt.");
       }
 
+      hintUsed = true; // Mark hint as used
       hintUsed = true; // Mark hint as used
       console.log("Hint used successfully.");
     } catch (error) {
@@ -164,6 +166,8 @@ async function checkChainCondition() {
 {#if isOpen}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="fixed inset-0 bg-black bg-opacity-75 z-10" on:click={close} tabindex="0" role="button" ></div>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div class="fixed inset-0 bg-black bg-opacity-75 z-10" on:click={close} tabindex="0" role="button" ></div>
   <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 rounded-lg z-20 max-h-3/5 max-w-2xl w-11/12 bg-custom-110 shadow-button-{data.Difficulty} text-white">
     <button class="absolute top-2.5 right-2.5 text-xl cursor-pointer bg-none" on:click={close}>✖</button>
     <div class="flex justify-between">
@@ -172,6 +176,7 @@ async function checkChainCondition() {
     </div>
     <h3 class="text-2xl">Description:</h3>
     <p class=" text-lg">{data.Description}</p>
+    <p class=" text-lg">{data.Description}</p>
     <h3 class="text-2xl">Hint:</h3>
     <p class="text-lg">{hints.Hint1}</p>
     <p class="text-lg">{hints.Hint2}</p>
@@ -179,7 +184,9 @@ async function checkChainCondition() {
     <div class="flex justify-between items-center mt-auto pt-4 border-t border-custom-200">
       <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitChallenge}>Submit</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitChallenge}>Submit</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
     </div>
   </div>
