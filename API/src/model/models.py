@@ -23,7 +23,10 @@ class Team(Base):
 
     users = relationship("User", back_populates="team")
     currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
-
+    flag_submissions = relationship("FlagSubmission", back_populates="team")
+    shared_flag_submissions = relationship("SharedFlagSubmission", foreign_keys="[SharedFlagSubmission.team_id]", back_populates="team")
+    team_points = relationship("TeamPoints", back_populates="team")
+    
 class TeamPoints(Base):
     """
     Database model for team points.
@@ -77,7 +80,9 @@ class Challenge(Base):
 
 
     made_by_users = relationship("UserMadeChallenge", back_populates="challenge")
-
+    flag_submissions = relationship("FlagSubmission", back_populates="challenge")
+    shared_flag_submissions = relationship("SharedFlagSubmission", back_populates="challenge")
+    static_flags = relationship("StaticFlag", back_populates="challenge")
 
 class UserMadeChallenge(Base):
     """
@@ -98,24 +103,35 @@ class FlagSubmission(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     flag = Column(String(255), index=True)
-    challenge_id = Column(Integer, index=True)
-    team_id = Column(Integer, index=True)
+    challenge_id = Column(Integer, ForeignKey("Challenges.ID"), index=True)
+    team_id = Column(Integer, ForeignKey("Teams.ID"), index=True)
     status = Column(String(50), index=True)
     submission_time = Column(DateTime(timezone=True), server_default=func.now())
+
+    challenge = relationship("Challenge", back_populates="flag_submissions")
+    team = relationship("Team", back_populates="flag_submissions")
 
 class SharedFlagSubmission(Base):
     __tablename__ = 'shared_flag_submissions'
 
     id = Column(Integer, primary_key=True, index=True)
     flag = Column(String(255), index=True)
-    challenge_id = Column(Integer, index=True)
-    team_id = Column(Integer, index=True)
-    original_team_id = Column(Integer, index=True)
+    challenge_id = Column(Integer, ForeignKey("Challenges.ID"), index=True)
+    team_id = Column(Integer, ForeignKey("Teams.ID"), index=True)
+    original_team_id = Column(Integer, ForeignKey("Teams.ID"), index=True)
     submission_time = Column(DateTime(timezone=True), server_default=func.now())
-    
+
+    challenge = relationship("Challenge", back_populates="shared_flag_submissions")
+    team = relationship("Team", foreign_keys=[team_id], back_populates="shared_flag_submissions")
+    original_team = relationship("Team", foreign_keys=[original_team_id])
+
 class StaticFlag(Base):
     __tablename__ = 'static_flags'
 
     id = Column(Integer, primary_key=True, index=True)
     flag = Column(String(255), unique=True, nullable=False)
-    challenge_id = Column(Integer, index=True, nullable=False)
+    challenge_id = Column(Integer, ForeignKey("Challenges.ID"), index=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    challenge = relationship("Challenge", back_populates="static_flags")
+

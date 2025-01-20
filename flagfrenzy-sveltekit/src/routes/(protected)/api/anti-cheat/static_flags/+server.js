@@ -2,35 +2,34 @@ import { error } from "@sveltejs/kit";
 
 const API_BASE_URL = 'http://api:8000';
 
-export async function GET() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/admin_panel/`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch flags');
-        }
+//export async function GET() {
+    //try {
+      //  const response = await fetch(`${API_BASE_URL}/admin_panel/`);
+        //if (!response.ok) {
+          //  throw new Error('Failed to fetch flags');
+        //}
 
         // Parse the JSON response
-        const data = await response.json();
+        //const data = await response.json();
         
         // Format response if additional handling is needed
-        return jsonResponse(data, response.status);
-    } catch (err) {
-        return jsonResponse({ message: "An error occurred", error: err.message }, 500);
-    }
-}
+        //return jsonResponse(data, response.status);
+    //} catch (err) {
+      //  return jsonResponse({ message: "An error occurred", error: err.message }, 500);
+    //}
+//}
 export async function POST({ request }) {
     
     const { TeamsID, ChallengeID, Flag} = await request.json();
 
     try {
-        const response = await fetch(`${API_BASE_URL}/submit_flag/${TeamsID}/${ChallengeID}?flag=${Flag}`, {
+        const response = await fetch(`${API_BASE_URL}/validate_flag/${ChallengeID}?flag=${Flag}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                team_id: TeamsID,
                 challenge_id: ChallengeID
             })
         });
