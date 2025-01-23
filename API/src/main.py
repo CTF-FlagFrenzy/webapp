@@ -784,11 +784,14 @@ def get_teampoints(db: Session = Depends(get_db)):
 @app.post("/teamPoints/")
 def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
     # Validate the time format
+    team = db.query(Team).filter(Team.ID == teampoints.TeamID).first()
+    
      
     # Create a new TeamPoints object
     new_teampoints = TeamPoints(
         TeamID=teampoints.TeamID,
         Points=teampoints.Points,
+        Teamname=team.Teamname,
         Time=datetime.utcnow()
     )
     
