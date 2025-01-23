@@ -360,7 +360,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     Create a new user.
     """
     nickname = generate_random_username()
-    images = ["Anonymous", "Hacker", "Hero", "logo", "Queen", "Spy", "Warrior"]
+    images = ["Anonymous", "Hacker", "Hero", "Queen", "Spy", "Warrior"]
     avatar = random.choice(images)
     db_user = User(Nickname=nickname, Avatar=avatar, **user.dict())
     try:
