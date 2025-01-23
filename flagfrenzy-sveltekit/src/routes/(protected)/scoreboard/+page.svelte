@@ -32,7 +32,7 @@
   onMount(async () => {
     await loadTeams();
     await loadGraphValue();
-    interval = setInterval(loadTeams, 10000); // Refresh every 60 seconds
+    interval = setInterval((loadTeams, loadGraphValue), 300000); // Refresh every 60 seconds
     return () => {
       clearInterval(interval); // Clean up interval when component is destroyed
     };
@@ -40,14 +40,15 @@
 
 </script>
   
-<div>
-{#if teamPoints}
-  <Graph data={teamPoints} />
-{:else}
-  <p>Loading graph data...</p>
-{/if}
+<div class="px-4 pt-4">
+  {#if teamPoints}
+    <Graph data={teamPoints} />
+  {:else}
+    <p>Loading graph data...</p>
+  {/if}
   {#if teams}
-    <table class="styled-table w-full bg-custom-110 mt-4">
+  <div class="bg-custom-110 mt-4 px-4 py-4 rounded-2xl">
+    <table class="styled-table w-full">
       <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
         <tr>
           <th>Name</th>
@@ -63,6 +64,8 @@
         {/each}
       </tbody>
     </table>
+  </div>
+    
   {:else if errorMessageTeams}
     <p class=" text-Hard text-lg font-bold col-span-2">{errorMessageTeams}</p>
   {:else}

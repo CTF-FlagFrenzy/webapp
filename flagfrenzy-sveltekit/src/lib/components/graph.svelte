@@ -59,12 +59,12 @@
       // Transformiere den Zeitstempel, um nur die Uhrzeit zu behalten
       const timeOnly = new Date(curr.Time).toLocaleTimeString('en-GB'); // HH:mm:ss
 
-      if (!acc[curr.TeamID]) {
-        acc[curr.TeamID] = [];
+      if (!acc[curr.Teamname]) {
+        acc[curr.Teamname] = [];
       }
 
       // Ersetze den Zeitstempel mit der Uhrzeit
-      acc[curr.TeamID].push({ ...curr, Time: timeOnly });
+      acc[curr.Teamname].push({ ...curr, Time: timeOnly });
 
       return acc;
     }, {});
@@ -82,9 +82,9 @@
   function createDatasets(groupedData, labels) {
     let index = 0;
 
-    return Object.keys(groupedData).map((teamID) => {
+    return Object.keys(groupedData).map((teamname) => {
       const allTeams = Object.keys(groupedData);
-      const teamData = groupedData[teamID];
+      const teamData = groupedData[teamname];
       let lastKnownValue = 0; // Startwert für Punkte
 
       const dataPoints = labels.map((timestamp) => {
@@ -100,7 +100,7 @@
       const backgroundColor = `hsl(${hue}, 70%, 80%)`;
 
       const dataset = {
-        label: `Team ${teamID}`,
+        label: `${teamname}`,
         data: dataPoints,
         borderColor: borderColor,
         backgroundColor: backgroundColor,
