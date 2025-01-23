@@ -3,7 +3,7 @@
   import { writable } from 'svelte/store';
   import Graph from '$lib/components/graph.svelte';
 
-  let teams, teamMembers;
+  let teams, teamMembers, teamPoints, interval;
   let errorMessageTeams = '';
 
   async function loadTeams() {
@@ -17,54 +17,55 @@
       errorMessageTeams = err.message;
     }
   }
-   async function loadGraphValue() {
+  async function loadGraphValue() {
     try {
-      errorMessageTeams, teamPoints = '';
+      errorMessageTeams = '';
       const response = await fetch('/api/teampoints');
       if (!response.ok) throw new Error("Failed to load values");
-
+      teamPoints = '';
       teamPoints = await response.json();
       console.log(teamPoints)
     } catch (err) {
       errorMessageTeams = err.message;
     }
   }
-onMount(() => {
-    loadTeams();
-    loadGraphValue();
-  
-    
-    const interval = setInterval(() => {
-      loadTeams();
-    }, 100000);
-
-    // Cleanup beim Verlassen der Komponente
-    return () => clearInterval(interval);
+  onMount(async () => {
+    await loadTeams();
+    await loadGraphValue();
+    interval = setInterval(loadTeams, 10000); // Refresh every 60 seconds
+    return () => {
+      clearInterval(interval); // Clean up interval when component is destroyed
+    };
   });
-  </script>
+
+</script>
   
-  <div>
-       {#if teams}
-        <table class="styled-table w-full bg-custom-110 mt-4">
-          <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
-            <tr>
-              <th>Name</th>
-              <th class="text-center">Points</th>
-            </tr>
-          </thead>
-          <tbody class="text-white text-sm">
-            {#each teams as team}
-              <tr class="border-b border-custom-100">
-                <td class="pt-2 align-top">{team.Teamname}</td>
-                <td class="pt-2 align-top text-center">{team.Points}</td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      {:else if errorMessageTeams}
-        <p class=" text-Hard text-lg font-bold col-span-2">{errorMessageTeams}</p>
-      {:else}
-        <p>Loading teams data...</p>
-      {/if}
-      <Graph />
-  </div>
+<div>
+{#if teamPoints}
+  <Graph data={teamPoints} />
+{:else}
+  <p>Loading graph data...</p>
+{/if}
+  {#if teams}
+    <table class="styled-table w-full bg-custom-110 mt-4">
+      <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
+        <tr>
+          <th>Name</th>
+          <th class="text-center">Points</th>
+        </tr>
+      </thead>
+      <tbody class="text-white text-sm">
+        {#each teams as team}
+          <tr class="border-b border-custom-100">
+            <td class="pt-2 align-top">{team.Teamname}</td>
+            <td class="pt-2 align-top text-center">{team.Points}</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  {:else if errorMessageTeams}
+    <p class=" text-Hard text-lg font-bold col-span-2">{errorMessageTeams}</p>
+  {:else}
+    <p>Loading teams data...</p>
+  {/if}
+</div>
