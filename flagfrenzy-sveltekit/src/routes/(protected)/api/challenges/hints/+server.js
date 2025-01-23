@@ -5,9 +5,9 @@ const API_BASE_URL = 'http://api:8000';
 export async function GET({ url }) {
     const id = url.searchParams.get('id');
     try {
-        const response = await fetch(`${API_BASE_URL}/challenges/${id}`);
+        const response = await fetch(`${API_BASE_URL}/challenges/hints/${id}`);
         if (!response.ok) {
-            throw new Error('Failed to fetch challenges');
+            throw new Error('Failed to fetch hints');
         }
 
         // Parse the JSON response
