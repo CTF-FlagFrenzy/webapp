@@ -25,7 +25,7 @@ class Team(Base):
     currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
     flag_submissions = relationship("FlagSubmission", back_populates="team")
     shared_flag_submissions = relationship("SharedFlagSubmission", foreign_keys="[SharedFlagSubmission.team_id]", back_populates="team")
-    team_points = relationship("TeamPoints", back_populates="team")
+
     
 class TeamPoints(Base):
     """
@@ -82,7 +82,6 @@ class Challenge(Base):
     made_by_users = relationship("UserMadeChallenge", back_populates="challenge")
     flag_submissions = relationship("FlagSubmission", back_populates="challenge")
     shared_flag_submissions = relationship("SharedFlagSubmission", back_populates="challenge")
-    static_flags = relationship("StaticFlag", back_populates="challenge")
 
 class UserMadeChallenge(Base):
     """

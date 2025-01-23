@@ -556,12 +556,10 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
                 "ChallengeName": challenge.ChallengeName,
                 "Difficulty": challenge.Difficulty,
                 "Category": challenge.Categorie,
-                "Hint1": challenge.Hint1,
-                "Hint2": challenge.Hint2,
-                "Hint3": challenge.Hint3,
                 "Description": challenge.Description,
                 "Chain": challenge.Chain,
                 "Points": challenge.Points,
+                "IsStatic": challenge.IsStatic,
                 "Solved": challenge.ID in solved_challenge_ids
             }
             for challenge in challenges
