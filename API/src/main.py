@@ -456,9 +456,11 @@ def update_user_disabled(user_id: str, user_disable: int, db: Session = Depends(
     """
     try:
         user = db.query(User).filter(User.ID == user_id).first()
+        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-
+        team.Members -= 1
+        team.Points = 0
         user.Disabled = user_disable
 
         db.commit()
