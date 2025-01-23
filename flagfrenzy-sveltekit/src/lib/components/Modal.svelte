@@ -12,6 +12,7 @@
   let allFlags;
   let flagStatus;
 
+
   const dispatch = createEventDispatcher();
 
   function close() {
@@ -189,6 +190,27 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
+  async function updatePoints() {
+    try {
+      const response = await fetch("/api/user/points", {
+        method: "PUT",
+        body: JSON.stringify({
+          UserID: user.ID,
+          Points: data.Points
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }
+      });
+      console.log( await response.json())
+
+      if (!response.ok) {
+        throw new Error(".");
+      }
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+    }
+  }
 </script>
 
 {#if isOpen}
@@ -215,6 +237,8 @@ async function checkChainCondition() {
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
+            <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={updatePoints}>Points</button>
+
 
     </div>
   </div>
