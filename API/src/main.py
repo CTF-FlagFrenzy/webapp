@@ -459,9 +459,12 @@ def update_user_disabled(user_id: str, user_disable: int, db: Session = Depends(
         team = db.query(Team).filter(Team.ID == user.TeamsID).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        team.Members -= 1
-        team.Points = 0
-        user.Disabled = user_disable
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+        if user.Disabled == 0:
+            team.Members -= 1
+            team.Points = 0
+            user.Disabled = user_disable
 
         db.commit()
         db.refresh(user)
@@ -937,8 +940,9 @@ async def admin_panel(db: Session = Depends(get_db)):
 @app.post("/validate_flag/{challenge_id}")
 async def validate_flag(flag: str, challenge_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
-    static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
-    
+    static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
+    if static_flag is None:
+        return {"status": "invalid", "message": "Challenge is not a static flag"}
     if 'FF{' + static_flag.Static + '}' == flag:
         return {"status": "successful", "message": "Flag is valid!"}
     else:
