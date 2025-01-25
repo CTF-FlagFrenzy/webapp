@@ -3,7 +3,7 @@
     import { writable } from 'svelte/store';
     let teams, teamMembers, teamPoints;
     let errorMessageTeams = '';
-
+    export let data;
     async function loadTeams() {
     try {
       errorMessageTeams, teams = '';
@@ -18,7 +18,7 @@
    async function loadGraphValue() {
     try {
       errorMessageTeams, teamPoints = '';
-      const response = await fetch('/api/teampoints');
+      const response = await fetch(`/api/teampoints?id=${data.username}`);
       if (!response.ok) throw new Error("Failed to load values");
 
       teamPoints = await response.json();

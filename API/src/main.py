@@ -819,8 +819,24 @@ def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = De
     return {"detail": "User-made challenge deleted successfully"}
 
 # --------------------- TEAM POINTS -----------------------
+from sqlalchemy import extract
 
-@app.get("/teamPoints/")
+@app.get("/teamPoints/{user_id}")
+def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
+    """
+    Retrieve all teamPoints over time with a time limit for classes.
+    """
+    if "2" in user_id:
+        teamPoints = db.query(TeamPoints).filter(
+        extract('hour', TeamPoints.Time) < 14
+        ).all()
+    else:  
+        teamPoints = db.query(TeamPoints).filter(
+        extract('hour', TeamPoints.Time) < 16
+        ).all()
+    return teamPoints
+
+@app.get("/teamPoints/admin")
 def get_teampoints(db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time.
