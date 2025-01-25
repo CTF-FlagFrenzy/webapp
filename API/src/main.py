@@ -17,7 +17,7 @@ import string
 from datetime import datetime, time, date
 from typing import Dict
 
-start_time = time(7, 0)  
+start_time = time(8, 0)  
 end_time = time(14, 0) 
 allowed_date = date(2025, 3, 20)
 
@@ -25,8 +25,13 @@ def is_not_allowed_time():
     current_time = datetime.utcnow().time()  
     current_date = datetime.utcnow().date()  
     print(current_date)
+    print(current_time) 
+    print(start_time)
+    print(end_time)
     if current_date == allowed_date and (start_time <= current_time <= end_time):
         return True  
+
+is_not_allowed_time()
 
 app = FastAPI()
 
