@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
-
+from sqlalchemy import extract
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
@@ -819,7 +819,6 @@ def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = De
     return {"detail": "User-made challenge deleted successfully"}
 
 # --------------------- TEAM POINTS -----------------------
-from sqlalchemy import extract
 
 @app.get("/teamPoints/{user_id}")
 def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
