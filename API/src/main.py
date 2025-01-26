@@ -24,10 +24,7 @@ allowed_date = date(2025, 3, 20)
 def is_not_allowed_time():
     current_time = datetime.utcnow().time()  
     current_date = datetime.utcnow().date()  
-    print(current_date)
-    print(current_time) 
-    print(start_time)
-    print(end_time)
+
     if current_date == allowed_date and (start_time <= current_time <= end_time):
         return True  
 
@@ -118,6 +115,7 @@ class TeamResponse(BaseModel):
     Points: int
     Members: int
     SharedFlag: int
+    Disabled: int
 
 class TeamPointsCreate(BaseModel):
     TeamID: int
@@ -452,34 +450,6 @@ def update_user_team(
     except Exception as ex:
         db.rollback()
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
-
-
-@app.put("/users/disabled/{user_id}")
-def update_user_disabled(user_id: str, user_disable: int, db: Session = Depends(get_db)):
-    """
-    Enable or disable a user's account.
-    """
-    try:
-        user = db.query(User).filter(User.ID == user_id).first()
-        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        if not team:
-            raise HTTPException(status_code=404, detail="Team not found")
-        if user.Disabled == 0:
-            team.Members -= 1
-            team.Points = 0
-            user.Disabled = user_disable
-
-        db.commit()
-        db.refresh(user)
-        return user
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="This nickname already exists.")
-    except Exception as ex:
-        db.rollback()
-        raise HTTPException(status_code=422, detail=str(ex))
-
 
 @app.put("/users/points/{user_id}")
 def update_user_points(user_id: str, points: int, db: Session = Depends(get_db)):
@@ -849,8 +819,6 @@ def get_teampoints(db: Session = Depends(get_db)):
     return teamPoints
 
 
-
-# POST endpoint for creating TeamPoints
 @app.post("/teamPoints/")
 def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
     # Validate the time format
@@ -905,8 +873,9 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
     challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()  # Assuming a single challenge for simplicity
 
     if not team or not challenge:
-        return { "status": "invalid"}
-
+        return { "status": "Not found"}
+    if team.Disabled == 1:
+        return { "status": "disabled"}
     # Generate the flag
     generated_flag = generate_flag(team.Teamkey, challenge.Static)
     print(f"Generated flag: {generated_flag}")
@@ -933,7 +902,13 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
                 submission_time=datetime.utcnow()
             )
             db.add(new_shared_submission)
+
+            team = db.query(Team).filter(Team.ID == team_id).first()
+            team.SharedFlag += 1
+            if team.SharedFlag == 2:
+                team.Disabled = 1
             db.commit()
+            db.refresh(team)
         else:
             status = 'invalid'
 
