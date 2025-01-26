@@ -20,6 +20,7 @@ class Team(Base):
     Points = Column(Integer, default=0)
     Members = Column(Integer, nullable=False, default=0)
     SharedFlag = Column(Integer, nullable=False, default=0)
+    Disabled = Column(Integer, nullable=False, default=0)
 
     users = relationship("User", back_populates="team")
     currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
@@ -50,7 +51,6 @@ class User(Base):
     Nickname = Column(String(50), nullable=False)
     Points = Column(Integer, default=0)
     TeamsID = Column(Integer, ForeignKey("Teams.ID"), nullable=True)
-    Disabled = Column(Integer, nullable=False, default=0)
     Email = Column(String(50), nullable=False)
     Avatar = Column(String(100), nullable=True, default=None)
 
