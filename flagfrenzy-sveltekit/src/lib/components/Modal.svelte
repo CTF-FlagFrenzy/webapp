@@ -105,6 +105,7 @@ async function checkChainCondition() {
     let solved = 0;
     if (flagStatus.status === "successful") {
       solved = 1;
+      close();
     } 
     try {
       const response = await fetch(`/api/user_made_challenges?id=${user.ID}&challenge_id=${data.ID}`, {
@@ -189,6 +190,13 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
+  function colorPicker(difficulty) {
+    if(data.Solved) {
+      return 'Default';
+    } else {
+      return difficulty;
+    }
+  }
 </script>
 
 {#if isOpen}
@@ -196,7 +204,7 @@ async function checkChainCondition() {
   <div class="fixed inset-0 bg-black bg-opacity-75 z-10" on:click={close} tabindex="0" role="button" ></div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="fixed inset-0 bg-black bg-opacity-75 z-10" on:click={close} tabindex="0" role="button" ></div>
-  <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 rounded-lg z-20 max-h-3/5 max-w-2xl w-11/12 bg-custom-110 shadow-button-{data.Difficulty} text-white">
+  <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 rounded-lg z-20 max-h-3/5 max-w-2xl w-11/12 bg-custom-110 shadow-button-{colorPicker(data.Difficulty)} text-white">
     <button class="absolute top-2.5 right-2.5 text-xl cursor-pointer bg-none" on:click={close}>✖</button>
     <div class="flex justify-between">
       <h2 class="text-3xl">{data.ChallengeName}</h2>
@@ -204,18 +212,22 @@ async function checkChainCondition() {
     </div>
     <h3 class="text-2xl">Description:</h3>
     <p class=" text-lg">{data.Description}</p>
-    <p class=" text-lg">{data.Description}</p>
     <h3 class="text-2xl">Hint:</h3>
     <p class="text-lg">{hints.Hint1}</p>
     <p class="text-lg">{hints.Hint2}</p>
     <p class="text-lg">{hints.Hint3}</p>
     <div class="flex justify-between items-center mt-auto pt-4 border-t border-custom-200">
-      <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
-
+      {#if data.Solved}
+        <div class="flex justify-center items-center w-full">
+          <p class="text-custom-200 text-xl">Solved</p>
+        </div>
+      {:else}
+        <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
+        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
+      {/if}
     </div>
   </div>
 {/if}

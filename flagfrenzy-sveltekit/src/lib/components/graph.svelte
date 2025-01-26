@@ -56,15 +56,17 @@
   //Gruppiere Daten nach TeamID
   function groupDataByTeams(data) {
     return data.reduce((acc, curr) => {
-      // Transformiere den Zeitstempel, um nur die Uhrzeit zu behalten
-      const timeOnly = new Date(curr.Time).toLocaleTimeString('en-GB'); // HH:mm:ss
+      // Zeitstempel um eine Stunde verschieben und im korrekten Format speichern
+      const date = new Date(curr.Time);
+      date.setHours(date.getHours() + 1);
+      const adjustedTime = date.toLocaleTimeString('en-GB'); // HH:mm:ss
 
       if (!acc[curr.Teamname]) {
         acc[curr.Teamname] = [];
       }
 
-      // Ersetze den Zeitstempel mit der Uhrzeit
-      acc[curr.Teamname].push({ ...curr, Time: timeOnly });
+      // Zeitstempel aktualisieren
+      acc[curr.Teamname].push({ ...curr, Time: adjustedTime });
 
       return acc;
     }, {});
@@ -75,7 +77,11 @@
     const timestamps = [...new Set(data.map((item) => item.Time))];
     return timestamps
       .sort((a, b) => new Date(a) - new Date(b))
-      .map((timestamp) => new Date(timestamp).toLocaleTimeString('en-GB')); // Nur die Zeit (hh:mm:ss) extrahieren
+      .map((timestamp) => {
+        const date = new Date(timestamp);
+        date.setHours(date.getHours() + 1); // Eine Stunde hinzufügen
+        return date.toLocaleTimeString('en-GB'); // Nur die Zeit (hh:mm:ss) extrahieren
+      });
   }
 
   //Erstelle Datensätze für jedes Team

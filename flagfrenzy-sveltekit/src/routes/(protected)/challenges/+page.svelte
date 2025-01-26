@@ -34,42 +34,59 @@
   }
 
   async function loadUsermadeChallenges() {
-      try {
-        const response = await fetch(`/api/user_made_challenges?id=${user.TeamsID}`);
-        if (!response.ok) throw new Error("Failed to load user_made_challenges");
-  
-        user_made_challenges = await response.json();
-        console.log(user_made_challenges)
-      } catch (err) {
-        error = err.message;
-      }
+    try {
+      const response = await fetch(`/api/user_made_challenges?id=${user.TeamsID}`);
+      if (!response.ok) throw new Error("Failed to load user_made_challenges");
+
+      user_made_challenges = await response.json();
+      console.log(user_made_challenges)
+    } catch (err) {
+      error = err.message;
     }
-    async function loadChallenges() {
-      try {
-        const response = await fetch(`/api/challenges?id=${user.TeamsID}`);
-        if (!response.ok) throw new Error("Failed to load challenges");
-  
-        // Set the categorized response directly to challengesByCategory
-        challengesByCategory = await response.json();
-      } catch (err) {
-        error = err.message;
+  }
+  async function loadChallenges() {
+    try {
+      const response = await fetch(`/api/challenges?id=${user.TeamsID}`);
+      if (!response.ok) throw new Error("Failed to load challenges");
+
+      const rawChallengesByCategory = await response.json();
+      console.log(rawChallengesByCategory);
+
+      // Map to track solved challenges by ID
+      const solvedMap = {};
+      Object.values(rawChallengesByCategory).flat().forEach(challenge => {
+          solvedMap[challenge.ID] = challenge.Solved;
+      });
+
+      // Filter challenges based on `Chain` and `Solved` status
+      challengesByCategory = {};
+      for (const [category, challenges] of Object.entries(rawChallengesByCategory)) {
+        challengesByCategory[category] = challenges.filter(challenge => {
+          return (
+            challenge.Chain === null || // No dependency
+            (challenge.Chain in solvedMap && solvedMap[challenge.Chain]) // Dependency solved
+          );
+        });
       }
+    } catch (err) {
+      error = err.message;
     }
-    onMount(async () => {
-      await getUser();
-      loadChallenges(); // Initial load
-      loadUsermadeChallenges();
-      // Start interval to refresh data
-      interval = setInterval(loadChallenges, 10000); // Refresh every 60 seconds
-  
-      return () => {
-        clearInterval(interval); // Clean up interval when component is destroyed
-      };
-    });
-  
-    onDestroy(() => {
-      if (interval) clearInterval(interval); // Ensure interval is cleared
-    });
+  }
+  onMount(async () => {
+    await getUser();
+    loadChallenges(); // Initial load
+    loadUsermadeChallenges();
+    // Start interval to refresh data
+    interval = setInterval(loadChallenges, 10000); // Refresh every 10 seconds
+
+    return () => {
+      clearInterval(interval); // Clean up interval when component is destroyed
+    };
+  });
+
+  onDestroy(() => {
+    if (interval) clearInterval(interval); // Ensure interval is cleared
+  });
 </script>
   
   {#each Object.keys(challengesByCategory) as category}
