@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
+from zoneinfo import ZoneInfo
 from sqlalchemy import extract
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
@@ -14,21 +15,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 import random
 import string
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timezone
 from typing import Dict
 
-start_time = time(8, 0)  
-end_time = time(14, 0) 
+start_time = time(9, 0)  
+end_time = time(15, 0) 
 allowed_date = date(2025, 3, 20)
-
+vienna_timezone = ZoneInfo("Europe/Vienna")
 def is_not_allowed_time():
-    current_time = datetime.utcnow().time()  
-    current_date = datetime.utcnow().date()  
-
+    current_time = datetime.now(vienna_timezone).time()  
+    current_date = datetime.now().date()  
     if current_date == allowed_date and (start_time <= current_time <= end_time):
         return True  
 
-is_not_allowed_time()
 
 app = FastAPI()
 
@@ -802,11 +801,11 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     """
     if "2" in user_id:
         teamPoints = db.query(TeamPoints).filter(
-        extract('hour', TeamPoints.Time) < 14
+        extract('hour', TeamPoints.Time) < 13
         ).all()
     else:  
         teamPoints = db.query(TeamPoints).filter(
-        extract('hour', TeamPoints.Time) < 16
+        extract('hour', TeamPoints.Time) < 15
         ).all()
     return teamPoints
 
@@ -827,7 +826,7 @@ def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_d
     new_teampoints = TeamPoints(
         TeamID=teampoints.TeamID,
         Points=teampoints.Points,
-        Time=datetime.utcnow()
+        Time=datetime.now(vienna_timezone)
     )
     
     # Add and commit to the database
@@ -884,7 +883,7 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
     if flag == "FF{"+ generated_flag +"}":
         status = 'successful'
         # Log the successful flag submission
-        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
+        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
@@ -899,7 +898,7 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
                 team_id=team_id,
                 challenge_id=challenge_id,
                 original_team_id=existing_submission.team_id,
-                submission_time=datetime.utcnow()
+                submission_time=datetime.now(vienna_timezone)
             )
             db.add(new_shared_submission)
 
