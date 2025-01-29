@@ -68,7 +68,6 @@ class Challenge(Base):
     ChallengeName = Column(String(100), nullable=False, unique=True)
     FormatedChallengeName =  Column(String(100), nullable=False, unique=True)
     Categorie = Column(String(45), nullable=False)
-    Hintcount = Column(Integer, default=0)
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
     Difficulty = Column(String(30), default="Easy")
