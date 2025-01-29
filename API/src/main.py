@@ -763,16 +763,24 @@ def update_user_made_challenge(
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
 
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
     firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
                                                     UserMadeChallenge.Firstblood == 1).first()
 
     if not firstblood and update_data.Solved == 1:
+        user.Points += challenge.Points*0.1
+        team.Points += challenge.Points*0.1
         user_made_challenge.Firstblood = 1
+        
 
     user_made_challenge.Solved = update_data.Solved
 
     db.commit()
     db.refresh(user_made_challenge)
+    db.refresh(user)
+
     return user_made_challenge
 
 
