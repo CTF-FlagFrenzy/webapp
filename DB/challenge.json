@@ -118,7 +118,7 @@
     "Static": "dogmom_adventure",
     "FormatedChallengeName": "profile-prodigy-part-1",
     "Chain": null,
-    "IsStatic": 0
+    "IsStatic": 1
   },{
     "ID":  9,
     "ChallengeName": "Profile Prodigy - Part 2",
@@ -132,7 +132,7 @@
     "Static": "Budapest",
     "FormatedChallengeName": "profile-prodigy-part-2",
     "Chain": 8,
-    "IsStatic": 0
+    "IsStatic": 1
   },{
     "ID":  10,
     "ChallengeName": "Profile Prodigy - Part 3",
@@ -146,7 +146,7 @@
     "Static": "07-06-1999",
     "FormatedChallengeName": "profile-prodigy-part-3",
     "Chain": 9,
-    "IsStatic": 0
+    "IsStatic": 1
   },{
     "ID":  11,
     "ChallengeName": "Time Traveler's Hunt - Part 1",
@@ -160,7 +160,7 @@
     "Static": "YouPassedTheTest",
     "FormatedChallengeName": "time-travelers-hunt-part-1",
     "Chain": null,
-    "IsStatic": 0
+    "IsStatic": 1
   }, {
     "ID":  12,
     "ChallengeName": "Time Traveler's Hunt - Part 2",
@@ -174,7 +174,7 @@
     "Static": "timemachine1",
     "FormatedChallengeName": "time-travelers-hunt-part-2",
     "Chain": 11,
-    "IsStatic": 0
+    "IsStatic": 1
   }, {
     "ID":  13,
     "ChallengeName": "Time Traveler's Hunt - Part 3",
@@ -188,7 +188,7 @@
     "Static": "itsasecret",
     "FormatedChallengeName": "time-travelers-hunt-part-3",
     "Chain": 12,
-    "IsStatic": 0
+    "IsStatic": 1
   },{
     "ID":  14,
     "ChallengeName": "Git Secrets: Layers of Discovery - Part 1",
@@ -202,6 +202,6 @@
     "Static": "Wi3dS#ld!k",
     "FormatedChallengeName": "git-secrets-layers-of-discovery-part-1",
     "Chain": null,
-    "IsStatic": 0
+    "IsStatic": 1
   }
 ]
