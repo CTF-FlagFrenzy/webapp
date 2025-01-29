@@ -58,7 +58,6 @@
     return data.reduce((acc, curr) => {
       // Zeitstempel um eine Stunde verschieben und im korrekten Format speichern
       const date = new Date(curr.Time);
-      date.setHours(date.getHours() + 1);
       const adjustedTime = date.toLocaleTimeString('en-GB'); // HH:mm:ss
 
       if (!acc[curr.Teamname]) {
@@ -79,7 +78,6 @@
       .sort((a, b) => new Date(a) - new Date(b))
       .map((timestamp) => {
         const date = new Date(timestamp);
-        date.setHours(date.getHours() + 1); // Eine Stunde hinzufügen
         return date.toLocaleTimeString('en-GB'); // Nur die Zeit (hh:mm:ss) extrahieren
       });
   }
