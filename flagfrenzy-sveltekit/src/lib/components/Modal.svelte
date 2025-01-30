@@ -56,32 +56,6 @@ async function checkChainCondition() {
     checkChainCondition();
     loadHints(); 
   }
-
-  async function hintCount() {
-    if (hintUsed) {
-      console.log("Hint already used for this modal session.");
-      return;
-    }
-    
-    try {
-      const response = await fetch(`/api/challenges/hintcount?challenge_id=${data.ID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error("Hint wurde bereits benutzt.");
-      }
-
-  
-      hintUsed = true; // Mark hint as used
-      console.log("Hint used successfully.");
-    } catch (error) {
-      console.log(error.message || "Es ist ein Fehler aufgetreten.");
-    }
-  }
   async function startChallenge() {
     try {
       const response = await fetch("/api/user_made_challenges", {
@@ -232,7 +206,7 @@ async function checkChainCondition() {
     <button class="absolute top-2.5 right-2.5 text-xl cursor-pointer bg-none" on:click={close}>✖</button>
     <div class="flex justify-between">
       <h2 class="text-3xl">{data.ChallengeName}</h2>
-      <h3 class="text-2xl mr-4">Difficulty: <span class="text-{data.Difficulty}">{data.Difficulty}</span></h3>
+      <h3 class="text-2xl mr-4">Difficulty: <span class="text-{colorPicker(data.Difficulty)}">{data.Difficulty}</span></h3>
     </div>
     <h3 class="text-2xl">Description:</h3>
     <p class=" text-lg">{data.Description}</p>
@@ -248,7 +222,6 @@ async function checkChainCondition() {
       {:else}<input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={updatePoints}>Points</button>
       {/if}
