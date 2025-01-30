@@ -3,30 +3,31 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table
 )
-
+from zoneinfo import ZoneInfo
+from sqlalchemy import extract
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, StaticFlag, TeamPoints
+from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, TeamPoints
 from model.database import SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 import random
 import string
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timezone
 from typing import Dict
 
-start_time = time(7, 0)  
-end_time = time(14, 0) 
+start_time = time(9, 0)  
+end_time = time(15, 0) 
 allowed_date = date(2025, 3, 20)
-
+vienna_timezone = ZoneInfo("Europe/Vienna")
 def is_not_allowed_time():
-    current_time = datetime.utcnow().time()  
-    current_date = datetime.utcnow().date()  
-    print(current_date)
+    current_time = datetime.now(vienna_timezone).time()  
+    current_date = datetime.now().date()  
     if current_date == allowed_date and (start_time <= current_time <= end_time):
         return True  
+
 
 app = FastAPI()
 
@@ -86,6 +87,7 @@ class ChallengeCreate(BaseModel):
     Static: str
     Description: str
     Difficulty: str = 'Easy'
+    IsStatic: int = 0
     Hint1: Optional[str] = None
     Hint2: Optional[str] = None
     Hint3: Optional[str] = None
@@ -112,6 +114,7 @@ class TeamResponse(BaseModel):
     Points: int
     Members: int
     SharedFlag: int
+    Disabled: int
 
 class TeamPointsCreate(BaseModel):
     TeamID: int
@@ -447,29 +450,6 @@ def update_user_team(
         db.rollback()
         raise HTTPException(status_code=500, detail="An unexpected error occurred")
 
-
-@app.put("/users/disabled/{user_id}")
-def update_user_disabled(user_id: str, user_disable: int, db: Session = Depends(get_db)):
-    """
-    Enable or disable a user's account.
-    """
-    try:
-        user = db.query(User).filter(User.ID == user_id).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        user.Disabled = user_disable
-
-        db.commit()
-        db.refresh(user)
-        return user
-    except IntegrityError:
-        raise HTTPException(status_code=400, detail="This nickname already exists.")
-    except Exception as ex:
-        db.rollback()
-        raise HTTPException(status_code=422, detail=str(ex))
-
-
 @app.put("/users/points/{user_id}")
 def update_user_points(user_id: str, points: int, db: Session = Depends(get_db)):
     """
@@ -555,12 +535,10 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
                 "ChallengeName": challenge.ChallengeName,
                 "Difficulty": challenge.Difficulty,
                 "Category": challenge.Categorie,
-                "Hint1": challenge.Hint1,
-                "Hint2": challenge.Hint2,
-                "Hint3": challenge.Hint3,
                 "Description": challenge.Description,
                 "Chain": challenge.Chain,
                 "Points": challenge.Points,
+                "IsStatic": challenge.IsStatic,
                 "Solved": challenge.ID in solved_challenge_ids
             }
             for challenge in challenges
@@ -816,7 +794,22 @@ def delete_user_made_challenge(user_id: str, challenge_id: int, db: Session = De
 
 # --------------------- TEAM POINTS -----------------------
 
-@app.get("/teamPoints/")
+@app.get("/teamPoints/{user_id}")
+def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
+    """
+    Retrieve all teamPoints over time with a time limit for classes.
+    """
+    if "2" in user_id:
+        teamPoints = db.query(TeamPoints).filter(
+        extract('hour', TeamPoints.Time) < 13
+        ).all()
+    else:  
+        teamPoints = db.query(TeamPoints).filter(
+        extract('hour', TeamPoints.Time) < 15
+        ).all()
+    return teamPoints
+
+@app.get("/teamPoints/admin")
 def get_teampoints(db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time.
@@ -825,8 +818,6 @@ def get_teampoints(db: Session = Depends(get_db)):
     return teamPoints
 
 
-
-# POST endpoint for creating TeamPoints
 @app.post("/teamPoints/")
 def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
     # Validate the time format
@@ -838,7 +829,7 @@ def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_d
         TeamID=teampoints.TeamID,
         Points=teampoints.Points,
         Teamname=team.Teamname,
-        Time=datetime.utcnow()
+        Time=datetime.now(vienna_timezone)
     )
     
     # Add and commit to the database
@@ -884,8 +875,9 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
     challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()  # Assuming a single challenge for simplicity
 
     if not team or not challenge:
-        return { "status": "invalid"}
-
+        return { "status": "Not found"}
+    if team.Disabled == 1:
+        return { "status": "disabled"}
     # Generate the flag
     generated_flag = generate_flag(team.Teamkey, challenge.Static)
     print(f"Generated flag: {generated_flag}")
@@ -894,7 +886,7 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
     if flag == "FF{"+ generated_flag +"}":
         status = 'successful'
         # Log the successful flag submission
-        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.utcnow())
+        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
@@ -909,10 +901,16 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
                 team_id=team_id,
                 challenge_id=challenge_id,
                 original_team_id=existing_submission.team_id,
-                submission_time=datetime.utcnow()
+                submission_time=datetime.now(vienna_timezone)
             )
             db.add(new_shared_submission)
+
+            team = db.query(Team).filter(Team.ID == team_id).first()
+            team.SharedFlag += 1
+            if team.SharedFlag == 2:
+                team.Disabled = 1
             db.commit()
+            db.refresh(team)
         else:
             status = 'invalid'
 
@@ -939,29 +937,30 @@ async def admin_panel(db: Session = Depends(get_db)):
 @app.post("/validate_flag/{challenge_id}")
 async def validate_flag(flag: str, challenge_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
-    static_flag = db.query(StaticFlag).filter(StaticFlag.flag == flag, StaticFlag.challenge_id == challenge_id).first()
-    
-    if static_flag:
+    static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
+    if static_flag is None:
+        return {"status": "invalid", "message": "Challenge is not a static flag"}
+    if 'FF{' + static_flag.Static + '}' == flag:
         return {"status": "successful", "message": "Flag is valid!"}
     else:
         return {"status": "invalid", "message": "Flag is invalid!"}
     
-@app.post("/add_static_flag")
-async def add_static_flag(flag_data: StaticFlagCreate, db: Session = Depends(get_db)):
-    # Check if the flag already exists
-    existing_flag = db.query(StaticFlag).filter(StaticFlag.flag == flag_data.flag, StaticFlag.challenge_id == flag_data.challenge_id).first()
-    if existing_flag:
-        raise HTTPException(status_code=400, detail="Flag already exists")
+# @app.post("/add_static_flag")
+# async def add_static_flag(flag_data: StaticFlagCreate, db: Session = Depends(get_db)):
+#     # Check if the flag already exists
+#     existing_flag = db.query(StaticFlag).filter(StaticFlag.flag == flag_data.flag, StaticFlag.challenge_id == flag_data.challenge_id).first()
+#     if existing_flag:
+#         raise HTTPException(status_code=400, detail="Flag already exists")
 
-    # Create a new static flag
-    new_flag = StaticFlag(
-        flag=flag_data.flag,
-        challenge_id=flag_data.challenge_id
-    )
-    db.add(new_flag)
-    db.commit()
-    db.refresh(new_flag)
-    return {"detail": "success", "flag": new_flag}
+#     # Create a new static flag
+#     new_flag = StaticFlag(
+#         flag=flag_data.flag,
+#         challenge_id=flag_data.challenge_id
+#     )
+#     db.add(new_flag)
+#     db.commit()
+#     db.refresh(new_flag)
+#     return {"detail": "success", "flag": new_flag}
 
 @app.get("/get_flags")
 async def get_flags(db: Session = Depends(get_db)):

@@ -12,6 +12,7 @@
   let allFlags;
   let flagStatus;
 
+
   const dispatch = createEventDispatcher();
 
   function close() {
@@ -190,11 +191,34 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
+
   function colorPicker(difficulty) {
     if(data.Solved) {
       return 'Default';
     } else {
       return difficulty;
+    }}
+  
+  async function updatePoints() {
+    try {
+      const response = await fetch("/api/user/points", {
+        method: "PUT",
+        body: JSON.stringify({
+          UserID: user.ID,
+          Points: data.Points
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }
+      });
+      console.log( await response.json())
+
+      if (!response.ok) {
+        throw new Error(".");
+      }
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+
     }
   }
 </script>
@@ -221,13 +245,18 @@ async function checkChainCondition() {
         <div class="flex justify-center items-center w-full">
           <p class="text-custom-200 text-xl">Solved</p>
         </div>
-      {:else}
-        <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
+      {:else}<input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={updatePoints}>Points</button>
       {/if}
+
+      
+
+
+
     </div>
   </div>
 {/if}

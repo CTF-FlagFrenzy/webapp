@@ -20,12 +20,13 @@ class Team(Base):
     Points = Column(Integer, default=0)
     Members = Column(Integer, nullable=False, default=0)
     SharedFlag = Column(Integer, nullable=False, default=0)
+    Disabled = Column(Integer, nullable=False, default=0)
 
     users = relationship("User", back_populates="team")
     currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
     flag_submissions = relationship("FlagSubmission", back_populates="team")
     shared_flag_submissions = relationship("SharedFlagSubmission", foreign_keys="[SharedFlagSubmission.team_id]", back_populates="team")
-    team_points = relationship("TeamPoints", back_populates="team")
+
     
 class TeamPoints(Base):
     """
@@ -51,7 +52,6 @@ class User(Base):
     Nickname = Column(String(50), nullable=False)
     Points = Column(Integer, default=0)
     TeamsID = Column(Integer, ForeignKey("Teams.ID"), nullable=True)
-    Disabled = Column(Integer, nullable=False, default=0)
     Email = Column(String(50), nullable=False)
     Avatar = Column(String(100), nullable=True, default=None)
 
@@ -69,7 +69,6 @@ class Challenge(Base):
     ChallengeName = Column(String(100), nullable=False, unique=True)
     FormatedChallengeName =  Column(String(100), nullable=False, unique=True)
     Categorie = Column(String(45), nullable=False)
-    Hintcount = Column(Integer, default=0)
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
     Difficulty = Column(String(30), default="Easy")
@@ -78,12 +77,11 @@ class Challenge(Base):
     Hint1 = Column(Text(400), nullable=True, default=None)
     Hint2 = Column(Text(400), nullable=True, default=None)
     Hint3 = Column(Text(400), nullable=True, default=None)
-
+    IsStatic = Column(Integer, nullable=False, default=0)
 
     made_by_users = relationship("UserMadeChallenge", back_populates="challenge")
     flag_submissions = relationship("FlagSubmission", back_populates="challenge")
     shared_flag_submissions = relationship("SharedFlagSubmission", back_populates="challenge")
-    static_flags = relationship("StaticFlag", back_populates="challenge")
 
 class UserMadeChallenge(Base):
     """
@@ -126,13 +124,13 @@ class SharedFlagSubmission(Base):
     team = relationship("Team", foreign_keys=[team_id], back_populates="shared_flag_submissions")
     original_team = relationship("Team", foreign_keys=[original_team_id])
 
-class StaticFlag(Base):
-    __tablename__ = 'static_flags'
+# class StaticFlag(Base):
+#     __tablename__ = 'static_flags'
 
-    id = Column(Integer, primary_key=True, index=True)
-    flag = Column(String(255), unique=True, nullable=False)
-    challenge_id = Column(Integer, ForeignKey("Challenges.ID"), index=True, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+#     id = Column(Integer, primary_key=True, index=True)
+#     flag = Column(String(255), unique=True, nullable=False)
+#     challenge_id = Column(Integer, ForeignKey("Challenges.ID"), index=True, nullable=False)
+#     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    challenge = relationship("Challenge", back_populates="static_flags")
+#     challenge = relationship("Challenge", back_populates="static_flags")
 
