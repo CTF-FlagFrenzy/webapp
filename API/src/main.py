@@ -880,15 +880,19 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
         return { "status": "Not found"}
     if team.Disabled == 1:
         return { "status": "disabled"}
+
     # Generate the flag
     generated_flag = generate_flag(team.Teamkey, challenge.Static)
     print(f"Generated flag: {generated_flag}")
 
+    # Normalize the submitted flag by removing spaces
+    normalized_flag = flag.replace(" ", "")
+
     # Validate the submitted flag
-    if flag == "FF{"+ generated_flag +"}":
+    if normalized_flag == "FF{" + generated_flag + "}":
         status = 'successful'
         # Log the successful flag submission
-        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
+        new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
