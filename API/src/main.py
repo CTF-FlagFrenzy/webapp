@@ -868,8 +868,8 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
     """
 
-
-    return subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result.stdout.strip()
     
     
 # --------------------- ANTI CHEAT -----------------------
