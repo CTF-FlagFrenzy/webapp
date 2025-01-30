@@ -17,6 +17,8 @@ import random
 import string
 from datetime import datetime, time, date, timezone
 from typing import Dict
+import os
+import subprocess
 
 start_time = time(9, 0)  
 end_time = time(15, 0) 
@@ -855,12 +857,19 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     if not user:
         raise HTTPException(status_code=404, detail="User was not found")
 
+    API_KEY = os.getenv("API_KEY", "default_secure_key")
     team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    team_id = str(team.ID)
 
-    return {
-        "challengeName": challenge.FormatedChallengeName,
-        "teamID": team.ID if team else None,
-    }
+    command = f"""
+    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deploy" \
+    -H "Authorization: Bearer {API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
+    """
+
+
+    return subprocess.run(command, shell=True, capture_output=True, text=True)
     
     
 # --------------------- ANTI CHEAT -----------------------
