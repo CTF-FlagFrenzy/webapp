@@ -38,6 +38,7 @@ class TeamPoints(Base):
     TeamID = Column(Integer, ForeignKey('Teams.ID'), nullable=False)
     Time = Column(DateTime, nullable=False)
     Points = Column(Integer, nullable=False)
+    Teamname = Column(String(50), nullable=False)
 
     team = relationship("Team", back_populates="currentPoints")
     
@@ -68,7 +69,6 @@ class Challenge(Base):
     ChallengeName = Column(String(100), nullable=False, unique=True)
     FormatedChallengeName =  Column(String(100), nullable=False, unique=True)
     Categorie = Column(String(45), nullable=False)
-    Hintcount = Column(Integer, default=0)
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
     Difficulty = Column(String(30), default="Easy")

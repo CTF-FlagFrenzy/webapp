@@ -363,7 +363,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     Create a new user.
     """
     nickname = generate_random_username()
-    images = ["Anonymous", "Hacker", "Hero", "logo", "Queen", "Spy", "Warrior"]
+    images = ["Anonymous", "Hacker", "Hero", "Queen", "Spy", "Warrior"]
     avatar = random.choice(images)
     db_user = User(Nickname=nickname, Avatar=avatar, **user.dict())
     try:
@@ -575,9 +575,9 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     current_time = datetime.now().time()
     
     # Define the times when hints are available
-    hint1_time = datetime.strptime("09:00", "%H:%M").time()
-    hint2_time = datetime.strptime("10:00", "%H:%M").time()
-    hint3_time = datetime.strptime("11:00", "%H:%M").time()
+    hint1_time = datetime.strptime("10:00", "%H:%M").time()
+    hint2_time = datetime.strptime("11:00", "%H:%M").time()
+    hint3_time = datetime.strptime("12:00", "%H:%M").time()
 
     hints = {
         'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 wird um 10 Uhr verfügbar sein.",
@@ -829,11 +829,14 @@ def get_teampoints(db: Session = Depends(get_db)):
 @app.post("/teamPoints/")
 def create_team_points(teampoints: TeamPointsCreate, db: Session = Depends(get_db)):
     # Validate the time format
+    team = db.query(Team).filter(Team.ID == teampoints.TeamID).first()
+    
      
     # Create a new TeamPoints object
     new_teampoints = TeamPoints(
         TeamID=teampoints.TeamID,
         Points=teampoints.Points,
+        Teamname=team.Teamname,
         Time=datetime.now(vienna_timezone)
     )
     
