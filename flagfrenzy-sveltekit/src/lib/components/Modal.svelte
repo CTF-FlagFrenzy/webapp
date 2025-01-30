@@ -231,7 +231,6 @@ async function checkChainCondition() {
       {:else}<input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submit}>Submit</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={updatePoints}>Points</button>
       {/if}
 
