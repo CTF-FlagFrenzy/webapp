@@ -17,6 +17,8 @@ import random
 import string
 from datetime import datetime, time, date, timezone
 from typing import Dict
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 start_time = time(9, 0)  
 end_time = time(15, 0) 
@@ -764,8 +766,8 @@ def update_user_made_challenge(
                                                     UserMadeChallenge.Firstblood == 1).first()
 
     if not firstblood and update_data.Solved == 1:
-        user.Points += challenge.Points*0.1
-        team.Points += challenge.Points*0.1
+        user.Points += challenge.Points*0.5
+        team.Points += challenge.Points*0.5
         user_made_challenge.Firstblood = 1
         
 
@@ -865,12 +867,14 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     
 # --------------------- ANTI CHEAT -----------------------
 
+vienna_timezone = ZoneInfo('Europe/Vienna')
+
 def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
 
-@app.post("/submit_flag/{team_id}/{challenge_id}")
-async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = Depends(get_db)):
+@app.post("/submit_flag/{user_id}/{challenge_id}")
+async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = Depends(get_db)):
 
     # Fetch the team key and challenge flag from the database
     team = db.query(Team).filter(Team.ID == team_id).first()
@@ -880,22 +884,44 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
         return { "status": "Not found"}
     if team.Disabled == 1:
         return { "status": "disabled"}
-
     # Generate the flag
     generated_flag = generate_flag(team.Teamkey, challenge.Static)
     print(f"Generated flag: {generated_flag}")
 
-    # Normalize the submitted flag by removing spaces
-    normalized_flag = flag.replace(" ", "")
-
     # Validate the submitted flag
-    if normalized_flag == "FF{" + generated_flag + "}":
+    if flag == "FF{"+ generated_flag +"}":
         status = 'successful'
         # Log the successful flag submission
-        new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
+        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
+        
+        current_time =datetime.now(vienna_timezone)
+        
+        # Calculate points based on submission time
+        start_time = current_time.replace(hour=9, minute=0, second=0, microsecond=0)
+        end_time = current_time.replace(hour=13, minute=0, second=0, microsecond=0)
+
+        if current_time < start_time:
+            points_multiplier = 2.0
+        elif current_time < start_time + timedelta(hours=1):
+            points_multiplier = 2.0
+        elif current_time < start_time + timedelta(hours=2):
+            points_multiplier = 1.75
+        elif current_time < start_time + timedelta(hours=3):
+            points_multiplier = 1.5
+        elif current_time < end_time:
+            points_multiplier = 1.25
+        else:
+            points_multiplier = 1.0
+        user = db.query(User).filter(User.ID == user_id).first()
+        team = db.query(Team).filter(Team.ID == user.ID).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user.Points += challenge.Points * points_multiplier
+        team.Points += challenge.Points * points_multiplier
     else:
         # Check if the flag already exists in the database
         existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
