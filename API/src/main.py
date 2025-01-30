@@ -270,16 +270,28 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
     db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
-
+    
+    
+    
     try:
         db.add(db_team)
         db.commit()
         db.refresh(db_team)
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=400, detail="Team with this name already exists."
-        )
+        # Add and commit to the database
+        new_teampoints = TeamPoints(
+        TeamID=db_team.ID,
+        Points=0,
+        Teamname=db_team.Teamname,
+        Time=datetime.now(vienna_timezone)
+    )
+        db.add(new_teampoints)
+        db.commit()
+        db.refresh(new_teampoints)
+    # except IntegrityError:
+    #     db.rollback()
+    #     raise HTTPException(
+    #         status_code=400, detail="Team with this name already exists."
+    #     )
     except Exception as ex:
         raise HTTPException(status_code=422, detail=str(ex))
     return db_team
@@ -660,24 +672,6 @@ def delete_challenge(challenge_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Challenge deleted successfully"}
 
-
-@app.put("/challenges/hintcount/{challenge_id}")
-def update_challenge_hintcount(challenge_id: int, db: Session = Depends(get_db)):
-    """
-    Increment the hint count for a specific challenge by ID.
-    """
-    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge not found")
-
-    challenge.Hintcount += 1
-
-    db.commit()
-    db.refresh(challenge)
-    return {
-        "detail": "Challenge hint count updated successfully",
-        "new_hintcount": challenge.Hintcount,
-    }
     
 # --------------------- USER MADE CHALLENGES -----------------------
 
@@ -763,16 +757,24 @@ def update_user_made_challenge(
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
 
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
     firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
                                                     UserMadeChallenge.Firstblood == 1).first()
 
     if not firstblood and update_data.Solved == 1:
+        user.Points += challenge.Points*0.1
+        team.Points += challenge.Points*0.1
         user_made_challenge.Firstblood = 1
+        
 
     user_made_challenge.Solved = update_data.Solved
 
     db.commit()
     db.refresh(user_made_challenge)
+    db.refresh(user)
+
     return user_made_challenge
 
 
@@ -945,22 +947,6 @@ async def validate_flag(flag: str, challenge_id: int, db: Session = Depends(get_
     else:
         return {"status": "invalid", "message": "Flag is invalid!"}
     
-# @app.post("/add_static_flag")
-# async def add_static_flag(flag_data: StaticFlagCreate, db: Session = Depends(get_db)):
-#     # Check if the flag already exists
-#     existing_flag = db.query(StaticFlag).filter(StaticFlag.flag == flag_data.flag, StaticFlag.challenge_id == flag_data.challenge_id).first()
-#     if existing_flag:
-#         raise HTTPException(status_code=400, detail="Flag already exists")
-
-#     # Create a new static flag
-#     new_flag = StaticFlag(
-#         flag=flag_data.flag,
-#         challenge_id=flag_data.challenge_id
-#     )
-#     db.add(new_flag)
-#     db.commit()
-#     db.refresh(new_flag)
-#     return {"detail": "success", "flag": new_flag}
 
 @app.get("/get_flags")
 async def get_flags(db: Session = Depends(get_db)):
