@@ -168,6 +168,14 @@ async function checkChainCondition() {
     }
   }
 
+  async function submit() {
+    if (data.IsStatic) {
+      submitStatic();
+    } else {
+      submitButton();
+    }
+  }
+
   async function submitStatic() {
     try {
       const response = await fetch("/api/anti-cheat/static_flags", {
@@ -233,11 +241,10 @@ async function checkChainCondition() {
     <p class="text-lg">{hints.Hint3}</p>
     <div class="flex justify-between items-center mt-auto pt-4 border-t border-custom-200">
       <input class="bg-custom-100 border-2 border-custom-200 rounded-full px-2 py-1 text-base" type="text" bind:value={flagToSubmit} placeholder="Enter Flag">
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitButton}>Submit</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submit}>Submit</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
       <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={hintCount}  disabled={hintUsed}>{hintUsed ? "Hint Used" : "Get Hint"}</button>
-      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submitStatic}>staticFlag</button>
-            <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={updatePoints}>Points</button>
+      <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={updatePoints}>Points</button>
 
 
     </div>
