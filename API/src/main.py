@@ -272,9 +272,6 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
     db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
-    
-    
-    
     try:
         db.add(db_team)
         db.commit()
@@ -289,13 +286,24 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
         db.add(new_teampoints)
         db.commit()
         db.refresh(new_teampoints)
-    # except IntegrityError:
-    #     db.rollback()
-    #     raise HTTPException(
-    #         status_code=400, detail="Team with this name already exists."
-    #     )
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400, detail="Team with this name already exists."
+        )
     except Exception as ex:
         raise HTTPException(status_code=422, detail=str(ex))
+    API_KEY = os.getenv("API_KEY", "default_secure_key")
+
+    command = f"""
+    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/teamkey" \
+    -H "Authorization: Bearer {API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{{"teamid":"{db_team.ID}", "teamkey":"{db_team.Teamkey}"}}'
+    """
+
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    print(result)
     return db_team
 
 
@@ -636,6 +644,7 @@ def update_challenge(
     challenge.Difficulty = challenge_update.Difficulty
     challenge.Static = challenge_update.Static
     challenge.Chain = challenge_update.Chain
+    challenge.IsStatic = challenge_update.IsStatic
     challenge.Hint1 = challenge_update.Hint1
     challenge.Hint2 = challenge_update.Hint2
     challenge.Hint3 = challenge_update.Hint3
@@ -901,6 +910,17 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
         db.add(new_submission)
         db.commit()
         print(f"Logged flag submission: {new_submission}")
+        API_KEY = os.getenv("API_KEY", "default_secure_key")
+
+        command = f"""
+        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+        -H "Authorization: Bearer {API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
+        """
+
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print(result)
     else:
         # Check if the flag already exists in the database
         existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
@@ -945,13 +965,25 @@ async def admin_panel(db: Session = Depends(get_db)):
         "shared_flags": shared_flags
     }
     
-@app.post("/validate_flag/{challenge_id}")
-async def validate_flag(flag: str, challenge_id: int, db: Session = Depends(get_db)):
+@app.post("/validate_flag/{challenge_id}/{team_id}")
+async def validate_flag(flag: str, challenge_id: int, team_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
     static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
+    print(static_flag)
     if static_flag is None:
         return {"status": "invalid", "message": "Challenge is not a static flag"}
     if 'FF{' + static_flag.Static + '}' == flag:
+        API_KEY = os.getenv("API_KEY", "default_secure_key")
+
+        command = f"""
+        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+        -H "Authorization: Bearer {API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{{"teamid":"{team_id}", "challenge":"{static_flag.FormatedChallengeName}"}}'
+        """
+
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print(result)
         return {"status": "successful", "message": "Flag is valid!"}
     else:
         return {"status": "invalid", "message": "Flag is invalid!"}
