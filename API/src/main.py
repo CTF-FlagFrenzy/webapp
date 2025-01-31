@@ -938,7 +938,23 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
         -H "Content-Type: application/json" \
         -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
         """
-
+        team.Points += challenge.Points
+        teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+    
+     
+        # Create a new TeamPoints object
+        new_teampoints = TeamPoints(
+            TeamID=teampoints.ID,
+            Points=teampoints.Points,
+            Teamname=team.Teamname,
+            Time=datetime.now(vienna_timezone)
+        )
+        
+        # Add and commit to the database
+        db.add(new_teampoints)
+        db.commit()
+        db.refresh(new_teampoints)
+        db.refresh(team)
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         print(result)
     else:
@@ -989,6 +1005,7 @@ async def admin_panel(db: Session = Depends(get_db)):
 async def validate_flag(flag: str, challenge_id: int, team_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
     static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
+    team = db.query(Team).filter(Team.ID == team_id).first()
     print(static_flag)
     if static_flag is None:
         return {"status": "invalid", "message": "Challenge is not a static flag"}
@@ -1001,7 +1018,23 @@ async def validate_flag(flag: str, challenge_id: int, team_id: int, db: Session 
         -H "Content-Type: application/json" \
         -d '{{"teamid":"{team_id}", "challenge":"{static_flag.FormatedChallengeName}"}}'
         """
-
+        team.Points += static_flag.Points
+        teampoints = db.query(Team).filter(Team.ID == team_id).first()
+    
+     
+        # Create a new TeamPoints object
+        new_teampoints = TeamPoints(
+            TeamID=teampoints.ID,
+            Points=teampoints.Points,
+            Teamname=team.Teamname,
+            Time=datetime.now(vienna_timezone)
+        )
+        
+        # Add and commit to the database
+        db.add(new_teampoints)
+        db.commit()
+        db.refresh(new_teampoints)
+        db.refresh(team)
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         print(result)
         return {"status": "successful", "message": "Flag is valid!"}
