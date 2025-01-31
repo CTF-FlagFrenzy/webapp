@@ -23,14 +23,15 @@ export async function POST({ request }) {
     const { TeamsID, ChallengeID, Flag} = await request.json();
 
     try {
-        const response = await fetch(`${API_BASE_URL}/validate_flag/${ChallengeID}?flag=${Flag}`, {
+        const response = await fetch(`${API_BASE_URL}/validate_flag/${ChallengeID}/${TeamsID}?flag=${Flag}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                challenge_id: ChallengeID
+                challenge_id: ChallengeID,
+                teams_id: TeamsID
             })
         });
         const data = await response.json();
