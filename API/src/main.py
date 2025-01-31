@@ -19,6 +19,7 @@ from datetime import datetime, time, date, timezone
 from typing import Dict
 import os
 import subprocess
+import json
 
 start_time = time(9, 0)  
 end_time = time(15, 0) 
@@ -860,7 +861,9 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     """
     challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
     user = db.query(User).filter(User.ID == user_id).first()
-
+    user_made_challenge = db.query(UserMadeChallenge).filter(
+        UserMadeChallenge.User_ID == user_id,
+        UserMadeChallenge.Challenges_ID == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge was not found")
     if not user:
@@ -876,8 +879,15 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     -H "Content-Type: application/json" \
     -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
     """
-
+    
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    # JSON-String in ein Dictionary umwandeln
+    parsed_data = json.loads(result.stdout.strip())
+    # URL extrahieren
+    url = parsed_data["url"]
+    user_made_challenge.Url = url
+    db.commit()
+    db.refresh(user_made_challenge)
     return result.stdout.strip()
     
     
