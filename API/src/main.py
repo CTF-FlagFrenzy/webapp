@@ -56,6 +56,14 @@ class TeamCreate(BaseModel):
     """
     Teamname: str
     Password: str
+    
+class TeamUpdate(BaseModel):
+    """
+    Schema for updating a team.
+    """
+    Teamname: str
+    Password: str
+    Points: int
 
 
 class UserCreate(BaseModel):
@@ -273,6 +281,7 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
     db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
+
     try:
         db.add(db_team)
         db.commit()
@@ -309,7 +318,7 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
 
 
 @app.put("/teams/{team_id}/{user_id}",  response_model=TeamResponse)
-def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session = Depends(get_db)):
+def update_team(team_id: int, user_id: str, team_update: TeamUpdate, db: Session = Depends(get_db)):
     """
     Update an existing team's details by ID.
     """
@@ -329,6 +338,7 @@ def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session
     if userTeam:
         team.Teamname = team_update.Teamname
         team.Password = hashlib.sha256(team_update.Password.encode()).hexdigest()
+        team.Points = team_update.Points
         db.commit()
         db.refresh(team)
     return team
@@ -595,7 +605,7 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
-    current_time = datetime.now().time()
+    current_time = datetime.now(vienna_timezone).time()
     
     # Define the times when hints are available
     hint1_time = datetime.strptime("10:00", "%H:%M").time()
