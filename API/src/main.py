@@ -990,8 +990,8 @@ async def admin_panel(db: Session = Depends(get_db)):
         "shared_flags": shared_flags
     }
     
-@app.post("/validate_flag/{challenge_id}")
-async def validate_static_flag(flag: str, challenge_id: int, db: Session = Depends(get_db)):
+@app.post("/validate_flag/{challenge_id}/{user_id}")
+async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
     static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
     if static_flag is None:
@@ -1003,8 +1003,9 @@ async def validate_static_flag(flag: str, challenge_id: int, db: Session = Depen
     # Validate the submitted flag
     if 'FF{' + static_flag.Static + '}' == normalized_flag:
         # Fetch the user and team associated with the flag submission
-        team = db.query(Team).filter(Team.ID == static_flag.TeamID).first()
-        user = db.query(User).filter(User.ID == team.UserID).first()
+       
+        user = db.query(User).filter(User.ID == user_id).first()
+        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
         # Calculate points based on submission time
         submission_time = datetime.now(vienna_timezone)
