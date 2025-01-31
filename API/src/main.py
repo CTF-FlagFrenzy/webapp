@@ -1030,6 +1030,7 @@ async def admin_panel(db: Session = Depends(get_db)):
 async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
     static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
+    team = db.query(Team).filter(Team.ID == team_id).first()
     print(static_flag)
     if static_flag is None:
         return {"status": "invalid", "message": "Challenge is not a static flag"}
