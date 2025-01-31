@@ -869,7 +869,6 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     
 # --------------------- ANTI CHEAT -----------------------
 
-vienna_timezone = ZoneInfo('Europe/Vienna')
 
 def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
