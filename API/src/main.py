@@ -874,11 +874,6 @@ def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
 
-def generate_dynamic_flag(team_key, challenge):
-    # Assuming dynamic flag generation logic similar to static flag
-    combined = team_key + challenge.DynamicData
-    return hashlib.sha256(combined.encode()).hexdigest()
-
 @app.post("/submit_flag/{user_id}/{challenge_id}")
 async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = Depends(get_db)):
 
@@ -894,81 +889,82 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
         return {"status": "Not found"}
     if team.Disabled == 1:
         return {"status": "disabled"}
-
-    # Generate the flag
-    if challenge.IsStatic:
-        generated_flag = generate_flag(team.Teamkey, challenge.Static)
-    else:
-        generated_flag = generate_dynamic_flag(team.Teamkey, challenge)
-
-    print(f"Generated flag: {generated_flag}")
-
-    # Normalize the submitted flag by removing spaces
-    normalized_flag = flag.replace(" ", "")
-
-    # Validate the submitted flag
-    if normalized_flag == "FF{" + generated_flag + "}":
-        status = 'successful'
-        # Log the successful flag submission
-        submission_time = datetime.now(vienna_timezone)
-        new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status=status, submission_time=submission_time)
-        db.add(new_submission)
-
-        # Calculate points based on submission time
-        start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
-        end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
-
-        if submission_time < start_time:
-            points_multiplier = 2.0
-        elif submission_time < start_time + timedelta(hours=1):
-            points_multiplier = 2.0
-        elif submission_time < start_time + timedelta(hours=2):
-            points_multiplier = 1.75
-        elif submission_time < start_time + timedelta(hours=3):
-            points_multiplier = 1.5
-        elif submission_time < end_time:
-            points_multiplier = 1.25
+    submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+    print(submission)
+    if not submission:
+        # Generate the flag
+        if challenge.IsStatic == 0:
+            generated_flag = generate_flag(team.Teamkey, challenge.Static)
         else:
-            points_multiplier = 1.0
+            return {"status": "static flag"}
 
-        user.Points += challenge.Points * points_multiplier
-        team.Points += challenge.Points * points_multiplier
+        print(f"Generated flag: {generated_flag}")
 
-        db.commit()
-        print(f"Logged flag submission: {new_submission}")
+        # Normalize the submitted flag by removing spaces
+        normalized_flag = flag.replace(" ", "")
 
-        API_KEY = os.getenv("API_KEY", "default_secure_key")
-        command = f"""
-        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
-        -H "Authorization: Bearer {API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
-        """
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        print(result)
-    else:
-        # Check if the flag already exists in the database
-        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
-        if existing_submission and existing_submission.team_id != team.ID:
-            status = 'shared'
-            # Log the shared flag submission in the new table
-            new_shared_submission = SharedFlagSubmission(
-                flag=flag,
-                team_id=team.ID,
-                challenge_id=challenge_id,
-                original_team_id=existing_submission.team_id,
-                submission_time=submission_time
-            )
-            db.add(new_shared_submission)
+        # Validate the submitted flag
+        if normalized_flag == "FF{" + generated_flag + "}":
+            status = 'successful'
+            # Log the successful flag submission
+            submission_time = datetime.now(vienna_timezone)
+            new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status=status, submission_time=submission_time)
+            db.add(new_submission)
 
-            team.SharedFlag += 1
-            if team.SharedFlag == 2:
-                team.Disabled = 1
+            # Calculate points based on submission time
+            start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
+            end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
+
+            if submission_time < start_time + timedelta(hours=1):
+                points_multiplier = 2.0
+            elif submission_time < start_time + timedelta(hours=2):
+                points_multiplier = 1.75
+            elif submission_time < start_time + timedelta(hours=3):
+                points_multiplier = 1.5
+            elif submission_time < end_time:
+                points_multiplier = 1.25
+            else:
+                points_multiplier = 1.0
+
+            user.Points += challenge.Points * points_multiplier
+            team.Points += challenge.Points * points_multiplier
+
             db.commit()
-            db.refresh(team)
-        else:
-            status = 'invalid'
+            print(f"Logged flag submission: {new_submission}")
 
+            API_KEY = os.getenv("API_KEY", "default_secure_key")
+            command = f"""
+            curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+            -H "Authorization: Bearer {API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
+            """
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            print(result)
+        else:
+            # Check if the flag already exists in the database
+            existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+            if existing_submission and existing_submission.team_id != team.ID:
+                status = 'shared'
+                # Log the shared flag submission in the new table
+                new_shared_submission = SharedFlagSubmission(
+                    flag=flag,
+                    team_id=team.ID,
+                    challenge_id=challenge_id,
+                    original_team_id=existing_submission.team_id,
+                    submission_time=submission_time
+                )
+                db.add(new_shared_submission)
+
+                team.SharedFlag += 1
+                if team.SharedFlag == 2:
+                    team.Disabled = 1
+                db.commit()
+                db.refresh(team)
+            else:
+                status = 'invalid'
+    else:
+        status = 'already submitted'
     return {"status": status}
 
 @app.get("/admin_panel")
@@ -1006,31 +1002,37 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
         user = db.query(User).filter(User.ID == user_id).first()
         team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
-        # Calculate points based on submission time
-        submission_time = datetime.now(vienna_timezone)
-        start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
-        end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+        print(submission)
+        if not submission:
 
-        if submission_time < start_time:
-            points_multiplier = 2.0
-        elif submission_time < start_time + timedelta(hours=1):
-            points_multiplier = 2.0
-        elif submission_time < start_time + timedelta(hours=2):
-            points_multiplier = 1.75
-        elif submission_time < start_time + timedelta(hours=3):
-            points_multiplier = 1.5
-        elif submission_time < end_time:
-            points_multiplier = 1.25
+         # Calculate points based on submission time
+            submission_time = datetime.now(vienna_timezone)
+            start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
+            end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
+
+            if submission_time < start_time:
+                points_multiplier = 2.0
+            elif submission_time < start_time + timedelta(hours=1):
+                points_multiplier = 2.0
+            elif submission_time < start_time + timedelta(hours=2):
+                points_multiplier = 1.75
+            elif submission_time < start_time + timedelta(hours=3):
+                points_multiplier = 1.5
+            elif submission_time < end_time:
+                points_multiplier = 1.25
+            else:
+                points_multiplier = 1.0
+
+            user.Points += static_flag.Points * points_multiplier
+            team.Points += static_flag.Points * points_multiplier
+
+            # Log the successful flag submission
+            new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status='successful', submission_time=submission_time)
+            db.add(new_submission)
+            db.commit()
+            return {"status": "successful", "message": "Flag is valid!"}
         else:
-            points_multiplier = 1.0
-
-        user.Points += static_flag.Points * points_multiplier
-        team.Points += static_flag.Points * points_multiplier
-
-        # Log the successful flag submission
-        new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status='successful', submission_time=submission_time)
-        db.add(new_submission)
-        db.commit()
-        return {"status": "successful", "message": "Flag is valid!"}
+            return {"status": "already submitted", "message": "Flag is already submitted!"}
     else:
         return {"status": "invalid", "message": "Flag is invalid!"}

@@ -156,7 +156,8 @@ async function checkChainCondition() {
       const response = await fetch("/api/anti-cheat/static_flags", {
         method: "POST",
         body: JSON.stringify({
-          ChallengeID: data.ID,
+          ChallengeID: data.ID, 
+          user_id: user.ID,
           Flag: flagToSubmit
         }),
         headers: {
