@@ -20,17 +20,17 @@ export async function GET() {
 }
 export async function POST({ request }) {
     
-    const { TeamsID, ChallengeID, Flag} = await request.json();
+    const { UserID, ChallengeID, Flag} = await request.json();
 
     try {
-        const response = await fetch(`${API_BASE_URL}/submit_flag/${TeamsID}/${ChallengeID}?flag=${Flag}`, {
+        const response = await fetch(`${API_BASE_URL}/submit_flag/${UserID}/${ChallengeID}?flag=${Flag}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                team_id: TeamsID,
+                user_id: UserID,
                 challenge_id: ChallengeID
             })
         });

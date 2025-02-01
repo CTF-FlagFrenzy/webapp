@@ -20,17 +20,19 @@ const API_BASE_URL = 'http://api:8000';
 //}
 export async function POST({ request }) {
     
-    const { TeamsID, ChallengeID, Flag} = await request.json();
+    const { user_id, ChallengeID, Flag} = await request.json();
+    console.log(user_id);
 
     try {
-        const response = await fetch(`${API_BASE_URL}/validate_flag/${ChallengeID}?flag=${Flag}`, {
+        const response = await fetch(`${API_BASE_URL}/validate_flag/${ChallengeID}/${user_id}?flag=${Flag}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                challenge_id: ChallengeID
+                challenge_id: ChallengeID,
+                user_id: user_id,
             })
         });
         const data = await response.json();

@@ -15,8 +15,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
 import random
 import string
+import os
+import subprocess
 from datetime import datetime, time, date, timezone
 from typing import Dict
+
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
 import os
 import subprocess
 import json
@@ -786,8 +792,8 @@ def update_user_made_challenge(
                                                     UserMadeChallenge.Firstblood == 1).first()
 
     if not firstblood and update_data.Solved == 1:
-        user.Points += challenge.Points*0.1
-        team.Points += challenge.Points*0.1
+        user.Points += challenge.Points*0.5
+        team.Points += challenge.Points*0.5
         user_made_challenge.Firstblood = 1
         
 
@@ -903,24 +909,66 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     
 # --------------------- ANTI CHEAT -----------------------
 
+
 def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
 
-@app.post("/submit_flag/{team_id}/{challenge_id}")
-async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = Depends(get_db)):
+@app.post("/submit_flag/{user_id}/{challenge_id}")
+async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = Depends(get_db)):
 
-    # Fetch the team key and challenge flag from the database
-    team = db.query(Team).filter(Team.ID == team_id).first()
-    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()  # Assuming a single challenge for simplicity
+    # Fetch the user, team, and challenge from the database
+    user = db.query(User).filter(User.ID == user_id).first()
+    if not user:
+        return {"status": "User not found"}
+    
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
 
     if not team or not challenge:
-        return { "status": "Not found"}
+        return {"status": "Not found"}
     if team.Disabled == 1:
-        return { "status": "disabled"}
-    # Generate the flag
-    generated_flag = generate_flag(team.Teamkey, challenge.Static)
-    print(f"Generated flag: {generated_flag}")
+        return {"status": "disabled"}
+    submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+    print(submission)
+    if not submission:
+        # Generate the flag
+        if challenge.IsStatic == 0:
+            generated_flag = generate_flag(team.Teamkey, challenge.Static)
+        else:
+            return {"status": "static flag"}
+
+        print(f"Generated flag: {generated_flag}")
+
+        # Normalize the submitted flag by removing spaces
+        normalized_flag = flag.replace(" ", "")
+
+        # Validate the submitted flag
+        if normalized_flag == "FF{" + generated_flag + "}":
+            status = 'successful'
+            # Log the successful flag submission
+            submission_time = datetime.now(vienna_timezone)
+            new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status=status, submission_time=submission_time)
+            db.add(new_submission)
+
+            # Calculate points based on submission time
+            start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
+            end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
+
+            if submission_time < start_time + timedelta(hours=1):
+                points_multiplier = 2.0
+            elif submission_time < start_time + timedelta(hours=2):
+                points_multiplier = 1.75
+            elif submission_time < start_time + timedelta(hours=3):
+                points_multiplier = 1.5
+            elif submission_time < end_time:
+                points_multiplier = 1.25
+            else:
+                points_multiplier = 1.0
+
+            user.Points += challenge.Points * points_multiplier
+            team.Points += challenge.Points * points_multiplier
+
 
     # Validate the submitted flag
     if flag == "FF{"+ generated_flag +"}":
@@ -960,12 +1008,44 @@ async def submit_flag(team_id: int, challenge_id: int, flag: str, db: Session = 
             team.SharedFlag += 1
             if team.SharedFlag == 2:
                 team.Disabled = 1
-            db.commit()
-            db.refresh(team)
-        else:
-            status = 'invalid'
 
-    return { "status": status}
+            db.commit()
+            print(f"Logged flag submission: {new_submission}")
+
+            API_KEY = os.getenv("API_KEY", "default_secure_key")
+            command = f"""
+            curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+            -H "Authorization: Bearer {API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
+            """
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            print(result)
+        else:
+            # Check if the flag already exists in the database
+            existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+            if existing_submission and existing_submission.team_id != team.ID:
+                status = 'shared'
+                # Log the shared flag submission in the new table
+                new_shared_submission = SharedFlagSubmission(
+                    flag=flag,
+                    team_id=team.ID,
+                    challenge_id=challenge_id,
+                    original_team_id=existing_submission.team_id,
+                    submission_time=submission_time
+                )
+                db.add(new_shared_submission)
+
+                team.SharedFlag += 1
+                if team.SharedFlag == 2:
+                    team.Disabled = 1
+                db.commit()
+                db.refresh(team)
+            else:
+                status = 'invalid'
+    else:
+        status = 'already submitted'
+    return {"status": status}
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
@@ -985,31 +1065,64 @@ async def admin_panel(db: Session = Depends(get_db)):
         "shared_flags": shared_flags
     }
     
-@app.post("/validate_flag/{challenge_id}/{team_id}")
-async def validate_flag(flag: str, challenge_id: int, team_id: int, db: Session = Depends(get_db)):
+
+@app.post("/validate_flag/{challenge_id}/{user_id}")
+async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
     static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
     print(static_flag)
     if static_flag is None:
         return {"status": "invalid", "message": "Challenge is not a static flag"}
-    if 'FF{' + static_flag.Static + '}' == flag:
-        API_KEY = os.getenv("API_KEY", "default_secure_key")
+    # Normalize the submitted flag by removing spaces
+    normalized_flag = flag.replace(" ", "")
 
-        command = f"""
-        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
-        -H "Authorization: Bearer {API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d '{{"teamid":"{team_id}", "challenge":"{static_flag.FormatedChallengeName}"}}'
-        """
+    # Validate the submitted flag
+    if 'FF{' + static_flag.Static + '}' == normalized_flag:
+        # Fetch the user and team associated with the flag submission
+       
+        user = db.query(User).filter(User.ID == user_id).first()
+        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        print(result)
-        return {"status": "successful", "message": "Flag is valid!"}
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+        print(submission)
+        if not submission:
+
+         # Calculate points based on submission time
+            submission_time = datetime.now(vienna_timezone)
+            start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
+            end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
+
+            if submission_time < start_time + timedelta(hours=1):
+                points_multiplier = 2.0
+            elif submission_time < start_time + timedelta(hours=2):
+                points_multiplier = 1.75
+            elif submission_time < start_time + timedelta(hours=3):
+                points_multiplier = 1.5
+            elif submission_time < end_time:
+                points_multiplier = 1.25
+            else:
+                points_multiplier = 1.0
+
+            user.Points += static_flag.Points * points_multiplier
+            team.Points += static_flag.Points * points_multiplier
+
+            # Log the successful flag submission
+            new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status='successful', submission_time=submission_time)
+            db.add(new_submission)
+            db.commit()
+            API_KEY = os.getenv("API_KEY", "default_secure_key")
+
+            command = f"""
+            curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+            -H "Authorization: Bearer {API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{{"teamid":"{team_id}", "challenge":"{static_flag.FormatedChallengeName}"}}'
+            """
+
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            print(result)
+            return {"status": "successful", "message": "Flag is valid!"}
+        else:
+            return {"status": "already submitted", "message": "Flag is already submitted!"}
     else:
         return {"status": "invalid", "message": "Flag is invalid!"}
-    
-
-@app.get("/get_flags")
-async def get_flags(db: Session = Depends(get_db)):
-    flags = db.query(StaticFlag).all()
-    return flags
