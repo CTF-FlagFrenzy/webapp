@@ -1011,9 +1011,7 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
             start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
             end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
 
-            if submission_time < start_time:
-                points_multiplier = 2.0
-            elif submission_time < start_time + timedelta(hours=1):
+            if submission_time < start_time + timedelta(hours=1):
                 points_multiplier = 2.0
             elif submission_time < start_time + timedelta(hours=2):
                 points_multiplier = 1.75

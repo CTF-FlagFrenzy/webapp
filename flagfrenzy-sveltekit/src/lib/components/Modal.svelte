@@ -125,7 +125,7 @@ async function checkChainCondition() {
         method: "POST",
         body: JSON.stringify({
           ChallengeID: data.ID,
-          TeamsID: user.TeamsID,
+          UserID: user.ID,
           Flag: flagToSubmit
         }),
         headers: {
