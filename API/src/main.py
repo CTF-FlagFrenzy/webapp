@@ -19,8 +19,13 @@ import os
 import subprocess
 from datetime import datetime, time, date, timezone
 from typing import Dict
+
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+
+import os
+import subprocess
+import json
 
 start_time = time(9, 0)  
 end_time = time(15, 0) 
@@ -57,6 +62,14 @@ class TeamCreate(BaseModel):
     """
     Teamname: str
     Password: str
+    
+class TeamUpdate(BaseModel):
+    """
+    Schema for updating a team.
+    """
+    Teamname: str
+    Password: str
+    Points: int
 
 
 class UserCreate(BaseModel):
@@ -274,9 +287,7 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
     db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
-    
-    
-    
+
     try:
         db.add(db_team)
         db.commit()
@@ -291,18 +302,29 @@ def create_team(team: TeamCreate, db: Session = Depends(get_db)):
         db.add(new_teampoints)
         db.commit()
         db.refresh(new_teampoints)
-    # except IntegrityError:
-    #     db.rollback()
-    #     raise HTTPException(
-    #         status_code=400, detail="Team with this name already exists."
-    #     )
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=400, detail="Team with this name already exists."
+        )
     except Exception as ex:
         raise HTTPException(status_code=422, detail=str(ex))
+    API_KEY = os.getenv("API_KEY", "default_secure_key")
+
+    command = f"""
+    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/teamkey" \
+    -H "Authorization: Bearer {API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{{"teamid":"{db_team.ID}", "teamkey":"{db_team.Teamkey}"}}'
+    """
+
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    print(result)
     return db_team
 
 
 @app.put("/teams/{team_id}/{user_id}",  response_model=TeamResponse)
-def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session = Depends(get_db)):
+def update_team(team_id: int, user_id: str, team_update: TeamUpdate, db: Session = Depends(get_db)):
     """
     Update an existing team's details by ID.
     """
@@ -322,6 +344,7 @@ def update_team(team_id: int, user_id: str, team_update: TeamCreate, db: Session
     if userTeam:
         team.Teamname = team_update.Teamname
         team.Password = hashlib.sha256(team_update.Password.encode()).hexdigest()
+        team.Points = team_update.Points
         db.commit()
         db.refresh(team)
     return team
@@ -588,7 +611,7 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
-    current_time = datetime.now().time()
+    current_time = datetime.now(vienna_timezone).time()
     
     # Define the times when hints are available
     hint1_time = datetime.strptime("10:00", "%H:%M").time()
@@ -638,6 +661,7 @@ def update_challenge(
     challenge.Difficulty = challenge_update.Difficulty
     challenge.Static = challenge_update.Static
     challenge.Chain = challenge_update.Chain
+    challenge.IsStatic = challenge_update.IsStatic
     challenge.Hint1 = challenge_update.Hint1
     challenge.Hint2 = challenge_update.Hint2
     challenge.Hint3 = challenge_update.Hint3
@@ -853,18 +877,34 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     """
     challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
     user = db.query(User).filter(User.ID == user_id).first()
-
+    user_made_challenge = db.query(UserMadeChallenge).filter(
+        UserMadeChallenge.User_ID == user_id,
+        UserMadeChallenge.Challenges_ID == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge was not found")
     if not user:
         raise HTTPException(status_code=404, detail="User was not found")
 
+    API_KEY = os.getenv("API_KEY", "default_secure_key")
     team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    team_id = str(team.ID)
 
-    return {
-        "challengeName": challenge.FormatedChallengeName,
-        "teamID": team.ID if team else None,
-    }
+    command = f"""
+    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deploy" \
+    -H "Authorization: Bearer {API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
+    """
+    
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    # JSON-String in ein Dictionary umwandeln
+    parsed_data = json.loads(result.stdout.strip())
+    # URL extrahieren
+    url = parsed_data["url"]
+    user_made_challenge.Url = url
+    db.commit()
+    db.refresh(user_made_challenge)
+    return result.stdout.strip()
     
     
 # --------------------- ANTI CHEAT -----------------------
@@ -929,6 +969,46 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             user.Points += challenge.Points * points_multiplier
             team.Points += challenge.Points * points_multiplier
 
+
+    # Validate the submitted flag
+    if flag == "FF{"+ generated_flag +"}":
+        status = 'successful'
+        # Log the successful flag submission
+        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
+        db.add(new_submission)
+        db.commit()
+        print(f"Logged flag submission: {new_submission}")
+        API_KEY = os.getenv("API_KEY", "default_secure_key")
+
+        command = f"""
+        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+        -H "Authorization: Bearer {API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
+        """
+
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print(result)
+    else:
+        # Check if the flag already exists in the database
+        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+        if existing_submission and existing_submission.team_id != team_id:
+            status = 'shared'
+            # Log the shared flag submission in the new table
+            new_shared_submission = SharedFlagSubmission(
+                flag=flag,
+                team_id=team_id,
+                challenge_id=challenge_id,
+                original_team_id=existing_submission.team_id,
+                submission_time=datetime.now(vienna_timezone)
+            )
+            db.add(new_shared_submission)
+
+            team = db.query(Team).filter(Team.ID == team_id).first()
+            team.SharedFlag += 1
+            if team.SharedFlag == 2:
+                team.Disabled = 1
+
             db.commit()
             print(f"Logged flag submission: {new_submission}")
 
@@ -985,13 +1065,14 @@ async def admin_panel(db: Session = Depends(get_db)):
         "shared_flags": shared_flags
     }
     
+
 @app.post("/validate_flag/{challenge_id}/{user_id}")
 async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
     static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
+    print(static_flag)
     if static_flag is None:
         return {"status": "invalid", "message": "Challenge is not a static flag"}
-
     # Normalize the submitted flag by removing spaces
     normalized_flag = flag.replace(" ", "")
 
@@ -1029,6 +1110,17 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
             new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status='successful', submission_time=submission_time)
             db.add(new_submission)
             db.commit()
+            API_KEY = os.getenv("API_KEY", "default_secure_key")
+
+            command = f"""
+            curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+            -H "Authorization: Bearer {API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{{"teamid":"{team_id}", "challenge":"{static_flag.FormatedChallengeName}"}}'
+            """
+
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            print(result)
             return {"status": "successful", "message": "Flag is valid!"}
         else:
             return {"status": "already submitted", "message": "Flag is already submitted!"}
