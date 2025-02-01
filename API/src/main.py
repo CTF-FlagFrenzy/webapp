@@ -969,46 +969,6 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             user.Points += challenge.Points * points_multiplier
             team.Points += challenge.Points * points_multiplier
 
-
-    # Validate the submitted flag
-    if flag == "FF{"+ generated_flag +"}":
-        status = 'successful'
-        # Log the successful flag submission
-        new_submission = FlagSubmission(flag=flag, challenge_id = challenge_id, team_id=team_id, status=status, submission_time=datetime.now(vienna_timezone))
-        db.add(new_submission)
-        db.commit()
-        print(f"Logged flag submission: {new_submission}")
-        API_KEY = os.getenv("API_KEY", "default_secure_key")
-
-        command = f"""
-        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
-        -H "Authorization: Bearer {API_KEY}" \
-        -H "Content-Type: application/json" \
-        -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
-        """
-
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        print(result)
-    else:
-        # Check if the flag already exists in the database
-        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
-        if existing_submission and existing_submission.team_id != team_id:
-            status = 'shared'
-            # Log the shared flag submission in the new table
-            new_shared_submission = SharedFlagSubmission(
-                flag=flag,
-                team_id=team_id,
-                challenge_id=challenge_id,
-                original_team_id=existing_submission.team_id,
-                submission_time=datetime.now(vienna_timezone)
-            )
-            db.add(new_shared_submission)
-
-            team = db.query(Team).filter(Team.ID == team_id).first()
-            team.SharedFlag += 1
-            if team.SharedFlag == 2:
-                team.Disabled = 1
-
             db.commit()
             print(f"Logged flag submission: {new_submission}")
 
@@ -1116,7 +1076,7 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
             curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
             -H "Authorization: Bearer {API_KEY}" \
             -H "Content-Type: application/json" \
-            -d '{{"teamid":"{team_id}", "challenge":"{static_flag.FormatedChallengeName}"}}'
+            -d '{{"teamid":"{user.TeamsID}", "challenge":"{static_flag.FormatedChallengeName}"}}'
             """
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
