@@ -20,6 +20,7 @@ export default {
         Hard: '#F35977',
         Expert: '#B259F3',
         Default: '#A5A2A2',
+        EasyPastel: '#A7F7A7',
       },
       boxShadow: {
         EasyShadow: '0 0px 20px #59F359',
@@ -27,6 +28,8 @@ export default {
         HardShadow: '0 0px 20px #F35977',
         ExpertShadow: '0 0px 20px #B259F3',
         DefaultShadow: '0 0px 20px #A5A2A2',
+        BackdropShadow: '-5px 5px 5px #1f2027',
+        BackdropShadow2: '0px -5px 5px #1f2027',
       },
       backgroundImage: {
         Hero: "url('/images/Hero.png')",
