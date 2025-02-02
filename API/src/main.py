@@ -940,22 +940,23 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
         return {"status": "Not found"}
     if team.Disabled == 1:
         return {"status": "disabled"}
-    submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
-    print(submission)
-    if not submission:
-        # Generate the flag
-        if challenge.IsStatic == 0:
-            generated_flag = generate_flag(team.Teamkey, challenge.Static)
-        else:
-            return {"status": "static flag"}
+    
+    # Generate the flag
+    if challenge.IsStatic == 0:
+        generated_flag = generate_flag(team.Teamkey, challenge.Static)
+    else:
+        return {"status": "static flag"}
 
-        print(f"Generated flag: {generated_flag}")
+    print(f"Generated flag: {generated_flag}")
 
-        # Normalize the submitted flag by removing spaces
-        normalized_flag = flag.replace(" ", "")
+    # Normalize the submitted flag by removing spaces
+    normalized_flag = flag.replace(" ", "")
 
-        # Validate the submitted flag
-        if normalized_flag == "FF{" + generated_flag + "}":
+    # Validate the submitted flag
+    if normalized_flag == "FF{" + generated_flag + "}":
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+        print(submission)
+        if not submission:
             status = 'successful'
             # Log the successful flag submission
             submission_time = datetime.now(vienna_timezone)
@@ -1004,29 +1005,30 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             db.refresh(new_teampoints)
             db.refresh(team)
         else:
-            # Check if the flag already exists in the database
-            existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
-            if existing_submission and existing_submission.team_id != team.ID:
-                status = 'shared'
-                # Log the shared flag submission in the new table
-                new_shared_submission = SharedFlagSubmission(
-                    flag=flag,
-                    team_id=team.ID,
-                    challenge_id=challenge_id,
-                    original_team_id=existing_submission.team_id,
-                    submission_time=submission_time
-                )
-                db.add(new_shared_submission)
-
-                team.SharedFlag += 1
-                if team.SharedFlag == 2:
-                    team.Disabled = 1
-                db.commit()
-                db.refresh(team)
-            else:
-                status = 'invalid'
+            status = 'already submitted'
     else:
-        status = 'already submitted'
+        # Check if the flag already exists in the database
+        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+        if existing_submission and existing_submission.team_id != team.ID:
+            status = 'shared'
+            # Log the shared flag submission in the new table
+            new_shared_submission = SharedFlagSubmission(
+                flag=flag,
+                team_id=team.ID,
+                challenge_id=challenge_id,
+                original_team_id=existing_submission.team_id,
+                submission_time=datetime.now(vienna_timezone)
+            )
+            db.add(new_shared_submission)
+
+            team.SharedFlag += 1
+            if team.SharedFlag == 2:
+                team.Disabled = 1
+            db.commit()
+            db.refresh(team)
+        else:
+            status = 'invalid'
+    
     return {"status": status}
 
 @app.get("/admin_panel")
