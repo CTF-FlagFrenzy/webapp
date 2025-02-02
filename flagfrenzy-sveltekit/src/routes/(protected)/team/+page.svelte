@@ -61,6 +61,7 @@
       if (!response.ok) throw new Error("Failed to load teams");
 
       teams = await response.json();
+      console.log(teams);
     } catch (err) {
       errorMessageTeams = err.message;
     }
@@ -134,6 +135,7 @@
           <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
             <tr>
               <th>Name</th>
+              <th class="text-center">Strikes</th>
               <th class="text-center">Members</th>
             </tr>
           </thead>
@@ -141,6 +143,17 @@
             {#each teams as team}
               <tr class="border-b border-custom-100">
                 <td class="pt-2 align-top">{team.Teamname}</td>
+                <td class="pt-2 align-top text-center">
+                  {#if team.Disabled}
+                    ☠️
+                  {:else if team.SharedFlag === 1}
+                    ❌
+                  {:else if team.SharedFlag === 2}
+                    ❌❌
+                  {:else}
+                    -
+                  {/if}
+                </td>
                 <td class="pt-2 align-top text-center">{team.Members}/4</td>
               </tr>
             {/each}
