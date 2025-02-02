@@ -64,14 +64,14 @@
 </script>
   
 <body class="bg-custom-100 h-auto text-white">
-  <header class="bg-custom-110 text-custom-200 shadow-lg flex justify-between items-center p-4">
-    <a href="/" >
+  <header class="bg-custom-110 text-custom-200 flex justify-between items-center p-4 z-10 shadow-BackdropShadow">
+    <a href="/" on:click={() => (isOpen2 = false)}>
       <img alt="The project logo" src={'/images/logo.png'} class="w-60 h-auto object-contain" />
     </a>
     <nav class="hidden md:flex gap-8 text-3xl">
-      <a href="/challenges" class:active-tab={currentPath === '/challenges'}>Challenges</a>
-      <a href="/scoreboard" class:active-tab={currentPath === '/scoreboard'}>Scoreboard</a>
-      <a href="/team" class:active-tab={currentPath === '/team'}>Team</a>
+      <a href="/challenges" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/challenges'}>Challenges</a>
+      <a href="/scoreboard" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/scoreboard'}>Scoreboard</a>
+      <a href="/team" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/team'}>Team</a>
     </nav>
     {#if user}
       <button class="hidden md:block text-custom-200 border-2 border-custom-200 rounded-full px-8 py-2 avatar-{user.Avatar} bg-no-repeat bg-center bg-cover w-16 h-16 mx-4" on:click={toggleMenu2}></button>
@@ -81,7 +81,7 @@
     <button on:click={toggleMenu} class="md:hidden text-custom-200 focus:outline-none text-3xl">{isOpen ? '✖' : '☰'}</button>
   </header>
   {#if isOpen2}
-    <nav class="hidden absolute right-0 items-center bg-custom-110 text-custom-200 p-4 space-y-4 md:block rounded-bl-lg z-10">
+    <nav class="hidden absolute right-0 items-center bg-custom-110 text-custom-200 p-4 space-y-4 md:block rounded-bl-lg z-50 shadow-BackdropShadow">
       <a href="/profile" class="block text-2xl text-center" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/profile'}>Profile</a>
       <button class="text-custom-200 px-4 py-2 text-2xl block w-full text-center" on:click={()=>window.location.href="/logout"}>Logout</button>
     </nav>
