@@ -157,7 +157,11 @@
     {#if teamMembers}
       <div class="flex gap-3.5 pb-4">
         <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">{teamMembers.Teamname}</h1>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5" on:click={deleteTeam}>Delete Team</button>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5" on:click={() => {
+          if (confirm("Bist du sicher, dass du das Team löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")) {
+            deleteTeam();
+          }
+        }}>Delete Team</button>
       </div>
     {:else}
       <div class="pb-4">
