@@ -795,6 +795,17 @@ def update_user_made_challenge(
         user.Points += challenge.Points*0.5
         team.Points += challenge.Points*0.5
         user_made_challenge.Firstblood = 1
+        teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+        new_teampoints = TeamPoints(
+            TeamID=teampoints.ID,
+            Points=teampoints.Points,
+            Teamname=team.Teamname,
+            Time=datetime.now(vienna_timezone)
+        )
+        db.add(new_teampoints)
+        db.commit()
+        db.refresh(new_teampoints)
+        db.refresh(team)
         
 
     user_made_challenge.Solved = update_data.Solved
@@ -981,6 +992,17 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             """
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             print(result)
+            teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+            new_teampoints = TeamPoints(
+                TeamID=teampoints.ID,
+                Points=teampoints.Points,
+                Teamname=team.Teamname,
+                Time=datetime.now(vienna_timezone)
+            )
+            db.add(new_teampoints)
+            db.commit()
+            db.refresh(new_teampoints)
+            db.refresh(team)
         else:
             # Check if the flag already exists in the database
             existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
@@ -1081,6 +1103,17 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             print(result)
+            teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+            new_teampoints = TeamPoints(
+                TeamID=teampoints.ID,
+                Points=teampoints.Points,
+                Teamname=team.Teamname,
+                Time=datetime.now(vienna_timezone)
+            )
+            db.add(new_teampoints)
+            db.commit()
+            db.refresh(new_teampoints)
+            db.refresh(team)
             return {"status": "successful", "message": "Flag is valid!"}
         else:
             return {"status": "already submitted", "message": "Flag is already submitted!"}
