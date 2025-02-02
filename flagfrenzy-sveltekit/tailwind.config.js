@@ -21,6 +21,10 @@ export default {
         Expert: '#B259F3',
         Default: '#A5A2A2',
         EasyPastel: '#A7F7A7',
+        MediumPastel: '#F9E29C',
+        HardPastel: '#f6889e',
+        ExpertPastel: '#deb8fa',
+        DefaultPastel: '#A5A2A2',
       },
       boxShadow: {
         EasyShadow: '0 0px 20px #59F359',

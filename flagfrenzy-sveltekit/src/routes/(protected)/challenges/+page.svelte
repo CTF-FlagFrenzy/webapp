@@ -94,10 +94,9 @@
       <h1 class="text-custom-200 text-3xl font-serif font-bold pt-4 pl-8 text-center">{category}</h1>
       <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {#each challengesByCategory[category] as challenge}
-          <div class="transform transition-transform duration-200 hover:scale-105">
+          <div>
             <Card challenge={challenge} user={user} />
           </div>
-          
         {/each}
       </div>
     </div>

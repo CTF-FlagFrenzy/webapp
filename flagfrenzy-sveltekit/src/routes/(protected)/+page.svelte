@@ -13,7 +13,7 @@
             The battleground for all cybersecurity enthusiasts! Whether you’re an experienced hacker or just beginning your journey 
             into hacking, this platform is designed to challenge your skills, expand your technical knowledge and push you to think 
             like a true security professional. Compete in a variety of challenges, including Web-Challenges, Cryptography, Reversing, 
-            Forensics, OSINT, Reverse-Engineering and Others, as you race against fellow participants to capture flags and prove your expertise.
+            Forensics, OSINT, Steganography and Others, as you race against fellow participants to capture flags and prove your expertise.
         </p>
         <br/>
         <p class="text-white text-lg text-center">

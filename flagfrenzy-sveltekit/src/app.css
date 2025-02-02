@@ -29,6 +29,18 @@ body {
 .card-EasyPastel {
   @apply text-EasyPastel;
 }
+.card-MediumPastel {
+  @apply text-MediumPastel;
+}
+.card-HardPastel {
+  @apply text-HardPastel;
+}
+.card-ExpertPastel {
+  @apply text-ExpertPastel;
+}
+.card-DefaultPastel {
+  @apply text-DefaultPastel;
+}
 
 .avatar-Hero {
   @apply bg-Hero;

@@ -232,16 +232,16 @@ async function checkChainCondition() {
     <p class="text-lg">{hints.Hint1}</p>
     <p class="text-lg">{hints.Hint2}</p>
     <p class="text-lg pb-2">{hints.Hint3}</p>
-    <div class="flex justify-between items-center mt-auto pt-4 border-t border-custom-200">
+    <div class="flex justify-between items-center gap-2 mt-auto pt-4 border-t border-custom-200">
 
       {#if data.Solved}
         <div class="flex justify-center items-center w-full">
           <p class="text-custom-200 text-xl">Solved</p>
         </div>
       {:else}
-        <input class="bg-custom-100 border-2 rounded-full px-2 py-1 text-base transition-all duration-300 outline-none {submitFailed ? 'border-red-500' : 'border-custom-200'}" type="text" bind:value={flagToSubmit} placeholder='Enter Flag: FF&#123;...&#125;' on:input={() => submitFailed = false} on:keydown={(event) => { if (event.key === 'Enter') submit(); }}>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={submit}>Submit</button>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base" on:click={startChallenge}>Start</button>
+        <input class="bg-custom-100 border-2 w-2/3 rounded-full px-2 py-1 text-base transition-all duration-300 outline-none {submitFailed ? 'border-red-500' : 'border-custom-200'}" type="text" bind:value={flagToSubmit} placeholder='Enter Flag: FF&#123;...&#125;' on:input={() => submitFailed = false} on:keydown={(event) => { if (event.key === 'Enter') submit(); }}>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={submit}>Submit</button>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={startChallenge}>Start</button>
       {/if}
     </div>
   </div>

@@ -129,7 +129,7 @@
     <div class="pb-4">
       <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Teams</h1>
     </div>
-    <div class="h-80 max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-full px-4 rounded-2xl">
+    <div class="h-80 max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-full px-4 rounded-2xl shadow-BackdropShadow">
       {#if teams}
         <table class="styled-table w-full bg-custom-110 mt-4">
           <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
@@ -181,7 +181,7 @@
         <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Join a Team</h1>
       </div>
     {/if}
-    <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl">
+    <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl shadow-BackdropShadow">
       {#if teamMembers}
         <table class="styled-table w-full">
           <thead class="text-custom-200 text-xl border-b border-custom-200">
