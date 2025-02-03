@@ -940,7 +940,6 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
         return {"status": "Not found"}
     if team.Disabled == 1:
         return {"status": "disabled"}
-    
     # Generate the flag
     if challenge.IsStatic == 0:
         generated_flag = generate_flag(team.Teamkey, challenge.Static)
@@ -954,7 +953,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 
     # Validate the submitted flag
     if normalized_flag == "FF{" + generated_flag + "}":
-        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID ).first()
         print(submission)
         if not submission:
             status = 'successful'
@@ -962,11 +961,9 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             submission_time = datetime.now(vienna_timezone)
             new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status=status, submission_time=submission_time)
             db.add(new_submission)
-
             # Calculate points based on submission time
             start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
             end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
-
             if submission_time < start_time + timedelta(hours=1):
                 points_multiplier = 2.0
             elif submission_time < start_time + timedelta(hours=2):
@@ -1067,7 +1064,7 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
         user = db.query(User).filter(User.ID == user_id).first()
         team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
-        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID ).first()
         print(submission)
         if not submission:
 
