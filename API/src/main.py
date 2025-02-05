@@ -887,36 +887,39 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     """
     Retrieve deployment details for a specific challenge and user.
     """
-    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
-    user = db.query(User).filter(User.ID == user_id).first()
-    user_made_challenge = db.query(UserMadeChallenge).filter(
-        UserMadeChallenge.User_ID == user_id,
-        UserMadeChallenge.Challenges_ID == challenge_id).first()
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge was not found")
-    if not user:
-        raise HTTPException(status_code=404, detail="User was not found")
+    try:
+        challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+        user = db.query(User).filter(User.ID == user_id).first()
+        user_made_challenge = db.query(UserMadeChallenge).filter(
+            UserMadeChallenge.User_ID == user_id,
+            UserMadeChallenge.Challenges_ID == challenge_id).first()
+        if not challenge:
+            raise HTTPException(status_code=404, detail="Challenge was not found")
+        if not user:
+            raise HTTPException(status_code=404, detail="User was not found")
 
-    API_KEY = os.getenv("API_KEY", "default_secure_key")
-    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
-    team_id = str(team.ID)
+        API_KEY = os.getenv("API_KEY", "default_secure_key")
+        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+        team_id = str(team.ID)
 
-    command = f"""
-    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deploy" \
-    -H "Authorization: Bearer {API_KEY}" \
-    -H "Content-Type: application/json" \
-    -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
-    """
-    
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    # JSON-String in ein Dictionary umwandeln
-    parsed_data = json.loads(result.stdout.strip())
-    # URL extrahieren
-    url = parsed_data["url"]
-    user_made_challenge.Url = url
-    db.commit()
-    db.refresh(user_made_challenge)
-    return result.stdout.strip()
+        command = f"""
+        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deploy" \
+        -H "Authorization: Bearer {API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
+        """
+        
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        # JSON-String in ein Dictionary umwandeln
+        parsed_data = json.loads(result.stdout.strip())
+        # URL extrahieren
+        url = parsed_data["url"]
+        user_made_challenge.Url = url
+        db.commit()
+        db.refresh(user_made_challenge)
+        return result.stdout.strip()
+    except Exception as ex:
+        return {"error": str(ex)}
     
     
 # --------------------- ANTI CHEAT -----------------------
