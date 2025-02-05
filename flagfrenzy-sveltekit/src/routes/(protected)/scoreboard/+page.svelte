@@ -44,14 +44,18 @@
 
 </script>
   
-<div class="px-4 pt-4">
+<div class="px-8 pt-8">
   {#if teamPoints}
-    <Graph data={teamPoints} />
+    <div class="px-32 hidden sm:block">
+      <Graph data={teamPoints}/>
+    </div>
+    <p class="sm:hidden text-center text-white">Der Graph wird nur auf größeren Bildschirmen angezeigt.</p>
   {:else}
-    <p>Loading graph data...</p>
+    <p class="hidden sm:block">Loading graph data...</p>
+    <p class="sm:hidden text-center text-white">Der Graph wird nur auf größeren Bildschirmen angezeigt.</p>
   {/if}
   {#if teams}
-  <div class="bg-custom-110 mt-4 px-4 py-4 rounded-2xl">
+  <div class="bg-custom-110 mt-4 px-4 py-4 rounded-2xl shadow-BackdropShadow">
     <table class="styled-table w-full">
       <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
         <tr>

@@ -61,6 +61,7 @@
       if (!response.ok) throw new Error("Failed to load teams");
 
       teams = await response.json();
+      console.log(teams);
     } catch (err) {
       errorMessageTeams = err.message;
     }
@@ -128,12 +129,13 @@
     <div class="pb-4">
       <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Teams</h1>
     </div>
-    <div class="h-80 max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-full px-4 rounded-2xl">
+    <div class="h-80 max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-full px-4 rounded-2xl shadow-BackdropShadow">
       {#if teams}
         <table class="styled-table w-full bg-custom-110 mt-4">
           <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
             <tr>
               <th>Name</th>
+              <th class="text-center">Strikes</th>
               <th class="text-center">Members</th>
             </tr>
           </thead>
@@ -141,6 +143,17 @@
             {#each teams as team}
               <tr class="border-b border-custom-100">
                 <td class="pt-2 align-top">{team.Teamname}</td>
+                <td class="pt-2 align-top text-center">
+                  {#if team.Disabled}
+                    ☠️
+                  {:else if team.SharedFlag === 1}
+                    ❌
+                  {:else if team.SharedFlag === 2}
+                    ❌❌
+                  {:else}
+                    -
+                  {/if}
+                </td>
                 <td class="pt-2 align-top text-center">{team.Members}/4</td>
               </tr>
             {/each}
@@ -157,14 +170,18 @@
     {#if teamMembers}
       <div class="flex gap-3.5 pb-4">
         <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">{teamMembers.Teamname}</h1>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5" on:click={deleteTeam}>Delete Team</button>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5" on:click={() => {
+          if (confirm("Bist du sicher, dass du das Team löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")) {
+            deleteTeam();
+          }
+        }}>Delete Team</button>
       </div>
     {:else}
       <div class="pb-4">
         <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Join a Team</h1>
       </div>
     {/if}
-    <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl">
+    <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl shadow-BackdropShadow">
       {#if teamMembers}
         <table class="styled-table w-full">
           <thead class="text-custom-200 text-xl border-b border-custom-200">
