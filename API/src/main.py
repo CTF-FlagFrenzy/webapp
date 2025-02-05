@@ -142,7 +142,6 @@ class ChallengeResponse(BaseModel):
     ID: int
     ChallengeName: str
     Categorie: str
-    Hintcount: Optional[int] = 0
     Points: int
     Description: str
     Difficulty: str
