@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy import (
-    create_engine, Column, String, Integer, ForeignKey, Text, Table
+    create_engine, Column, String, Integer, ForeignKey, Text, Table, Time
 )
 from zoneinfo import ZoneInfo
 from sqlalchemy import extract
+from sqlalchemy.sql import cast
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
@@ -842,11 +843,11 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     """
     if "2" in user_id:
         teamPoints = db.query(TeamPoints).filter(
-        extract('hour', TeamPoints.Time) < 13
+            cast(TeamPoints.Time, Time) < "12:30:00"
         ).all()
-    else:  
+    else:
         teamPoints = db.query(TeamPoints).filter(
-        extract('hour', TeamPoints.Time) < 15
+            cast(TeamPoints.Time, Time) < "14:30:00"
         ).all()
     return teamPoints
 
