@@ -63,7 +63,7 @@
       for (const [category, challenges] of Object.entries(rawChallengesByCategory)) {
         challengesByCategory[category] = challenges.filter(challenge => {
           return (
-            challenge.Chain === null || // No dependency
+            challenge.Chain === null || challenge.Chain === 0 ||
             (challenge.Chain in solvedMap && solvedMap[challenge.Chain]) // Dependency solved
           );
         });
