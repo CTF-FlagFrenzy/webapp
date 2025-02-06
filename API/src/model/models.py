@@ -23,7 +23,7 @@ class Team(Base):
     Disabled = Column(Integer, nullable=False, default=0)
     TeamLeader = Column(String(150), ForeignKey("User.ID"), nullable=False)
 
-    leader = relationship("User", back_populates="leader_of_team", foreign_keys="[User.ID]")
+    leader = relationship("User", back_populates="leader_of_team", foreign_keys="[Team.TeamLeader]", uselist=False)
 
     users = relationship("User", back_populates="team", foreign_keys="[User.TeamsID]")
     currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
@@ -57,9 +57,8 @@ class User(Base):
     Email = Column(String(50), nullable=False)
     Avatar = Column(String(100), nullable=True, default=None)
 
-    leader_of_team = relationship("Team", back_populates="leader")
-
-    team = relationship("Team", back_populates="users")
+    leader_of_team = relationship("Team", back_populates="leader", foreign_keys="[Team.TeamLeader]", uselist=False)
+    team = relationship("Team", back_populates="users", foreign_keys="[User.TeamsID]")
     challenges = relationship("UserMadeChallenge", back_populates="user")
 
 

@@ -133,6 +133,7 @@ class TeamResponse(BaseModel):
     Members: int
     SharedFlag: int
     Disabled: int
+    TeamLeader: str
 
 class TeamPointsCreate(BaseModel):
     TeamID: int
@@ -284,10 +285,19 @@ def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
     """
     if is_not_allowed_time():
         raise HTTPException(status_code=403, detail="The Event started")
+
+    existing_team = db.query(Team).filter(Team.TeamLeader == user_id).first()
+    if existing_team:
+        raise HTTPException(status_code=400, detail="User is already a team leader.")
+
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
-    db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
-
+    db_team = Team(
+        Teamkey=team_key, 
+        **team.dict(exclude={"Password"}), 
+        Password=hashed_password, 
+        TeamLeader=user_id
+    )
     try:
         db.add(db_team)
         db.commit()
@@ -357,23 +367,28 @@ def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
     """
     if is_not_allowed_time():
         raise HTTPException(status_code=403, detail="The Event started")
+
     team = db.query(Team).filter(Team.ID == team_id).first()
     user = db.query(User).filter(User.ID == user_id).first()
-    userTeam = db.query(User).filter(team.ID == user.TeamsID).first()
+
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
 
-    if userTeam:
-        # Set TeamsID to null for all users in the team
-        users_in_team = db.query(User).filter(User.TeamsID == team_id).all()
-        for user in users_in_team:
-            user.TeamsID = None
+    if team.TeamLeader != user.ID:
+        raise HTTPException(status_code=403, detail="You have no permission to delete this team")
 
-        db.delete(team)
-        db.commit()
-        return {"detail": "Team deleted successfully and associated users' team ID set to null"}
-    else:
-        return {"detail": "You have no permission to delete this team"}
+    # Alle TeamPoints-Einträge des Teams löschen
+    db.query(TeamPoints).filter(TeamPoints.TeamID == team_id).delete()
+
+    # Setze TeamsID auf NULL für alle Mitglieder des Teams
+    db.query(User).filter(User.TeamsID == team_id).update({User.TeamsID: None})
+
+    # Team löschen
+    db.delete(team)
+    db.commit()
+
+    return {"detail": "Team and all related TeamPoints deleted successfully"}
+
 
 # --------------------- USERS -----------------------
 @app.get("/users/")
@@ -464,7 +479,9 @@ def update_user_team(
             print(team.Password )
             print(hashlib.sha256(userInput.Password.encode()).hexdigest())
             raise HTTPException(status_code=400, detail="Invalid team password")
-
+        existing_team = db.query(Team).filter(Team.TeamLeader == user_id).first()
+        if existing_team and existing_team.ID != team.ID:
+            raise HTTPException(status_code=400, detail="You cannot join another team while being a Team Leader")
         if user.TeamsID:
             old_team = db.query(Team).filter(Team.ID == user.TeamsID).first()
             if old_team and old_team.Members > 0:
