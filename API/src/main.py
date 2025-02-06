@@ -1001,8 +1001,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             db.commit()
             db.refresh(new_teampoints)
             db.refresh(team)
-        else:
-            status = 'already submitted'
+        status = 'already submitted'
     else:
         # Check if the flag already exists in the database
         existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
@@ -1024,9 +1023,42 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             db.commit()
             db.refresh(team)
         else:
+            # Apply penalty for incorrect submission
+            incorrect_submissions = db.query(FlagSubmission).filter(
+                FlagSubmission.team_id == team.ID,
+                FlagSubmission.challenge_id == challenge_id,
+                FlagSubmission.status == 'invalid'
+            ).count()
+
+            penalty_percentage = 0
+            next_penalty_percentage = 0
+            if incorrect_submissions >= 3:
+                if incorrect_submissions < 5:
+                    penalty_percentage = 5
+                    next_penalty_percentage = 10
+                elif incorrect_submissions < 7:
+                    penalty_percentage = 10
+                    next_penalty_percentage = 20
+                elif incorrect_submissions < 9:
+                    penalty_percentage = 20
+                    next_penalty_percentage = 30
+                else:
+                    penalty_percentage = 30
+                    next_penalty_percentage = 30
+
+            penalty_points = challenge.Points * (penalty_percentage / 100)
+            challenge.Points -= penalty_points
+            team.Points -= penalty_points
+
             status = 'invalid'
-    
+            
+            return {
+                "status": status,
+                "message": f"Flag is invalid! Next penalty will be {next_penalty_percentage}% of the challenge points."
+            }
+
     return {"status": status}
+
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
@@ -1117,4 +1149,36 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
         else:
             return {"status": "already submitted", "message": "Flag is already submitted!"}
     else:
-        return {"status": "invalid", "message": "Flag is invalid!"}
+            # Apply penalty for incorrect submission
+        incorrect_submissions = db.query(FlagSubmission).filter(
+            FlagSubmission.team_id == team.ID,
+            FlagSubmission.challenge_id == challenge_id,
+            FlagSubmission.status == 'invalid'
+        ).count()
+
+        penalty_percentage = 0
+        next_penalty_percentage = 0
+        if incorrect_submissions >= 3:
+            if incorrect_submissions < 5:
+                penalty_percentage = 5
+                next_penalty_percentage = 10
+            elif incorrect_submissions < 7:
+                penalty_percentage = 10
+                next_penalty_percentage = 20
+            elif incorrect_submissions < 9:
+                penalty_percentage = 20
+                next_penalty_percentage = 30
+            else:
+                penalty_percentage = 30
+                next_penalty_percentage = 30
+
+        penalty_points = challenge.Points * (penalty_percentage / 100)
+        challenge.Points -= penalty_points
+        team.Points -= penalty_points
+
+        status = 'invalid'
+            
+        return {
+            "status": status,
+            "message": f"Flag is invalid! Next penalty will be {next_penalty_percentage}% of the challenge points."            }
+
