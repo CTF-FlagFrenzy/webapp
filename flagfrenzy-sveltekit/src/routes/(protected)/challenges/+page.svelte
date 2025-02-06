@@ -93,7 +93,7 @@
     <h1 class="text-whita text-5xl font-serif font-bold pt-4 pl-8 text-center">{category}</h1>
     
     <div class="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 w-full px-8 relative">
-      <hr class="border-t-2 border-custom-200 my-4 sm:col-start-1 sm:col-end-3 sm:w-1/2 sm:mx-auto md:col-start-2 md:col-end-[-2] md:w-full">
+      <hr class="border-t-2 border-custom-200 opacity-80 my-4 sm:col-start-1 sm:col-end-3 sm:w-1/2 sm:mx-auto md:col-start-2 md:col-end-[-2] md:w-full">
     </div>
 
     <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">

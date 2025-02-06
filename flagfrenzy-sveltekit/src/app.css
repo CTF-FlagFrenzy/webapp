@@ -8,9 +8,6 @@ body {
   font-weight: 900;
 }
 
-.card h2 {
-  padding-bottom: 10%;
-}
 .card-Easy {
   @apply shadow-EasyShadow;
 }
