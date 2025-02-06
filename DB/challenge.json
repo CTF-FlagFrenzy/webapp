@@ -245,5 +245,21 @@
     "FormatedChallengeName": "git-secrets-layers-of-discovery-part-4",
     "Chain": 14,
     "IsStatic": 1
-  }
+  },
+    {
+    "ID":  18,
+    "ChallengeName": "Hidden Job",
+    "Categorie": "Web Challenge",
+    "Points": 1000,
+    "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
+    "Difficulty": "Medium",
+    "Hint1": "Could the flyer be hiding something more?",
+    "Hint2": "What if the first flag holds the key to the second?",
+    "Hint3": "Run east, and you just might stumble upon a hidden boss.",
+    "Static": "R2LQXpy^Us",
+    "FormatedChallengeName": "hidden-job",
+    "Chain": null, 
+    "IsStatic": 0
+
+  },
 ]
