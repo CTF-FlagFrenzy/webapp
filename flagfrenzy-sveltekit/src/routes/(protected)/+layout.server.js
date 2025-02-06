@@ -5,10 +5,12 @@ export function load({ locals }) {
 	const email = (userinfo).mail;
 	const givenname = (userinfo).givenName;
 	const surname = (userinfo).surname;
+	const adminUser = ["PINTER Elias, 5AHITS"]
 	return {
 		username,
 		email,
 		givenname,
-		surname
+		surname,
+		adminUser
 	};
 }

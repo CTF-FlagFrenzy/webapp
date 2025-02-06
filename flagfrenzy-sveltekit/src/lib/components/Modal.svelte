@@ -8,7 +8,6 @@
   export let user;
   let hints = {};
   let canSubmit;
-  let allFlags;
   let flagStatus;
   let submitFailed = false;
 
@@ -104,24 +103,7 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
-     async function loadFlags() {
-      try {
-        const response = await fetch(`/api/anti-cheat`, {
-          method: "GET",
-      
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          }
-     });
-    allFlags = await response.json();
-    console.log(allFlags);
-      if (!response.ok) {
-        throw new Error("Flags konnten nicht geladen werden.");
-      }
-    } catch (error) {
-      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
-    }
-  }
+    
 
  async function submitButton() {
     try {
@@ -186,28 +168,7 @@ async function checkChainCondition() {
       return difficulty;
     }}
   
-  async function updatePoints() {
-    try {
-      const response = await fetch("/api/user/points", {
-        method: "PUT",
-        body: JSON.stringify({
-          UserID: user.ID,
-          Points: data.Points
-        }),
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        }
-      });
-      console.log( await response.json())
-
-      if (!response.ok) {
-        throw new Error(".");
-      }
-    } catch (error) {
-      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
-
-    }
-  }
+  
 </script>
 
 {#if isOpen}

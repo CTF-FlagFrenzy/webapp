@@ -277,8 +277,8 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
     }
 
 
-@app.post("/teams/", response_model=TeamResponse)
-def create_team(team: TeamCreate, db: Session = Depends(get_db)):
+@app.post("/teams/{user_id}", response_model=TeamResponse)
+def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
     """
     Create a new team with a unique key.
     """
@@ -842,7 +842,7 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     """
     if "2" in user_id:
         teamPoints = db.query(TeamPoints).filter(
-            cast(TeamPoints.Time, Time) < "12:30:00"
+            cast(TeamPoints.Time, Time) < "11:30:00"
         ).all()
     else:
         teamPoints = db.query(TeamPoints).filter(
