@@ -247,7 +247,39 @@
     "IsStatic": 1
   },{
     "ID":  18,
-    "ChallengeName": "Hidden Job",
+    "ChallengeName": "Hidden Job - Part 1",
+    "Categorie": "Web Challenge",
+    "Points": 1000,
+    "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
+    "Difficulty": "Medium",
+    "Hint1": "Could the flyer be hiding something more?",
+    "Hint2": "What if the first flag holds the key to the second?",
+    "Hint3": "Run east, and you just might stumble upon a hidden boss.",
+    "Static": "N0oN3Kn0W2!",
+    "FormatedChallengeName": "hidden-job",
+    "Chain": null, 
+    "IsStatic": 0
+
+  },
+  {
+    "ID":  18,
+    "ChallengeName": "Hidden Job - Part 2",
+    "Categorie": "Web Challenge",
+    "Points": 1000,
+    "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
+    "Difficulty": "Medium",
+    "Hint1": "Could the flyer be hiding something more?",
+    "Hint2": "What if the first flag holds the key to the second?",
+    "Hint3": "Run east, and you just might stumble upon a hidden boss.",
+    "Static": "#74q$j&zcB",
+    "FormatedChallengeName": "hidden-job",
+    "Chain": null, 
+    "IsStatic": 0
+
+  },
+  {
+    "ID":  18,
+    "ChallengeName": "Hidden Job - Part 3",
     "Categorie": "Web Challenge",
     "Points": 1000,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
@@ -256,6 +288,22 @@
     "Hint2": "What if the first flag holds the key to the second?",
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "R2LQXpy^Us",
+    "FormatedChallengeName": "hidden-job",
+    "Chain": null, 
+    "IsStatic": 0
+
+  },
+  {
+    "ID":  18,
+    "ChallengeName": "Hidden Job - Part 4",
+    "Categorie": "Web Challenge",
+    "Points": 1000,
+    "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
+    "Difficulty": "Medium",
+    "Hint1": "Could the flyer be hiding something more?",
+    "Hint2": "What if the first flag holds the key to the second?",
+    "Hint3": "Run east, and you just might stumble upon a hidden boss.",
+    "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
     "Chain": null, 
     "IsStatic": 0
@@ -284,7 +332,7 @@
     "Hint1": "Both are rather easy if you know what you have to do...",
     "Hint2": "SYT: URI model | Maths: Length of an unknown side is needed",
     "Hint3": "SYT: First R, then I | Maths: Sinus and cosine rule may help",
-    "Static": "3SA4gzo82l",
+    "Static": "Honolulu",
     "FormatedChallengeName": "security-maths",
     "Chain": null,
     "IsStatic": 1
