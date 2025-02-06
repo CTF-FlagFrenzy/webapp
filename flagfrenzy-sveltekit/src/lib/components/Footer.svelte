@@ -1,4 +1,4 @@
-<footer class="shadow-BackdropShadow2">
+<footer class="shadow-BackdropShadow2 bg-custom-110">
 	<div class="footer-column">
 	  <h3>About Us</h3>
 	  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur auctor magna in enim.</p>
@@ -25,7 +25,6 @@
 	footer {
 	  display: flex;
 	  justify-content: space-around;
-	  background: #40424B;
 	  color: #ffffff;
 	  text-align: center;
 	  padding: 2em 1em 1em 1em;
