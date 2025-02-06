@@ -795,6 +795,17 @@ def update_user_made_challenge(
         user.Points += challenge.Points*0.5
         team.Points += challenge.Points*0.5
         user_made_challenge.Firstblood = 1
+        teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+        new_teampoints = TeamPoints(
+            TeamID=teampoints.ID,
+            Points=teampoints.Points,
+            Teamname=team.Teamname,
+            Time=datetime.now(vienna_timezone)
+        )
+        db.add(new_teampoints)
+        db.commit()
+        db.refresh(new_teampoints)
+        db.refresh(team)
         
 
     user_made_challenge.Solved = update_data.Solved
@@ -929,32 +940,30 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
         return {"status": "Not found"}
     if team.Disabled == 1:
         return {"status": "disabled"}
-    submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
-    print(submission)
-    if not submission:
-        # Generate the flag
-        if challenge.IsStatic == 0:
-            generated_flag = generate_flag(team.Teamkey, challenge.Static)
-        else:
-            return {"status": "static flag"}
+    # Generate the flag
+    if challenge.IsStatic == 0:
+        generated_flag = generate_flag(team.Teamkey, challenge.Static)
+    else:
+        return {"status": "static flag"}
 
-        print(f"Generated flag: {generated_flag}")
+    print(f"Generated flag: {generated_flag}")
 
-        # Normalize the submitted flag by removing spaces
-        normalized_flag = flag.replace(" ", "")
+    # Normalize the submitted flag by removing spaces
+    normalized_flag = flag.replace(" ", "")
 
-        # Validate the submitted flag
-        if normalized_flag == "FF{" + generated_flag + "}":
+    # Validate the submitted flag
+    if normalized_flag == "FF{" + generated_flag + "}":
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID ).first()
+        print(submission)
+        if not submission:
             status = 'successful'
             # Log the successful flag submission
             submission_time = datetime.now(vienna_timezone)
             new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status=status, submission_time=submission_time)
             db.add(new_submission)
-
             # Calculate points based on submission time
             start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
             end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
-
             if submission_time < start_time + timedelta(hours=1):
                 points_multiplier = 2.0
             elif submission_time < start_time + timedelta(hours=2):
@@ -981,30 +990,42 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             """
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             print(result)
+            teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+            new_teampoints = TeamPoints(
+                TeamID=teampoints.ID,
+                Points=teampoints.Points,
+                Teamname=team.Teamname,
+                Time=datetime.now(vienna_timezone)
+            )
+            db.add(new_teampoints)
+            db.commit()
+            db.refresh(new_teampoints)
+            db.refresh(team)
         else:
-            # Check if the flag already exists in the database
-            existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
-            if existing_submission and existing_submission.team_id != team.ID:
-                status = 'shared'
-                # Log the shared flag submission in the new table
-                new_shared_submission = SharedFlagSubmission(
-                    flag=flag,
-                    team_id=team.ID,
-                    challenge_id=challenge_id,
-                    original_team_id=existing_submission.team_id,
-                    submission_time=submission_time
-                )
-                db.add(new_shared_submission)
-
-                team.SharedFlag += 1
-                if team.SharedFlag == 2:
-                    team.Disabled = 1
-                db.commit()
-                db.refresh(team)
-            else:
-                status = 'invalid'
+            status = 'already submitted'
     else:
-        status = 'already submitted'
+        # Check if the flag already exists in the database
+        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+        if existing_submission and existing_submission.team_id != team.ID:
+            status = 'shared'
+            # Log the shared flag submission in the new table
+            new_shared_submission = SharedFlagSubmission(
+                flag=flag,
+                team_id=team.ID,
+                challenge_id=challenge_id,
+                original_team_id=existing_submission.team_id,
+                submission_time=datetime.now(vienna_timezone)
+            )
+            db.add(new_shared_submission)
+
+            team.SharedFlag += 1
+            if team.SharedFlag == 2:
+                team.Disabled = 1
+            db.commit()
+            db.refresh(team)
+        else:
+            status = 'invalid'
+    
     return {"status": status}
 
 @app.get("/admin_panel")
@@ -1043,7 +1064,7 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
         user = db.query(User).filter(User.ID == user_id).first()
         team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
-        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id and FlagSubmission.team_id == team.ID ).first()
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID ).first()
         print(submission)
         if not submission:
 
@@ -1081,6 +1102,17 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             print(result)
+            teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+            new_teampoints = TeamPoints(
+                TeamID=teampoints.ID,
+                Points=teampoints.Points,
+                Teamname=team.Teamname,
+                Time=datetime.now(vienna_timezone)
+            )
+            db.add(new_teampoints)
+            db.commit()
+            db.refresh(new_teampoints)
+            db.refresh(team)
             return {"status": "successful", "message": "Flag is valid!"}
         else:
             return {"status": "already submitted", "message": "Flag is already submitted!"}

@@ -1,4 +1,4 @@
-<footer>
+<footer class="shadow-BackdropShadow2">
 	<div class="footer-column">
 	  <h3>About Us</h3>
 	  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur auctor magna in enim.</p>

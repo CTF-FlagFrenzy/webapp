@@ -26,20 +26,20 @@ body {
 .card-Default {
   @apply shadow-DefaultShadow;
 }
-.card-Easy span {
-  @apply text-Easy;
+.card-EasyPastel {
+  @apply text-EasyPastel;
 }
-.card-Medium span {
-  @apply text-Medium;
+.card-MediumPastel {
+  @apply text-MediumPastel;
 }
-.card-Hard span {
-  @apply text-Hard;
+.card-HardPastel {
+  @apply text-HardPastel;
 }
-.card-Expert span {
-  @apply text-Expert;
+.card-ExpertPastel {
+  @apply text-ExpertPastel;
 }
-.card-Default span {
-  @apply text-Default;
+.card-DefaultPastel {
+  @apply text-DefaultPastel;
 }
 
 .avatar-Hero {

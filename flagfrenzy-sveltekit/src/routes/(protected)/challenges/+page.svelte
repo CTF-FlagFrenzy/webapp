@@ -63,7 +63,7 @@
       for (const [category, challenges] of Object.entries(rawChallengesByCategory)) {
         challengesByCategory[category] = challenges.filter(challenge => {
           return (
-            challenge.Chain === null || // No dependency
+            challenge.Chain === null || challenge.Chain === 0 ||
             (challenge.Chain in solvedMap && solvedMap[challenge.Chain]) // Dependency solved
           );
         });
@@ -88,15 +88,17 @@
     if (interval) clearInterval(interval); // Ensure interval is cleared
   });
 </script>
-  
-  {#each Object.keys(challengesByCategory) as category}
-    <h1 class="text-custom-200 text-2xl font-serif font-bold pt-4 pl-4">{category}</h1>
-    <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {#each challengesByCategory[category] as challenge}
-        <Card challenge={challenge} user={user} />
-      {/each}
+<div class="pt-8 w-full">
+  {#each Object.keys(challengesByCategory) as category, index}
+    <div class="{index % 2 === 0 ? 'bg-custom-100' : 'bg-custom-110'}">
+      <h1 class="text-custom-200 text-3xl font-serif font-bold pt-4 pl-8 text-center">{category}</h1>
+      <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {#each challengesByCategory[category] as challenge}
+          <div>
+            <Card challenge={challenge} user={user} />
+          </div>
+        {/each}
+      </div>
     </div>
   {/each}
-
-
-  
+</div>
