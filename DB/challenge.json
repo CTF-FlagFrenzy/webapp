@@ -265,7 +265,7 @@
     "ChallengeName": "Binary Puzzeling",
     "Categorie": "Cryptography",
     "Points": 500,
-    "Description": "Someone has been tampering with the repository—an unknown user who shouldn’t have access. But who is it? PhantomCoder0916 may have created a fake identity to cover their tracks. Find the imposter and expose their email address to uncover the final piece of the puzzle. Submit your findings in the format FF{email-address}",
+    "Description": "We have found an endpoint that prints some strange data. According to some captured documentation this endpoint contains the password of a administrative account. As always, the password is in the format FF{somelongstring}",
     "Difficulty": "Medium",
     "Hint1": "Maybe the data is not in a human readable format.",
     "Hint2": "Characters can be represented in binary.",
