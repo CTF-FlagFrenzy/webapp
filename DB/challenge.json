@@ -245,8 +245,7 @@
     "FormatedChallengeName": "git-secrets-layers-of-discovery-part-4",
     "Chain": 14,
     "IsStatic": 1
-  },
-    {
+  },{
     "ID":  18,
     "ChallengeName": "Hidden Job",
     "Categorie": "Web Challenge",
@@ -261,5 +260,19 @@
     "Chain": null, 
     "IsStatic": 0
 
-  },
+  },{
+    "ID":  19,
+    "ChallengeName": "Binary Puzzeling",
+    "Categorie": "Cryptography",
+    "Points": 500,
+    "Description": "Someone has been tampering with the repository—an unknown user who shouldn’t have access. But who is it? PhantomCoder0916 may have created a fake identity to cover their tracks. Find the imposter and expose their email address to uncover the final piece of the puzzle. Submit your findings in the format FF{email-address}",
+    "Difficulty": "Medium",
+    "Hint1": "Maybe the data is not in a human readable format.",
+    "Hint2": "Characters can be represented in binary.",
+    "Hint3": "Maybe it is not just one whole string as output, but two",
+    "Static": "k^kpB2Y99nKwhjex8!G1Mpw7cb!gEMtfa@kuPj*dzn%yqu65P^6RhnPtUZsQF0g&",
+    "FormatedChallengeName": "binary-puzzeling",
+    "Chain": null,
+    "IsStatic": 0
+  }
 ]
