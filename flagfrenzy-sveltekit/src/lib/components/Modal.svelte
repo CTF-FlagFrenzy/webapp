@@ -67,6 +67,22 @@ async function checkChainCondition() {
         }
       });
       checkChainCondition();
+      deploy();
+      if (!response.ok) {
+        throw new Error("Challenge konnte nicht gestartet werden.");
+      }
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+    }
+  }
+  async function deploy() {
+    try {
+      const response = await fetch(`/api/cluster?user_id=${user.ID}&challenge_id=${data.ID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }
+      });
       if (!response.ok) {
         throw new Error("Challenge konnte nicht gestartet werden.");
       }
