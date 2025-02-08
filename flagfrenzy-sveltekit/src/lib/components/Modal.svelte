@@ -9,7 +9,6 @@
   export let user;
   let hints = {};
   let canSubmit;
-  let allFlags;
   let flagStatus;
   let submitFailed = false;
   let challengeStarted = false;
@@ -72,6 +71,22 @@ async function checkChainCondition() {
         }
       });
       checkChainCondition();
+      deploy();
+      if (!response.ok) {
+        throw new Error("Challenge konnte nicht gestartet werden.");
+      }
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+    }
+  }
+  async function deploy() {
+    try {
+      const response = await fetch(`/api/cluster?user_id=${user.ID}&challenge_id=${data.ID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }
+      });
       if (!response.ok) {
         throw new Error("Challenge konnte nicht gestartet werden.");
       }
@@ -108,24 +123,7 @@ async function checkChainCondition() {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
     }
   }
-     async function loadFlags() {
-      try {
-        const response = await fetch(`/api/anti-cheat`, {
-          method: "GET",
-      
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          }
-     });
-    allFlags = await response.json();
-    console.log(allFlags);
-      if (!response.ok) {
-        throw new Error("Flags konnten nicht geladen werden.");
-      }
-    } catch (error) {
-      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
-    }
-  }
+    
 
  async function submitButton() {
     try {
@@ -190,6 +188,7 @@ async function checkChainCondition() {
       return difficulty;
     }}
   
+
   async function updatePoints() {
     try {
       const response = await fetch("/api/user/points", {
@@ -223,6 +222,7 @@ async function checkChainCondition() {
       error = err.message;
     }
   }
+
 </script>
 
 {#if isOpen}

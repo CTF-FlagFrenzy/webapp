@@ -39,7 +39,8 @@
           method: "POST",
           body: JSON.stringify({
             Teamname: teamname,
-            Password: password
+            Password: password,
+            UserID: data.username
           }),
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
