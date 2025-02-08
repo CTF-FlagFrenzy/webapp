@@ -44,10 +44,10 @@ export async function DELETE({ url }) {
 }
 
 export async function POST({ request }) {
-    const { Password, Teamname} = await request.json();
+    const { Password, Teamname, UserID} = await request.json();
 
     try {
-        const response = await fetch(`${API_BASE_URL}/teams`, {
+        const response = await fetch(`${API_BASE_URL}/teams/${UserID}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
