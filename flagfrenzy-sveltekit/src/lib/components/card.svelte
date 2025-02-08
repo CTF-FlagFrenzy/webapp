@@ -24,9 +24,9 @@
     }
   }
 </script>
-<div class="transform transition-transform duration-200 hover:scale-105">
+<div class="transform transition-transform duration-200 hover:scale-105 {challenge.Solved ? 'opacity-60' : 'opacity-100'}">
   <button on:click={openModal} class="card h-96 w-72 my-4 bg-custom-110 border-0 card-{colorPicker(challenge.Difficulty)} {challenge.Solved ? 'text-Default' : 'text-white'} rounded-2xl p-2.5">
-    <h2 class="text-3xl text-center w-full block" class:text-EasyPastel={challenge.Difficulty === 'Easy'}
+    <h2 class="text-3xl text-center w-full block mt-3" class:text-EasyPastel={challenge.Difficulty === 'Easy'}
     class:text-MediumPastel={challenge.Difficulty === 'Medium'}
     class:text-HardPastel={challenge.Difficulty === 'Hard'}
     class:text-ExpertPastel={challenge.Difficulty === 'Expert'}>{challenge.ChallengeName}</h2>
