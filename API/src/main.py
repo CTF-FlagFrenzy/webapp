@@ -243,6 +243,36 @@ def get_team(team_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Team not found")
     return team
 
+@app.get("/team/members")
+def get_all_teammembers(db: Session = Depends(get_db)):
+    """
+    Retrieve all members for every team.
+    """
+    teams = db.query(Team).all()
+
+    if not teams:
+        raise HTTPException(status_code=404, detail="No teams found")
+
+    # Erstelle eine Liste mit allen Teams und deren Mitgliedern
+    teams_list = []
+    for team in teams:
+        # Hole alle Mitglieder des jeweiligen Teams
+        team_members = db.query(User.ID, User.Nickname).filter(User.TeamsID == team.ID).all()
+
+        # Konvertiere die Mitglieder in ein Dictionary-Format
+        members_list = [{"ID": member.ID, "Nickname": member.Nickname} for member in team_members]
+
+        # Füge das Team mit Mitgliedern zur Liste hinzu
+        teams_list.append({
+            "TeamsID": team.ID,
+            "Teamname": team.Teamname,
+            "Points": team.Points,
+            "Members": members_list
+        })
+
+    return teams_list
+
+
 @app.get("/teams/members/{user_id}")
 def get_team_members(user_id: str, db: Session = Depends(get_db)):
     """
@@ -276,6 +306,7 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
         "Points": team.Points,
         "Members": members_list
     }
+
 
 
 @app.post("/teams/{user_id}", response_model=TeamResponse)
