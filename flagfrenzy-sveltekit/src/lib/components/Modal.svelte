@@ -188,30 +188,9 @@ async function checkChainCondition() {
       return 'Default';
     } else {
       return difficulty;
-    }}
-  
-  async function updatePoints() {
-    try {
-      const response = await fetch("/api/user/points", {
-        method: "PUT",
-        body: JSON.stringify({
-          UserID: user.ID,
-          Points: data.Points
-        }),
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        }
-      });
-      console.log( await response.json())
-
-      if (!response.ok) {
-        throw new Error(".");
-      }
-    } catch (error) {
-      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
-
     }
   }
+  
   async function checkIfStarted() {
     try {
       const response = await fetch(`/api/user_made_challenges?id=${user.TeamsID}`);
