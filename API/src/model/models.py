@@ -21,6 +21,7 @@ class Team(Base):
     Members = Column(Integer, nullable=False, default=0)
     SharedFlag = Column(Integer, nullable=False, default=0)
     Disabled = Column(Integer, nullable=False, default=0)
+    FirstBloods = Column(Integer, nullable=False, default=0)
     TeamLeader = Column(String(150), ForeignKey("User.ID"), nullable=False)
 
     leader = relationship("User", back_populates="leader_of_team", foreign_keys="[Team.TeamLeader]", uselist=False)

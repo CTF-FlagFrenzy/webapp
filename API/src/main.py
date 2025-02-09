@@ -133,6 +133,7 @@ class TeamResponse(BaseModel):
     Members: int
     SharedFlag: int
     Disabled: int
+    FirstBloods: int
     TeamLeader: str
 
 class TeamPointsCreate(BaseModel):
@@ -843,6 +844,7 @@ def update_user_made_challenge(
         user.Points += challenge.Points*0.5
         team.Points += challenge.Points*0.5
         user_made_challenge.Firstblood = 1
+        team.FirstBloods += 1
         teampoints = db.query(Team).filter(Team.ID == team.ID).first()
         new_teampoints = TeamPoints(
             TeamID=teampoints.ID,
