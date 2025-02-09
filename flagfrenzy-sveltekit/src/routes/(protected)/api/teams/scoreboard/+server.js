@@ -6,7 +6,7 @@ export async function GET() {
     try {
         const response = await fetch(`${API_BASE_URL}/teams/top10`);
         if (!response.ok) {
-            throw new Error('Failed to fetch teams');
+            throw new Error('Failed to fetch top10 teams');
         }
 
         const data = await response.json();
