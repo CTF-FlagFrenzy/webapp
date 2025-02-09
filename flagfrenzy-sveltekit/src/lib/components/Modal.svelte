@@ -3,6 +3,7 @@
   
   
   export let isOpen = false;
+  let error = null;
   export let data;
   let flagToSubmit;
   export let user;
@@ -10,6 +11,8 @@
   let canSubmit;
   let flagStatus;
   let submitFailed = false;
+  let challengeStarted = false;
+  let user_made_challenges;
 
   const dispatch = createEventDispatcher();
 
@@ -53,6 +56,7 @@ async function checkChainCondition() {
     // Call the function to check conditions when modal opens
     checkChainCondition();
     loadHints(); 
+    checkIfStarted();
   }
   async function startChallenge() {
     try {
@@ -182,9 +186,21 @@ async function checkChainCondition() {
       return 'Default';
     } else {
       return difficulty;
-    }}
+    }
+  }
   
-  
+  async function checkIfStarted() {
+    try {
+      const response = await fetch(`/api/user_made_challenges?id=${user.TeamsID}`);
+      if (!response.ok) throw new Error("Failed to load user_made_challenges");
+
+      user_made_challenges = await response.json();
+      challengeStarted = user_made_challenges.some(challenge => challenge.Challenges_ID === data.ID);
+    } catch (err) {
+      error = err.message;
+    }
+  }
+
 </script>
 
 {#if isOpen}
@@ -192,38 +208,41 @@ async function checkChainCondition() {
   <div class="fixed inset-0 bg-black bg-opacity-75 z-10" on:click={close} tabindex="0" role="button" ></div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="fixed inset-0 bg-black bg-opacity-75 z-10" on:click={close} tabindex="0" role="button" ></div>
-  <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 rounded-lg z-20 max-h-3/5 max-w-2xl w-11/12 bg-custom-110 card-{submitFailed ? 'Hard' : colorPicker(data.Difficulty)} text-white">
+  <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 rounded-lg z-20 max-h-3/5 max-w-2xl w-11/12 bg-custom-110 card-{colorPicker(data.Difficulty)} text-white">
     <button class="absolute top-2.5 right-2.5 text-xl cursor-pointer bg-none" on:click={close}>✖</button>
     <div class="flex justify-between pb-4">
-      <h2 class="text-3xl" class:text-EasyPastel={data.Difficulty === 'Easy'}
-      class:text-Medium={data.Difficulty === 'Medium'}
-      class:text-Hard={data.Difficulty === 'Hard'}
-      class:text-Expert={data.Difficulty === 'Expert'}>{data.ChallengeName}</h2>
+      <h2 class="text-3xl w-80" class:text-EasyPastel={data.Difficulty === 'Easy'}
+      class:text-MediumPastel={data.Difficulty === 'Medium'}
+      class:text-HardPastel={data.Difficulty === 'Hard'}
+      class:text-ExpertPastel={data.Difficulty === 'Expert'}>{data.ChallengeName}</h2>
       <h3 class="text-2xl mr-4">Difficulty: <span class:text-Easy={data.Difficulty === 'Easy'}
         class:text-Medium={data.Difficulty === 'Medium'}
         class:text-Hard={data.Difficulty === 'Hard'}
         class:text-Expert={data.Difficulty === 'Expert'}>{data.Difficulty}</span></h3>
     </div>
     <h3 class="text-2xl">Description:</h3>
-    <p class=" text-gray-400 pb-2">{data.Description}</p>
-    <h3 class="text-2xl pt-2 border-t border-custom-200">Hint:</h3>
-    <p class="text-lg">{hints.Hint1}</p>
-    <p class="text-lg">{hints.Hint2}</p>
-    <p class="text-lg pb-2">{hints.Hint3}</p>
+    <p class=" text-gray-400 pb-4 text-justify">{data.Description}</p>
+    <h3 class="text-2xl pt-4 border-t border-custom-200">Hints:</h3>
+    <ul class="text-lg text-gray-400 pb-4">
+      {#if hints.Hint1}<li>- {hints.Hint1}</li>{/if}
+      {#if hints.Hint2}<li>- {hints.Hint2}</li>{/if}
+      {#if hints.Hint3}<li>- {hints.Hint3}</li>{/if}
+    </ul>
     <div class="flex justify-between items-center gap-2 mt-auto pt-4 border-t border-custom-200">
 
       {#if data.Solved}
         <div class="flex justify-center items-center w-full">
-          <p class="text-custom-200 text-xl">Solved</p>
+          <p class="text-custom-200 text-2xl">Solved</p>
         </div>
       {:else}
         <input class="bg-custom-100 border-2 w-2/3 rounded-full px-2 py-1 text-base transition-all duration-300 outline-none {submitFailed ? 'border-red-500' : 'border-custom-200'}" type="text" bind:value={flagToSubmit} placeholder='Enter Flag: FF&#123;...&#125;' on:input={() => submitFailed = false} on:keydown={(event) => { if (event.key === 'Enter') submit(); }}>
         <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={submit}>Submit</button>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={startChallenge}>Start</button>
+        {#if !challengeStarted}
+          <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={startChallenge}>Start</button>
+        {:else}
+          <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3">URL</button>
+        {/if}
       {/if}
     </div>
   </div>
 {/if}
-
-<style lang="postcss">
-</style>
