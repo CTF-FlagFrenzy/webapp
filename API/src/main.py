@@ -1076,7 +1076,16 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             penalty_points = challenge.Points * (penalty_percentage / 100)
             user.Points -= penalty_points
             team.Points -= penalty_points
+            teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+            new_teampoints = TeamPoints(
+                TeamID=teampoints.ID,
+                Points=teampoints.Points,
+                Teamname=team.Teamname,
+                Time=datetime.now(vienna_timezone)
+            )
+            db.add(new_teampoints)
             db.commit()
+            db.refresh(new_teampoints)
             db.refresh(team)
             db.refresh(user)
 
@@ -1194,7 +1203,16 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
         penalty_points = challenge.Points * (penalty_percentage / 100)
         user.Points -= penalty_points
         team.Points -= penalty_points
+        teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+        new_teampoints = TeamPoints(
+            TeamID=teampoints.ID,
+            Points=teampoints.Points,
+            Teamname=team.Teamname,
+            Time=datetime.now(vienna_timezone)
+        )
+        db.add(new_teampoints)
         db.commit()
+        db.refresh(new_teampoints)
         db.refresh(team)
         db.refresh(user)
 
