@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy import (
-    create_engine, Column, String, Integer, ForeignKey, Text, Table
+    create_engine, Column, String, Integer, ForeignKey, Text, Table, Time
 )
 from zoneinfo import ZoneInfo
 from sqlalchemy import extract
+from sqlalchemy.sql import cast
 import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
@@ -132,6 +133,7 @@ class TeamResponse(BaseModel):
     Members: int
     SharedFlag: int
     Disabled: int
+    TeamLeader: str
 
 class TeamPointsCreate(BaseModel):
     TeamID: int
@@ -141,7 +143,6 @@ class ChallengeResponse(BaseModel):
     ID: int
     ChallengeName: str
     Categorie: str
-    Hintcount: Optional[int] = 0
     Points: int
     Description: str
     Difficulty: str
@@ -277,17 +278,26 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
     }
 
 
-@app.post("/teams/", response_model=TeamResponse)
-def create_team(team: TeamCreate, db: Session = Depends(get_db)):
+@app.post("/teams/{user_id}", response_model=TeamResponse)
+def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
     """
     Create a new team with a unique key.
     """
     if is_not_allowed_time():
         raise HTTPException(status_code=403, detail="The Event started")
+
+    existing_team = db.query(Team).filter(Team.TeamLeader == user_id).first()
+    if existing_team:
+        raise HTTPException(status_code=400, detail="User is already a team leader.")
+
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
-    db_team = Team(Teamkey=team_key, **team.dict(exclude={"Password"}), Password=hashed_password)
-
+    db_team = Team(
+        Teamkey=team_key, 
+        **team.dict(exclude={"Password"}), 
+        Password=hashed_password, 
+        TeamLeader=user_id
+    )
     try:
         db.add(db_team)
         db.commit()
@@ -357,23 +367,28 @@ def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
     """
     if is_not_allowed_time():
         raise HTTPException(status_code=403, detail="The Event started")
+
     team = db.query(Team).filter(Team.ID == team_id).first()
     user = db.query(User).filter(User.ID == user_id).first()
-    userTeam = db.query(User).filter(team.ID == user.TeamsID).first()
+
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
 
-    if userTeam:
-        # Set TeamsID to null for all users in the team
-        users_in_team = db.query(User).filter(User.TeamsID == team_id).all()
-        for user in users_in_team:
-            user.TeamsID = None
+    if team.TeamLeader != user.ID:
+        raise HTTPException(status_code=403, detail="You have no permission to delete this team")
 
-        db.delete(team)
-        db.commit()
-        return {"detail": "Team deleted successfully and associated users' team ID set to null"}
-    else:
-        return {"detail": "You have no permission to delete this team"}
+    # Alle TeamPoints-Einträge des Teams löschen
+    db.query(TeamPoints).filter(TeamPoints.TeamID == team_id).delete()
+
+    # Setze TeamsID auf NULL für alle Mitglieder des Teams
+    db.query(User).filter(User.TeamsID == team_id).update({User.TeamsID: None})
+
+    # Team löschen
+    db.delete(team)
+    db.commit()
+
+    return {"detail": "Team and all related TeamPoints deleted successfully"}
+
 
 # --------------------- USERS -----------------------
 @app.get("/users/")
@@ -464,7 +479,9 @@ def update_user_team(
             print(team.Password )
             print(hashlib.sha256(userInput.Password.encode()).hexdigest())
             raise HTTPException(status_code=400, detail="Invalid team password")
-
+        existing_team = db.query(Team).filter(Team.TeamLeader == user_id).first()
+        if existing_team and existing_team.ID != team.ID:
+            raise HTTPException(status_code=400, detail="You cannot join another team while being a Team Leader")
         if user.TeamsID:
             old_team = db.query(Team).filter(Team.ID == user.TeamsID).first()
             if old_team and old_team.Members > 0:
@@ -842,11 +859,11 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     """
     if "2" in user_id:
         teamPoints = db.query(TeamPoints).filter(
-        extract('hour', TeamPoints.Time) < 13
+            cast(TeamPoints.Time, Time) < "11:30:00"
         ).all()
-    else:  
+    else:
         teamPoints = db.query(TeamPoints).filter(
-        extract('hour', TeamPoints.Time) < 15
+            cast(TeamPoints.Time, Time) < "14:30:00"
         ).all()
     return teamPoints
 
@@ -886,36 +903,39 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     """
     Retrieve deployment details for a specific challenge and user.
     """
-    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
-    user = db.query(User).filter(User.ID == user_id).first()
-    user_made_challenge = db.query(UserMadeChallenge).filter(
-        UserMadeChallenge.User_ID == user_id,
-        UserMadeChallenge.Challenges_ID == challenge_id).first()
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge was not found")
-    if not user:
-        raise HTTPException(status_code=404, detail="User was not found")
+    try:
+        challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+        user = db.query(User).filter(User.ID == user_id).first()
+        user_made_challenge = db.query(UserMadeChallenge).filter(
+            UserMadeChallenge.User_ID == user_id,
+            UserMadeChallenge.Challenges_ID == challenge_id).first()
+        if not challenge:
+            raise HTTPException(status_code=404, detail="Challenge was not found")
+        if not user:
+            raise HTTPException(status_code=404, detail="User was not found")
 
-    API_KEY = os.getenv("API_KEY", "default_secure_key")
-    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
-    team_id = str(team.ID)
+        API_KEY = os.getenv("API_KEY", "default_secure_key")
+        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+        team_id = str(team.ID)
 
-    command = f"""
-    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deploy" \
-    -H "Authorization: Bearer {API_KEY}" \
-    -H "Content-Type: application/json" \
-    -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
-    """
-    
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    # JSON-String in ein Dictionary umwandeln
-    parsed_data = json.loads(result.stdout.strip())
-    # URL extrahieren
-    url = parsed_data["url"]
-    user_made_challenge.Url = url
-    db.commit()
-    db.refresh(user_made_challenge)
-    return result.stdout.strip()
+        command = f"""
+        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deploy" \
+        -H "Authorization: Bearer {API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{{"teamid":"{team_id}", "challenge":"{challenge.FormatedChallengeName}"}}'
+        """
+        
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        # JSON-String in ein Dictionary umwandeln
+        parsed_data = json.loads(result.stdout.strip())
+        # URL extrahieren
+        url = parsed_data["url"]
+        user_made_challenge.Url = url
+        db.commit()
+        db.refresh(user_made_challenge)
+        return result.stdout.strip()
+    except Exception as ex:
+        return {"error": str(ex)}
     
     
 # --------------------- ANTI CHEAT -----------------------

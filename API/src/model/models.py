@@ -12,7 +12,7 @@ class Team(Base):
     Database model for teams.
     """
     __tablename__ = "Teams"
-
+    
     ID = Column(Integer, primary_key=True, autoincrement=True)
     Teamname = Column(String(50), nullable=False, unique=True)
     Password = Column(String(256), nullable=False)
@@ -21,12 +21,14 @@ class Team(Base):
     Members = Column(Integer, nullable=False, default=0)
     SharedFlag = Column(Integer, nullable=False, default=0)
     Disabled = Column(Integer, nullable=False, default=0)
+    TeamLeader = Column(String(150), ForeignKey("User.ID"), nullable=False)
 
-    users = relationship("User", back_populates="team")
+    leader = relationship("User", back_populates="leader_of_team", foreign_keys="[Team.TeamLeader]", uselist=False)
+
+    users = relationship("User", back_populates="team", foreign_keys="[User.TeamsID]")
     currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
     flag_submissions = relationship("FlagSubmission", back_populates="team")
     shared_flag_submissions = relationship("SharedFlagSubmission", foreign_keys="[SharedFlagSubmission.team_id]", back_populates="team")
-
     
 class TeamPoints(Base):
     """
@@ -55,7 +57,8 @@ class User(Base):
     Email = Column(String(50), nullable=False)
     Avatar = Column(String(100), nullable=True, default=None)
 
-    team = relationship("Team", back_populates="users")
+    leader_of_team = relationship("Team", back_populates="leader", foreign_keys="[Team.TeamLeader]", uselist=False)
+    team = relationship("Team", back_populates="users", foreign_keys="[User.TeamsID]")
     challenges = relationship("UserMadeChallenge", back_populates="user")
 
 
