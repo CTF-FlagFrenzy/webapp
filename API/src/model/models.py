@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    create_engine, Column, String, Integer, ForeignKey, Text, Table, DateTime
+    create_engine, Column, String, Integer, ForeignKey, Text, Table, DateTime, Float
 )
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.sql import func
@@ -17,7 +17,7 @@ class Team(Base):
     Teamname = Column(String(50), nullable=False, unique=True)
     Password = Column(String(256), nullable=False)
     Teamkey = Column(String(75), nullable=False, unique=True)
-    Points = Column(Integer, default=0)
+    Points = Column(Float, default=0)
     Members = Column(Integer, nullable=False, default=0)
     SharedFlag = Column(Integer, nullable=False, default=0)
     Disabled = Column(Integer, nullable=False, default=0)
@@ -50,7 +50,7 @@ class User(Base):
 
     ID = Column(String(150), primary_key=True)
     Nickname = Column(String(50), nullable=False)
-    Points = Column(Integer, default=0)
+    Points = Column(Float, default=0)
     TeamsID = Column(Integer, ForeignKey("Teams.ID"), nullable=True)
     Email = Column(String(50), nullable=False)
     Avatar = Column(String(100), nullable=True, default=None)
