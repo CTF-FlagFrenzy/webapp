@@ -1024,12 +1024,15 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             db.refresh(team)
         else:
             # Apply penalty for incorrect submission
+            new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status="invalid", submission_time=datetime.now(vienna_timezone))
+            db.add(new_submission)
+            db.commit()
             incorrect_submissions = db.query(FlagSubmission).filter(
                 FlagSubmission.team_id == team.ID,
                 FlagSubmission.challenge_id == challenge_id,
                 FlagSubmission.status == 'invalid'
             ).count()
-
+            print(incorrect_submissions)
             penalty_percentage = 0
             next_penalty_percentage = 0
             if incorrect_submissions >= 3:
@@ -1047,8 +1050,11 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
                     next_penalty_percentage = 30
 
             penalty_points = challenge.Points * (penalty_percentage / 100)
-            challenge.Points -= penalty_points
+            user.Points -= penalty_points
             team.Points -= penalty_points
+            db.commit()
+            db.refresh(team)
+            db.refresh(user)
 
             status = 'invalid'
             
