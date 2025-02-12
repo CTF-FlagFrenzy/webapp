@@ -32,8 +32,10 @@ export default {
         HardShadow: '0 0px 20px #F35977',
         ExpertShadow: '0 0px 20px #B259F3',
         DefaultShadow: '0 0px 20px #A5A2A2',
-        BackdropShadow: '-5px 5px 5px #1f2027',
-        BackdropShadow2: '0px -5px 5px #1f2027',
+        BackdropShadow: '-5px 5px 5px #35363c',
+        BackdropShadow2: '0px -5px 5px #35363c',
+        BackdropShadow3: '-2px 2px 5px 3px #35363c',
+        BackdropShadow4: '0px 5px 5px #35363c',
       },
       backgroundImage: {
         Hero: "url('/images/Hero.png')",
