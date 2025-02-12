@@ -129,7 +129,7 @@ class UserMadeChallengeUpdate(BaseModel):
 class TeamResponse(BaseModel):
     ID: int
     Teamname: str
-    Points: int
+    Points: float
     Members: int
     SharedFlag: int
     Disabled: int
@@ -138,7 +138,7 @@ class TeamResponse(BaseModel):
 
 class TeamPointsCreate(BaseModel):
     TeamID: int
-    Points: int
+    Points: float
     
 class ChallengeResponse(BaseModel):
     ID: int
@@ -893,7 +893,7 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")   
     
-    if "2" in user_id:
+    if "2" in user_id or "1" in user_id:
         teamPoints = db.query(TeamPoints).filter(
             cast(TeamPoints.Time, Time) < "11:30:00"
         ).all()
@@ -903,8 +903,8 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
         ).all()
     return teamPoints
 
-@app.get("/teamPoints/admin")
-def get_teampoints(db: Session = Depends(get_db)):
+@app.get("/teamPoints")
+def get_all_teampoints(db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time.
     """
@@ -981,6 +981,20 @@ def generate_flag(team_key, challenge_flag):
     combined = team_key + challenge_flag
     return hashlib.sha256(combined.encode()).hexdigest()
 
+def calculate_points(base_points, current_time):
+    start_time = datetime.strptime("09:00", "%H:%M")
+    end_time = datetime.strptime("15:00", "%H:%M")
+    total_minutes = (end_time - start_time).seconds // 60  
+    
+    elapsed_minutes = (current_time - start_time).seconds // 60
+    elapsed_minutes = max(0, min(elapsed_minutes, total_minutes))  
+
+    initial_points = base_points * 1.6  
+    decay_rate = (initial_points - base_points) / total_minutes  
+
+    current_points = max(base_points, initial_points - decay_rate * elapsed_minutes)
+    return round(current_points, 2)
+
 @app.post("/submit_flag/{user_id}/{challenge_id}")
 async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = Depends(get_db)):
 
@@ -1009,30 +1023,19 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 
     # Validate the submitted flag
     if normalized_flag == "FF{" + generated_flag + "}":
-        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID ).first()
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID, FlagSubmission.status == "successful" ).first()
         print(submission)
         if not submission:
             status = 'successful'
             # Log the successful flag submission
-            submission_time = datetime.now(vienna_timezone)
+            submission_time = datetime.now(vienna_timezone).replace(tzinfo=None)
             new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status=status, submission_time=submission_time)
             db.add(new_submission)
             # Calculate points based on submission time
-            start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
-            end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
-            if submission_time < start_time + timedelta(hours=1):
-                points_multiplier = 2.0
-            elif submission_time < start_time + timedelta(hours=2):
-                points_multiplier = 1.75
-            elif submission_time < start_time + timedelta(hours=3):
-                points_multiplier = 1.5
-            elif submission_time < end_time:
-                points_multiplier = 1.25
-            else:
-                points_multiplier = 1.0
-
-            user.Points += challenge.Points * points_multiplier
-            team.Points += challenge.Points * points_multiplier
+            calculate_point = calculate_points(challenge.Points, submission_time)
+            print(f"Calculated points: {calculate_point}")
+            user.Points += calculate_point
+            team.Points += calculate_point
 
             db.commit()
             print(f"Logged flag submission: {new_submission}")
@@ -1080,9 +1083,57 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             db.commit()
             db.refresh(team)
         else:
+            # Apply penalty for incorrect submission
+            new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status="invalid", submission_time=datetime.now(vienna_timezone))
+            db.add(new_submission)
+            db.commit()
+            incorrect_submissions = db.query(FlagSubmission).filter(
+                FlagSubmission.team_id == team.ID,
+                FlagSubmission.challenge_id == challenge_id,
+                FlagSubmission.status == 'invalid'
+            ).count()
+            print(incorrect_submissions)
+            penalty_percentage = 0
+            next_penalty_percentage = 0
+            if incorrect_submissions >= 3:
+                if incorrect_submissions < 5:
+                    penalty_percentage = 5
+                    next_penalty_percentage = 10
+                elif incorrect_submissions < 7:
+                    penalty_percentage = 10
+                    next_penalty_percentage = 20
+                elif incorrect_submissions < 9:
+                    penalty_percentage = 20
+                    next_penalty_percentage = 30
+                else:
+                    penalty_percentage = 30
+                    next_penalty_percentage = 30
+
+            penalty_points = challenge.Points * (penalty_percentage / 100)
+            user.Points -= penalty_points
+            team.Points -= penalty_points
+            teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+            new_teampoints = TeamPoints(
+                TeamID=teampoints.ID,
+                Points=teampoints.Points,
+                Teamname=team.Teamname,
+                Time=datetime.now(vienna_timezone)
+            )
+            db.add(new_teampoints)
+            db.commit()
+            db.refresh(new_teampoints)
+            db.refresh(team)
+            db.refresh(user)
+
             status = 'invalid'
-    
+            
+            return {
+                "status": status,
+                "message": f"Flag is invalid! Next penalty will be {next_penalty_percentage}% of the challenge points."
+            }
+
     return {"status": status}
+
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
@@ -1106,44 +1157,28 @@ async def admin_panel(db: Session = Depends(get_db)):
 @app.post("/validate_flag/{challenge_id}/{user_id}")
 async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Session = Depends(get_db)):
     # Fetch the static flag from the database
-    static_flag = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
-    team = db.query(Team).filter(Team.ID == team_id).first()
-    team = db.query(Team).filter(Team.ID == team_id).first()
-    print(static_flag)
-    if static_flag is None:
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id, Challenge.IsStatic == 1).first()
+    if challenge is None:
         return {"status": "invalid", "message": "Challenge is not a static flag"}
     # Normalize the submitted flag by removing spaces
     normalized_flag = flag.replace(" ", "")
+    user = db.query(User).filter(User.ID == user_id).first()
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
 
     # Validate the submitted flag
-    if 'FF{' + static_flag.Static + '}' == normalized_flag:
+    if 'FF{' + challenge.Static + '}' == normalized_flag:
         # Fetch the user and team associated with the flag submission
-       
-        user = db.query(User).filter(User.ID == user_id).first()
-        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
-
-        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID ).first()
+    
+        submission = db.query(FlagSubmission).filter(FlagSubmission.challenge_id == challenge_id, FlagSubmission.team_id == team.ID, FlagSubmission.status == "successful" ).first()
         print(submission)
         if not submission:
-
-         # Calculate points based on submission time
-            submission_time = datetime.now(vienna_timezone)
-            start_time = submission_time.replace(hour=9, minute=0, second=0, microsecond=0)
-            end_time = submission_time.replace(hour=13, minute=0, second=0, microsecond=0)
-
-            if submission_time < start_time + timedelta(hours=1):
-                points_multiplier = 2.0
-            elif submission_time < start_time + timedelta(hours=2):
-                points_multiplier = 1.75
-            elif submission_time < start_time + timedelta(hours=3):
-                points_multiplier = 1.5
-            elif submission_time < end_time:
-                points_multiplier = 1.25
-            else:
-                points_multiplier = 1.0
-
-            user.Points += static_flag.Points * points_multiplier
-            team.Points += static_flag.Points * points_multiplier
+            submission_time = datetime.now(vienna_timezone).replace(tzinfo=None)
+            print(submission_time)
+            # Calculate points based on submission time
+            calculate_point = calculate_points(challenge.Points, submission_time)
+            print(f"Calculated points: {calculate_point}")
+            user.Points += calculate_point
+            team.Points += calculate_point
 
             # Log the successful flag submission
             new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status='successful', submission_time=submission_time)
@@ -1155,7 +1190,7 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
             curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
             -H "Authorization: Bearer {API_KEY}" \
             -H "Content-Type: application/json" \
-            -d '{{"teamid":"{user.TeamsID}", "challenge":"{static_flag.FormatedChallengeName}"}}'
+            -d '{{"teamid":"{user.TeamsID}", "challenge":"{challenge.FormatedChallengeName}"}}'
             """
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -1175,4 +1210,51 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
         else:
             return {"status": "already submitted", "message": "Flag is already submitted!"}
     else:
-        return {"status": "invalid", "message": "Flag is invalid!"}
+        new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status="invalid", submission_time=datetime.now(vienna_timezone))
+        db.add(new_submission)
+        db.commit()
+            # Apply penalty for incorrect submission
+        incorrect_submissions = db.query(FlagSubmission).filter(
+            FlagSubmission.team_id == team.ID,
+            FlagSubmission.challenge_id == challenge_id,
+            FlagSubmission.status == 'invalid'
+        ).count()
+
+        penalty_percentage = 0
+        next_penalty_percentage = 0
+        if incorrect_submissions >= 3:
+            if incorrect_submissions < 5:
+                penalty_percentage = 5
+                next_penalty_percentage = 10
+            elif incorrect_submissions < 7:
+                penalty_percentage = 10
+                next_penalty_percentage = 20
+            elif incorrect_submissions < 9:
+                penalty_percentage = 20
+                next_penalty_percentage = 30
+            else:
+                penalty_percentage = 30
+                next_penalty_percentage = 30
+
+        penalty_points = challenge.Points * (penalty_percentage / 100)
+        user.Points -= penalty_points
+        team.Points -= penalty_points
+        teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+        new_teampoints = TeamPoints(
+            TeamID=teampoints.ID,
+            Points=teampoints.Points,
+            Teamname=team.Teamname,
+            Time=datetime.now(vienna_timezone)
+        )
+        db.add(new_teampoints)
+        db.commit()
+        db.refresh(new_teampoints)
+        db.refresh(team)
+        db.refresh(user)
+
+        status = 'invalid'
+            
+        return {
+            "status": status,
+            "message": f"Flag is invalid! Next penalty will be {next_penalty_percentage}% of the challenge points."            }
+
