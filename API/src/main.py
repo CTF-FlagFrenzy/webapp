@@ -138,7 +138,7 @@ class TeamResponse(BaseModel):
 
 class TeamPointsCreate(BaseModel):
     TeamID: int
-    Points: int
+    Points: float
     
 class ChallengeResponse(BaseModel):
     ID: int
