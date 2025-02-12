@@ -25,7 +25,7 @@
     </div>
 </div>
 
-<div class="flex flex-col mb-8 mx-8 bg-custom-110 px-6 py-4 border-2 border-custom-200 rounded-xl shadow-BackdropShadow">
+<div class="flex flex-col mb-8 mx-8 bg-custom-110 px-6 py-4 border-2 border-custom-200 rounded-xl shadow-BackdropShadow" id="Rules">
     <h1 class="text-3xl text-center font-bold mb-4 text-custom-200"><span class="italic text-custom-200 opacity-80">#</span>RULES</h1>
     <ul class="list-inside list-decimal text-lg text-white">
         <li class="mb-2">
