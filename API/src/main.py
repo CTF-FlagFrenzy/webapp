@@ -254,16 +254,15 @@ def get_all_teammembers(db: Session = Depends(get_db)):
     if not teams:
         raise HTTPException(status_code=404, detail="No teams found")
 
-    # Erstelle eine Liste mit allen Teams und deren Mitgliedern
     teams_list = []
     for team in teams:
-        # Hole alle Mitglieder des jeweiligen Teams
+        # Get all members of the respective team
         team_members = db.query(User.ID, User.Nickname).filter(User.TeamsID == team.ID).all()
 
-        # Konvertiere die Mitglieder in ein Dictionary-Format
+        # Convert the members to a dictionary format
         members_list = [{"ID": member.ID, "Nickname": member.Nickname} for member in team_members]
 
-        # Füge das Team mit Mitgliedern zur Liste hinzu
+        # Add the team with members to the list
         teams_list.append({
             "TeamsID": team.ID,
             "Teamname": team.Teamname,
