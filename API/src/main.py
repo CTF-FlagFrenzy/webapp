@@ -893,7 +893,7 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")   
     
-    if "2" in user_id:
+    if "2" in user_id or "1" in user_id:
         teamPoints = db.query(TeamPoints).filter(
             cast(TeamPoints.Time, Time) < "11:30:00"
         ).all()
@@ -903,8 +903,8 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
         ).all()
     return teamPoints
 
-@app.get("/teamPoints/admin")
-def get_teampoints(db: Session = Depends(get_db)):
+@app.get("/teamPoints")
+def get_all_teampoints(db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time.
     """
