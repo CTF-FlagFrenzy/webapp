@@ -133,6 +133,7 @@ class TeamResponse(BaseModel):
     Members: int
     SharedFlag: int
     Disabled: int
+    FirstBloods: int
     TeamLeader: str
 
 class TeamPointsCreate(BaseModel):
@@ -243,6 +244,35 @@ def get_team(team_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Team not found")
     return team
 
+@app.get("/team/members")
+def get_all_teammembers(db: Session = Depends(get_db)):
+    """
+    Retrieve all members for every team.
+    """
+    teams = db.query(Team).all()
+
+    if not teams:
+        raise HTTPException(status_code=404, detail="No teams found")
+
+    teams_list = []
+    for team in teams:
+        # Get all members of the respective team
+        team_members = db.query(User.ID, User.Nickname).filter(User.TeamsID == team.ID).all()
+
+        # Convert the members to a dictionary format
+        members_list = [{"ID": member.ID, "Nickname": member.Nickname} for member in team_members]
+
+        # Add the team with members to the list
+        teams_list.append({
+            "TeamsID": team.ID,
+            "Teamname": team.Teamname,
+            "Points": team.Points,
+            "Members": members_list
+        })
+
+    return teams_list
+
+
 @app.get("/teams/members/{user_id}")
 def get_team_members(user_id: str, db: Session = Depends(get_db)):
     """
@@ -276,6 +306,7 @@ def get_team_members(user_id: str, db: Session = Depends(get_db)):
         "Points": team.Points,
         "Members": members_list
     }
+
 
 
 @app.post("/teams/{user_id}", response_model=TeamResponse)
@@ -812,6 +843,7 @@ def update_user_made_challenge(
         user.Points += challenge.Points*0.5
         team.Points += challenge.Points*0.5
         user_made_challenge.Firstblood = 1
+        team.FirstBloods += 1
         teampoints = db.query(Team).filter(Team.ID == team.ID).first()
         new_teampoints = TeamPoints(
             TeamID=teampoints.ID,
@@ -857,6 +889,10 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time with a time limit for classes.
     """
+    user = db.query(User).filter(User.ID == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")   
+    
     if "2" in user_id:
         teamPoints = db.query(TeamPoints).filter(
             cast(TeamPoints.Time, Time) < "11:30:00"

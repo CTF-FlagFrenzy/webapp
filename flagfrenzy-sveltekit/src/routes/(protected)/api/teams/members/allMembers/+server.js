@@ -3,9 +3,8 @@ import { error } from "@sveltejs/kit";
 const API_BASE_URL = 'http://api:8000';
 
 export async function GET({ request, url }) {
-    const user_id = url.searchParams.get('user_id');
     try {
-        const response = await fetch(`${API_BASE_URL}/teams/members/${user_id}`);
+        const response = await fetch(`${API_BASE_URL}/teams/members`);
         if (!response.ok) {
             throw new Error('Failed to fetch teammembers');
         }

@@ -3,7 +3,7 @@
     import { writable } from 'svelte/store';
 
     let teamname, password = '';
-    let teams, teamMembers;
+    let teams, teamMembers, allMembers;
     let errorMessage, errorMessageTeams, errorMessageTeamMembers = '';
 
     export let data;
@@ -62,6 +62,18 @@
       if (!response.ok) throw new Error("Failed to load teams");
 
       teams = await response.json();
+      console.log(teams);
+    } catch (err) {
+      errorMessageTeams = err.message;
+    }
+  }
+  async function loadAllTeamMembers() {
+    try {
+      errorMessageTeams, teams = '';
+      const response = await fetch('/api/teams/members/allmembers');
+      if (!response.ok) throw new Error("Failed to load teammembers");
+
+      allMembers = await response.json();
       console.log(teams);
     } catch (err) {
       errorMessageTeams = err.message;

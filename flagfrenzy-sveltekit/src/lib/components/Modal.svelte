@@ -13,6 +13,8 @@
   let submitFailed = false;
   let challengeStarted = false;
   let user_made_challenges;
+  let refreshInterval;
+
 
   const dispatch = createEventDispatcher();
 
@@ -57,9 +59,17 @@ async function checkChainCondition() {
     checkChainCondition();
     loadHints(); 
     checkIfStarted();
+
+    refreshInterval = setInterval(() => {
+      checkIfStarted();
+    }, 5000); // Alle 5 Sekunden
+  } else {
+    clearInterval(refreshInterval);
   }
   async function startChallenge() {
     try {
+      challengeStarted = true;
+      data.URL = null;
       const response = await fetch("/api/user_made_challenges", {
         method: "POST",
         body: JSON.stringify({
@@ -195,7 +205,18 @@ async function checkChainCondition() {
       if (!response.ok) throw new Error("Failed to load user_made_challenges");
 
       user_made_challenges = await response.json();
-      challengeStarted = user_made_challenges.some(challenge => challenge.Challenges_ID === data.ID);
+      let challenge = user_made_challenges.find(challenge => challenge.Challenges_ID === data.ID);
+      if (challenge) {
+        challengeStarted = true;
+        if (challenge.Url !== "") {
+          data.URL = challenge.Url; // Speichere die URL, falls vorhanden
+        } else {
+          data.URL = null; // Falls keine URL gesetzt ist
+        }
+    } else {
+      challengeStarted = false;
+      data.URL = null;
+    }
     } catch (err) {
       error = err.message;
     }
@@ -240,7 +261,16 @@ async function checkChainCondition() {
         {#if !challengeStarted}
           <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={startChallenge}>Start</button>
         {:else}
-          <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3">URL</button>
+          {#if data.URL}
+            <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{data.URL}" target="_blank">Open Challenge</a>
+          {:else}
+          <button class="text-custom-200 px-2 py-1 text-base w-1/3 flex justify-center items-center" disabled>
+            <svg class="animate-spin h-7 w-7 text-custom-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M12 2a10 10 0 0110 10h-2a8 8 0 00-8-8V2z"></path>
+            </svg>
+          </button>
+          {/if}
         {/if}
       {/if}
     </div>
