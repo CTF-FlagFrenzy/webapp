@@ -857,6 +857,10 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     """
     Retrieve all teamPoints over time with a time limit for classes.
     """
+    user = db.query(User).filter(User.ID == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")   
+    
     if "2" in user_id:
         teamPoints = db.query(TeamPoints).filter(
             cast(TeamPoints.Time, Time) < "11:30:00"
