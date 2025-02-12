@@ -840,8 +840,8 @@ def update_user_made_challenge(
                                                     UserMadeChallenge.Firstblood == 1).first()
 
     if not firstblood and update_data.Solved == 1:
-        user.Points += challenge.Points*0.5
-        team.Points += challenge.Points*0.5
+        user.Points += challenge.Points*0.4
+        team.Points += challenge.Points*0.4
         user_made_challenge.Firstblood = 1
         team.FirstBloods += 1
         teampoints = db.query(Team).filter(Team.ID == team.ID).first()
