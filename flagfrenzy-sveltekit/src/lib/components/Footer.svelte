@@ -1,8 +1,7 @@
 <script>
   import { onMount } from "svelte";
 
-  let onlineMembers = 0;
-  let totalMembers = 0;
+  let onlineMembers, totalMembers = 0;
 
   async function fetchDiscordStats() {
     try {
@@ -10,8 +9,7 @@
         "https://discord.com/api/v9/invites/HgxWtFJT?with_counts=true"
       );
       const data = await response.json();
-      
-      // Check if the response contains the required data
+
       if (data.approximate_presence_count && data.approximate_member_count) {
         onlineMembers = data.approximate_presence_count;
         totalMembers = data.approximate_member_count;
@@ -20,8 +18,6 @@
       console.error("Failed to fetch Discord stats:", error);
     }
   }
-
-  // Fetch the data when the component mounts
   onMount(fetchDiscordStats);
 </script>
 
@@ -44,20 +40,9 @@
             </div>
           </div>
         </div>
-        <a class="bg-green-500 rounded-md text-sm font-semibold hover:bg-green-600 transition text-white px-4 py-2 lg:px-2 xl:px-4 " href="https://discord.gg/HgxWtFJT">Join</a>
+        <a class="bg-green-500 rounded-md text-sm font-semibold hover:bg-green-600 transition text-white px-2 py-2 sm:!px-4 md:!px-4 lg:!px-2 xl:!px-4 " href="https://discord.gg/HgxWtFJT">Join</a>
       </div>
     </div>
-<!--
-    <div class="bg-custom-100 rounded-md p-2 w-auto text-white h-20">
-      <div class="flex justify-center items-center h-full px-2">
-        <img class=" h-full rounded-xl pr-2" src="https://cdn.discordapp.com/icons/1283699326534553600/811f9b16c144dfae14c6e571c3cfbbee.webp?size=128" alt="Discord server icon">
-        <div class="flex flex-col items-center text-center">
-          <h3 class="flex items-center text-base font-semibold">TopHack | CTF FlagFrenzy</h3>
-          <a class="bg-custom-200 text-white w-1/2 py-1 my-1 rounded-md text-sm font-semibold transition hover:opacity-60" href="https://discord.gg/HgxWtFJT">Join</a>
-        </div>
-      </div>
-    </div>
--->
 	</div>
 
 	<div class="w-full text-center lg:border-r border-gray-500 sm:mb-4 md:mb-4 lg:mb-0">
