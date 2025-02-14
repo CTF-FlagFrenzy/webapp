@@ -1080,6 +1080,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             team.SharedFlag += 1
             if team.SharedFlag == 2:
                 team.Disabled = 1
+                team.Points = 0
             db.commit()
             db.refresh(team)
         else:
