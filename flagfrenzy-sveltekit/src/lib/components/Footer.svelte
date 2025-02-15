@@ -51,7 +51,7 @@
       <ul class="text-white">
         <li><a href="/">Home</a></li>
         <li><a href="/about-us">About Us</a></li>
-        <li><a href="/#Rules">#Rules</a></li>
+        <li><a href="/#Rules">Rules</a></li>
       </ul>
     </div>
 	</div>
