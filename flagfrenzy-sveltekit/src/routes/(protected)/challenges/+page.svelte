@@ -74,8 +74,8 @@
   }
   onMount(async () => {
     await getUser();
-    loadChallenges(); // Initial load
-    loadUsermadeChallenges();
+    await loadChallenges(); // Initial load
+    await loadUsermadeChallenges();
     // Start interval to refresh data
     interval = setInterval(loadChallenges, 10000); // Refresh every 10 seconds
 
@@ -88,20 +88,30 @@
     if (interval) clearInterval(interval); // Ensure interval is cleared
   });
 </script>
-<div class="pt-8 w-full">
-  {#each Object.keys(challengesByCategory) as category}
-    <h1 class="text-whita text-4xl font-serif font-bold pt-4 text-center md:text-5xl">{category}</h1>
-    
-    <div class="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 w-full px-8 relative">
-      <hr class="border-t-2 border-custom-200 opacity-80 my-4 sm:col-start-1 sm:col-end-3 sm:w-full sm:mx-auto md:col-start-1 md:col-end-[-1] md:w-full lg:col-start-2 lg:col-end-[-2]">
-    </div>
+{#if !user.TeamsID}
+  <div class="flex justify-center h-screen items-center">
+    <h1 class="text-4xl">Join a Team first.</h1>
+  </div>
+{:else if Object.keys(challengesByCategory).length === 0}
+  <div class="flex justify-center h-screen items-center">
+    <h1 class="text-4xl">The event hasn't started yet.</h1>
+  </div>
+{:else if challengesByCategory}
+  <div class="pt-8 w-full">
+    {#each Object.keys(challengesByCategory) as category}
+      <h1 class="text-whita text-4xl font-serif font-bold pt-4 text-center md:text-5xl">{category}</h1>
+      
+      <div class="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 w-full px-8 relative">
+        <hr class="border-t-2 border-custom-200 opacity-80 my-4 sm:col-start-1 sm:col-end-3 sm:w-full sm:mx-auto md:col-start-2 md:col-end-[-2] md:w-full lg:col-start-2 lg:col-end-[-2]">
+      </div>
 
-    <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
-      {#each challengesByCategory[category] as challenge}
-        <div class="col-span-2">
-          <Card challenge={challenge} user={user} />
-        </div>
-      {/each}
-    </div>
-  {/each}
-</div>
+      <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+        {#each challengesByCategory[category] as challenge}
+          <div class="col-span-2">
+            <Card challenge={challenge} user={user} />
+          </div>
+        {/each}
+      </div>
+    {/each}
+  </div>
+{/if}
