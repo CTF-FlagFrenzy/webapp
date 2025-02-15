@@ -39,6 +39,7 @@ export default {
         BackdropShadow2: '0px -5px 5px #35363c',
         BackdropShadow3: '-2px 2px 5px 3px #35363c',
         BackdropShadow4: '0px 5px 5px #35363c',
+        BackdropShadow5: '0px 0px 5px 5px#35363c',
       },
       backgroundImage: {
         Hero: "url('/images/Hero.png')",
@@ -50,5 +51,13 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.counter-reset-rules': {counterReset: 'rules',},
+        '.counter-increment-rules': {counterIncrement: 'rules',},
+        '.before-content-counter': {content: "counter(rules) '.'",}
+      })
+    }
+  ],
 }
