@@ -3,6 +3,9 @@ export default {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {  // Alle Anpassungen hier rein!
+      fontFamily: {
+        sans: ['"Open Sans"', 'sans-serif'],
+      },
       colors: {
         custom: {
           100: '#0d1116',

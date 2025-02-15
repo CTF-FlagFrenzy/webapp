@@ -87,7 +87,7 @@
       {#if data.adminUser && data.adminUser.includes(user.ID)}
         <a href="/admin" class="block text-2xl text-center" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/admin'}>Admin</a>
       {/if}
-      <button class="text-custom-200 px-4 py-2 text-2xl block w-full text-center" on:click={()=>window.location.href="/logout"}>Logout</button>
+      <button class="text-custom-200 px-4 pb-2 text-2xl block w-full text-center" on:click={()=>window.location.href="/logout"}>Logout</button>
     </nav>
   {/if}
   
