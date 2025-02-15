@@ -11,7 +11,7 @@
     "Hint3": "The web storage function allows you to see the content of all saved cookies.",
     "Static": "R^@LgvG5QD",
     "FormatedChallengeName": "solana-assets",
-    "Chain": null, 
+    "Chain": 0, 
     "IsStatic": 0
 
   },
@@ -27,7 +27,7 @@
     "Hint3": "Consider trying an SQL injection.",
     "Static": "NQ^D@zd$q6",
     "FormatedChallengeName": "the-sql-heist",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },
   {
@@ -42,7 +42,7 @@
     "Hint3": "You can use FUZZ to find hidden files.",
     "Static": "#74q$j&zcB",
     "FormatedChallengeName": " file-and-seek",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },
   {
@@ -57,7 +57,7 @@
     "Hint3": "The student manipulated the IDs. Another number may provide additional information.",
     "Static": "t9gE6@W!Nz",
     "FormatedChallengeName": "shadow-files",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
     
   },
@@ -73,7 +73,7 @@
     "Hint3": "You can use a web tool to view the metadata.",
     "Static": "T1#mXeG24B",
     "FormatedChallengeName": "pixel-spy",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },
   {
@@ -88,7 +88,7 @@
     "Hint3": "The script is broken. Try to fix it on your own :).",
     "Static": "#8W@3fp5#Y",
     "FormatedChallengeName": "mental-overflow",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },
     {
@@ -103,7 +103,7 @@
     "Hint3": "Comments aren’t just for conversations; sometimes, they hide secrets.",
     "Static": "Wi3dS#ld!k",
     "FormatedChallengeName": "behind-the-pixels",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },{
     "ID":  8,
@@ -117,7 +117,7 @@
     "Hint3": "Sometimes, the most important details aren’t in the image itself but in what’s linked to it.",
     "Static": "dogmom_adventure",
     "FormatedChallengeName": "profile-prodigy",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 1
   },{
     "ID":  9,
@@ -159,7 +159,7 @@
     "Hint3": "Have a better look at the source.",
     "Static": "YouPassedTheTest",
     "FormatedChallengeName": "time-travelers-hunt",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 1
   }, {
     "ID":  12,
@@ -201,7 +201,7 @@
     "Hint3": "Search commit messages carefully—one of them hides the truth.",
     "Static": "541-d310a87159",
     "FormatedChallengeName": "git-secrets-layers-of-discovery",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 1
   },{
     "ID":  15,
@@ -257,7 +257,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "N0oN3Kn0W2!",
     "FormatedChallengeName": "hidden-job",
-    "Chain": null, 
+    "Chain": 0, 
     "IsStatic": 0
 
   },
@@ -273,7 +273,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "#74q$j&zcB",
     "FormatedChallengeName": "hidden-job",
-    "Chain": null, 
+    "Chain": 0, 
     "IsStatic": 0
 
   },
@@ -289,7 +289,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "R2LQXpy^Us",
     "FormatedChallengeName": "hidden-job",
-    "Chain": null, 
+    "Chain": 0, 
     "IsStatic": 0
 
   },
@@ -305,7 +305,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
-    "Chain": null, 
+    "Chain": 0, 
     "IsStatic": 0
 
   },{
@@ -320,7 +320,7 @@
     "Hint3": "Maybe it is not just one whole string as output, but two",
     "Static": "k^kpB2Y99nKwhjex8!G1Mpw7cb!gEMtfa@kuPj*dzn%yqu65P^6RhnPtUZsQF0g&",
     "FormatedChallengeName": "binary-puzzeling",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },{
     "ID":  23,
@@ -334,7 +334,7 @@
     "Hint3": "SYT: First R, then I | Maths: Sinus and cosine rule may help",
     "Static": "Honolulu",
     "FormatedChallengeName": "security-maths",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 1
   },{
     "ID":  24,
@@ -348,7 +348,7 @@
     "Hint3": "No hint yet",
     "Static": "#oLq3j&ZcF",
     "FormatedChallengeName": "stealth-invoice",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },{
     "ID":  25,
@@ -362,7 +362,7 @@
     "Hint3": "Is this the only file you downloaded?",
     "Static": "M9LQXpX^Us",
     "FormatedChallengeName": "stealth-invoice",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 0
   },{
     "ID":  26,
@@ -376,7 +376,7 @@
     "Hint3": "The key is already there, just waiting to be read. The last few words might be your way in.",
     "Static": "l==k_@t_m€",
     "FormatedChallengeName": "hidden-frequencies",
-    "Chain": null,
+    "Chain": 0,
     "IsStatic": 1
   }
 ]
