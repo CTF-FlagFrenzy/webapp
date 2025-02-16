@@ -49,7 +49,7 @@
     "ID":  4,
     "ChallengeName": "Shadow Files",
     "Categorie": "Web Challenge",
-    "Points": 750,
+    "Points": 1000,
     "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look. Some other information might help you assemble the flag.",
     "Difficulty": "Hard",
     "Hint1": "The student provides more on their website than you might think.",
