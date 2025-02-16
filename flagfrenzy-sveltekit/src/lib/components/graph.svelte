@@ -18,6 +18,13 @@
         legend: {
           position: 'bottom',
           display: true,
+          labels: {
+            color: 'white',
+            usePointStyle: true,
+            pointStyle: 'circle',
+            boxWidth: 8,
+            boxHeight: 8,
+          },
         },
       },
       scales: {
@@ -25,12 +32,26 @@
           title: {
             display: true,
             text: 'Time',
+            color: 'white',
+          },
+          ticks: {
+            color: 'white',
+          },
+          grid: {
+            color: '#444444', // Y-Achsen-Gitterlinien in Weiß
           },
         },
         y: {
           title: {
             display: true,
             text: 'Points',
+            color: 'white',
+          },
+          ticks: {
+            color: 'white',
+          },
+          grid: {
+            color: '#444444', // Y-Achsen-Gitterlinien in Weiß
           },
           beginAtZero: true,
         },
@@ -117,4 +138,4 @@
   }
 </script>
 
-<canvas id="teamChart"></canvas>
+<canvas id="teamChart" class="text-white !w-full !h-full"></canvas>
