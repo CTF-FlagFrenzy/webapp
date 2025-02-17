@@ -266,7 +266,10 @@ def get_all_teammembers(db: Session = Depends(get_db)):
         teams_list.append({
             "TeamsID": team.ID,
             "Teamname": team.Teamname,
-            "Points": team.Points,
+            "TeamLeader": team.TeamLeader,
+            "SharedFlag": team.SharedFlag,
+            "Disabled": team.Disabled,
+            "FirstBloods": team.FirstBloods,
             "Members": members_list
         })
 
