@@ -71,7 +71,7 @@ class Challenge(Base):
 
     ID = Column(Integer, primary_key=True, autoincrement=True)
     ChallengeName = Column(String(100), nullable=False, unique=True)
-    FormatedChallengeName =  Column(String(100), nullable=False, unique=True)
+    FormatedChallengeName =  Column(String(100), nullable=False)
     Categorie = Column(String(45), nullable=False)
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
