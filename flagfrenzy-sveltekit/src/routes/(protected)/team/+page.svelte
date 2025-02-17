@@ -1,59 +1,45 @@
 <script>
-    import { onMount } from 'svelte';
-    import { writable } from 'svelte/store';
+  import { onMount } from 'svelte';
+  import { writable } from 'svelte/store';
+  import Modal from '$lib/components/CreateTeamModal.svelte';
+  import TeamModal from '$lib/components/TeamModal.svelte';
 
-    let teamname, password = '';
-    let teams, teamMembers, allMembers;
-    let errorMessage, errorMessageTeams, errorMessageTeamMembers = '';
+  export let data;
+  let teamname, password = '';
+  let teams, teamMembers, allMembers;
+  let errorMessage, errorMessageTeams, errorMessageTeamMembers = '';
+  let isModalOpen = false;
 
-    export let data;
+  function openModal() {
+    isModalOpen = true;
+  }
+  function closeModal() {
+    isModalOpen = false;
+  }
 
-    async function joinTeam() {
-      try {
-        errorMessage = '';
-        const response = await fetch(`/api/user/team?id=${data.username}`, {
-          method: "PUT",
-          body: JSON.stringify({
-            Teamname: teamname,
-            Password: password
-          }),
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          }  
-        });
-        if (!response.ok) {
-          throw new Error("Team konnte nicht beigetreten werden. Bitte überprüfe Teamname und Passwort.");
-        }
+  async function joinTeam() {
+    try {
+      errorMessage = '';
+      const response = await fetch(`/api/user/team?id=${data.username}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          Teamname: teamname,
+          Password: password
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }  
+      });
+      if (!response.ok) {
+        throw new Error("Team konnte nicht beigetreten werden. Bitte überprüfe Teamname und Passwort.");
+      }
+      loadTeams();
+      loadTeamMember();
 
-        loadTeams();
-        loadTeamMember();
-  
-      } catch (error) {
-        errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
-      } 
+    } catch (error) {
+      errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
     } 
-    async function addTeam() {
-      try {
-        errorMessage = '';
-        const response = await fetch("/api/teams", {
-          method: "POST",
-          body: JSON.stringify({
-            Teamname: teamname,
-            Password: password,
-            UserID: data.username
-          }),
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          }
-        });
-        if (!response.ok) {
-          throw new Error("Team konnte nicht erstellt werden. Bitte überprüfe den Teamname.");
-        }
-        joinTeam()
-      } catch (error) {
-        errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
-      } 
-    } 
+  }
     
   async function loadTeams() {
     try {
@@ -69,12 +55,12 @@
   }
   async function loadAllTeamMembers() {
     try {
-      errorMessageTeams, teams = '';
-      const response = await fetch('/api/teams/members/allmembers');
+      errorMessageTeams, allMembers = '';
+      const response = await fetch('/api/teams/members/allMembers/');
       if (!response.ok) throw new Error("Failed to load teammembers");
 
       allMembers = await response.json();
-      console.log(teams);
+      console.log(allMembers);
     } catch (err) {
       errorMessageTeams = err.message;
     }
@@ -92,27 +78,28 @@
       errorMessageTeamMembers = err.message;
     }
   }
-      async function deleteTeam() {
-        try {
-            const response = await fetch(`/api/teams?id=${teamMembers.TeamsID}&userId=${data.username}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json; charset=UTF-8",
-                },
-            });
-            if (response.ok) {
-                dispatch('deleteTeam');
-                loadTeams();
-                loadTeamMember();
-            } 
-        } catch (error) {
-            console.log(error)
-        }
+  async function deleteTeam() {
+    try {
+        const response = await fetch(`/api/teams?id=${teamMembers.TeamsID}&userId=${data.username}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+            },
+        });
+        if (response.ok) {
+            dispatch('deleteTeam');
+            loadTeams();
+            loadTeamMember();
+        } 
+    } catch (error) {
+        console.log(error)
     }
+  }
 
   onMount(() => {
     loadTeams();
     loadTeamMember();
+    loadAllTeamMembers();
     
     const interval = setInterval(() => {
       loadTeams();
@@ -123,24 +110,27 @@
     return () => clearInterval(interval);
   });
 
+  $: filteredTeams = teamname
+      ? teams.filter(team => team.Teamname.toLowerCase().includes(teamname.toLowerCase()))
+      : teams;
 </script>
 
-<h1 class="text-custom-200 text-2xl font-serif font-bold pt-4 px-4">Create or Join Team</h1>
+<h1 class="text-white text-2xl font-serif font-bold pt-4 px-4">Search / Create Team</h1>
 <div class=" gap-7 px-4 mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
   <form class="py-4 gap-3.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-    <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="text" placeholder="Team name" bind:value={teamname} required>
-    <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="password" placeholder="Password" bind:value={password} required>
+    <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="text" placeholder="Team name" bind:value={teamname}>
+    <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3" type="submit">Search</button>
+    <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3" type="submit" on:click={openModal}>Create</button>
   </form>
   <div class="py-4 gap-3.5 flex">
-    <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5 lg:w-1/6" type="submit" on:click={addTeam}>Create</button>
-    <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5 lg:w-1/6" type="submit" on:click={joinTeam}>Join</button>
+    <!-- <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5 lg:w-1/6" type="submit" on:click={joinTeam}>Join</button> -->
   </div>
   {#if errorMessage}
     <p class=" text-Hard text-lg font-bold col-span-2">{errorMessage}</p>
   {/if}
   <div class="">
     <div class="pb-4">
-      <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Teams</h1>
+      <h1 class="text-white text-2xl font-serif font-bold py-1">Teams</h1>
     </div>
     <div class="h-80 max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-full px-4 rounded-2xl shadow-BackdropShadow">
       {#if teams}
@@ -153,7 +143,7 @@
             </tr>
           </thead>
           <tbody class="text-white text-sm">
-            {#each teams as team}
+            {#each filteredTeams as team}
               <tr class="border-b border-custom-100">
                 <td class="pt-2 align-top">{team.Teamname}</td>
                 <td class="pt-2 align-top text-center">
@@ -161,8 +151,6 @@
                     ☠️
                   {:else if team.SharedFlag === 1}
                     ❌
-                  {:else if team.SharedFlag === 2}
-                    ❌❌
                   {:else}
                     -
                   {/if}
@@ -182,7 +170,7 @@
   <div class="">
     {#if teamMembers}
       <div class="flex gap-3.5 pb-4">
-        <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">{teamMembers.Teamname}</h1>
+        <h1 class="text-white text-2xl font-serif font-bold py-1">{teamMembers.Teamname}</h1>
         <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 md:w-1/5" on:click={() => {
           if (confirm("Bist du sicher, dass du das Team löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.")) {
             deleteTeam();
@@ -191,7 +179,7 @@
       </div>
     {:else}
       <div class="pb-4">
-        <h1 class="text-custom-200 text-2xl font-serif font-bold py-1">Join a Team</h1>
+        <h1 class="text-white text-2xl font-serif font-bold py-1">Join a Team</h1>
       </div>
     {/if}
     <div class="max-h-80 overflow-y-auto hide-scrollbar bg-custom-110 w-2/3 px-4 py-4 rounded-2xl shadow-BackdropShadow">
@@ -219,6 +207,9 @@
       {/if}
     </div>
   </div>
+</div>
+<div>
+  <Modal isOpen={isModalOpen} data={data} teamname={teamname} on:close={closeModal}></Modal>
 </div>
 
 <style>
