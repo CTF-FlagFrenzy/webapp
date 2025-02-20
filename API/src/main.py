@@ -792,6 +792,14 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
     user_made_challenges = db.query(UserMadeChallenge).all()
     return user_made_challenges
 
+@app.get("/user-made-challenges/notsolved")
+def users_made_challenges_notsolved(db: Session = Depends(get_db)):
+    """
+    Retrieve all user-made challenges which are not solved.
+    """
+    user_made_challenges = db.query(UserMadeChallenge).filter(UserMadeChallenge.Solved == 0).all()
+    return user_made_challenges
+
 @app.get("/user-made-challenges/{challenge_id}/solved_by_team/{team_id}")
 def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
     if is_challenge_solved_by_team(team_id, challenge_id, db):
@@ -1005,8 +1013,24 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
         return result.stdout.strip()
     except Exception as ex:
         return {"error": str(ex)}
-    
-    
+
+# --------------------- DEPROVISION -----------------------
+@app.post("/deprovision")
+def deprovision_challenge(teamid: int, challengeid: int, db: Session = Depends(get_db)):
+    team = db.query(Team).filter(Team.ID == teamid).first()
+    challenge = db.query(Challenge).filter(Challenge.ID == challengeid).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+    API_KEY = os.getenv("API_KEY", "default_secure_key")
+    command = f"""
+    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+    -H "Authorization: Bearer {API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
+    """
+
 # --------------------- ANTI CHEAT -----------------------
 
 
