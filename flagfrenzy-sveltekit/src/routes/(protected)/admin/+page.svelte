@@ -1,6 +1,7 @@
 <script>
     let allFlags;
     import Graph from '$lib/components/graph.svelte';
+  import { onMount, onDestroy } from 'svelte';
 
 let teamPoints, interval;
 let errorMessageTeams = '';
@@ -42,7 +43,7 @@ async function loadGraphValue() {
 }
 onMount(async () => {
   await loadGraphValue();
-  interval = setInterval((loadTeams, loadGraphValue), 300000); // Refresh every 60 seconds
+  interval = setInterval((loadGraphValue), 300000); // Refresh every 60 seconds
   return () => {
     clearInterval(interval); // Clean up interval when component is destroyed
   };
