@@ -268,6 +268,7 @@ def get_all_teammembers(db: Session = Depends(get_db)):
             "Teamname": team.Teamname,
             "TeamLeader": team.TeamLeader,
             "SharedFlag": team.SharedFlag,
+            "Points": team.Points,
             "Disabled": team.Disabled,
             "FirstBloods": team.FirstBloods,
             "Members": members_list
@@ -490,7 +491,38 @@ def update_user(user_id: str, user_update:UserUpdate, db: Session = Depends(get_
         db.rollback()
         raise HTTPException(status_code=422, detail=str(ex))
 
+@app.put("/users/leaveteam/{user_id}")
+def leave_team(
+    user_id: str, db: Session = Depends(get_db)
+):
+    """
+    Leave a team.
+    """
+    try:
+        user = db.query(User).filter(User.ID == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
+        team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+        if not team:
+            raise HTTPException(status_code=404, detail="Team not found")
+
+        if team.TeamLeader == user_id:
+            raise HTTPException(status_code=400, detail="Team Leader cannot leave the team")
+
+        team.Members -= 1
+        user.TeamsID = None
+
+        db.commit()
+        db.refresh(user)
+        return user
+    except HTTPException as http_ex:
+        raise http_ex
+    except Exception as ex:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+    
+    
 @app.put("/users/team/{user_id}")
 def update_user_team(
     user_id: str, userInput:TeamJoin, db: Session = Depends(get_db)
