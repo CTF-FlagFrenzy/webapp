@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table, Time
 )
+import asyncio
 from zoneinfo import ZoneInfo
 from sqlalchemy import extract
 from sqlalchemy.sql import cast
@@ -10,7 +11,7 @@ import hashlib
 from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, TeamPoints
+from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, TeamPoints, TeamPointsUser
 from model.database import SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from collections import defaultdict
@@ -22,9 +23,7 @@ from datetime import datetime, time, date, timezone
 from typing import Dict
 
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
-import os
 import subprocess
 import json
 
@@ -40,6 +39,40 @@ def is_not_allowed_time():
 
 
 app = FastAPI()
+
+def insert_teampoints():
+    db = SessionLocal()
+    try:
+        teams = db.query(Team).all()  
+        
+        for team in teams:
+            new_teampoints = TeamPointsUser(
+                TeamID=team.ID,
+                Points=team.Points,
+                Teamname=team.Teamname,
+                Time=datetime.now(vienna_timezone)
+            )
+            db.add(new_teampoints)
+        
+        db.commit()  
+    except Exception as e:
+        db.rollback()  
+        print(f"Fehler beim Einfügen der Team-Punkte: {e}")
+    finally:
+        db.close()
+
+
+async def background_task():
+    while True:
+        now = datetime.now(vienna_timezone).time()
+        if now >= time(9, 0):  
+            insert_teampoints()
+        await asyncio.sleep(60)  
+
+
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(background_task())
 
 # --------------------- MIDDLEWARE -----------------------
 
@@ -894,12 +927,12 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")   
     
     if "2" in user_id or "1" in user_id:
-        teamPoints = db.query(TeamPoints).filter(
-            cast(TeamPoints.Time, Time) < "11:30:00"
+        teamPoints = db.query(TeamPointsUser).filter(
+            cast(TeamPointsUser.Time, Time) < "11:30:00"
         ).all()
     else:
-        teamPoints = db.query(TeamPoints).filter(
-            cast(TeamPoints.Time, Time) < "14:30:00"
+        teamPoints = db.query(TeamPointsUser).filter(
+            cast(TeamPointsUser.Time, Time) < "14:30:00"
         ).all()
     return teamPoints
 
