@@ -1003,9 +1003,7 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
         """
         
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        # JSON-String in ein Dictionary umwandeln
         parsed_data = json.loads(result.stdout.strip())
-        # URL extrahieren
         url = parsed_data["url"]
         user_made_challenge.Url = url
         db.commit()
@@ -1015,10 +1013,11 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
         return {"error": str(ex)}
 
 # --------------------- DEPROVISION -----------------------
-@app.post("/deprovision")
-def deprovision_challenge(teamid: int, challengeid: int, db: Session = Depends(get_db)):
-    team = db.query(Team).filter(Team.ID == teamid).first()
-    challenge = db.query(Challenge).filter(Challenge.ID == challengeid).first()
+@app.post("/deprovision/{user_id}/{challenge_id}")
+def deprovision_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.ID == user_id).first()
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     if not challenge:
@@ -1030,6 +1029,8 @@ def deprovision_challenge(teamid: int, challengeid: int, db: Session = Depends(g
     -H "Content-Type: application/json" \
     -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
     """
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result
 
 # --------------------- ANTI CHEAT -----------------------
 
