@@ -43,7 +43,6 @@ export async function POST({ request }) {
 export async function PUT({ request, url }) {
     const user_id = url.searchParams.get('id');
     const challenge_id = url.searchParams.get('challenge_id')
-    console.log(user_id)
     const { Solved} = await request.json();
 
     try {

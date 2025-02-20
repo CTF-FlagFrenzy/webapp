@@ -18,7 +18,6 @@ let errorMessageTeams = '';
           }
      });
     allFlags = await response.json();
-    console.log(allFlags);
       if (!response.ok) {
         throw new Error("Flags konnten nicht geladen werden.");
       }
@@ -36,7 +35,6 @@ async function loadGraphValue() {
     if (!response.ok) throw new Error("Failed to load values");
     teamPoints = '';
     teamPoints = await response.json();
-    console.log(teamPoints)
   } catch (err) {
     errorMessageTeams = err.message;
   }

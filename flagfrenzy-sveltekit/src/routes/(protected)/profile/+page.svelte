@@ -31,7 +31,6 @@
 
       const userData = await response.json();
       user = userData;
-      console.log(user);
       Avatar = userData.Avatar;
       Nickname = userData.Nickname;
 
