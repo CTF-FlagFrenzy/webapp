@@ -78,6 +78,7 @@ async function loadGraphValue() {
   }
 }
 onMount(async () => {
+  await loadNotSolved();
   await loadGraphValue();
   interval = setInterval((loadGraphValue), 300000); // Refresh every 60 seconds
   return () => {
