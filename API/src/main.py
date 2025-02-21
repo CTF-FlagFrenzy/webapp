@@ -1153,7 +1153,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             status = 'already submitted'
     else:
         # Check if the flag already exists in the database
-        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag, FlagSubmission.status == "successful").first()
         if existing_submission and existing_submission.team_id != team.ID:
             status = 'shared'
             # Log the shared flag submission in the new table
