@@ -5,7 +5,7 @@ const API_BASE_URL = 'http://api:8000';
 export async function GET({ request, url }) {
 
     try {
-        const response = await fetch(`${API_BASE_URL}/user-made-challenges/notSolved`);
+        const response = await fetch(`${API_BASE_URL}/user-made-challenges/notsolved`);
         if (!response.ok) {
             throw new Error('Failed to fetch users');
         }

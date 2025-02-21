@@ -795,10 +795,32 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
 @app.get("/user-made-challenges/notsolved")
 def users_made_challenges_notsolved(db: Session = Depends(get_db)):
     """
-    Retrieve all user-made challenges which are not solved.
+    Retrieve all user-made challenges which are not solved, including the Team name.
     """
-    user_made_challenges = db.query(UserMadeChallenge).filter(UserMadeChallenge.Solved == 0).all()
-    return user_made_challenges
+    user_made_challenges = (
+        db.query(
+            UserMadeChallenge.User_ID,
+            UserMadeChallenge.Challenges_ID,
+            UserMadeChallenge.Firstblood,
+            UserMadeChallenge.Url,
+            Team.Teamname 
+        )
+        .join(User, UserMadeChallenge.User_ID == User.ID) 
+        .join(Team, User.TeamsID == Team.ID)  
+        .filter(UserMadeChallenge.Solved == 0)  
+        .all()
+    )
+
+    return [
+        {
+            "UserID": challenge.User_ID,
+            "ChallengeID": challenge.Challenges_ID,
+            "Firstblood": challenge.Firstblood,
+            "URL": challenge.Url,
+            "Teamname": challenge.Teamname,  
+        }
+        for challenge in user_made_challenges
+    ]
 
 @app.get("/user-made-challenges/{challenge_id}/solved_by_team/{team_id}")
 def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
@@ -1030,6 +1052,15 @@ def deprovision_challenge(user_id: str, challenge_id: int, db: Session = Depends
     -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
     """
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    user_made_challenge = db.query(UserMadeChallenge).filter(
+        UserMadeChallenge.User_ID == user.ID,
+        UserMadeChallenge.Challenges_ID == challenge.ID
+    ).first()
+    if not user_made_challenge:
+        raise HTTPException(status_code=404, detail="User-made challenge not found")
+
+    db.delete(user_made_challenge)
+    db.commit()
     return result
 
 # --------------------- ANTI CHEAT -----------------------
