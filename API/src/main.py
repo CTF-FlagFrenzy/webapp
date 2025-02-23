@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import extract
 from sqlalchemy.sql import cast
 import hashlib
-from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
+from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base, aliased
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
 from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, TeamPoints, TeamPointsUser
@@ -1227,22 +1227,52 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
-    # Fetch valid flag submissions
-    valid_flags = db.query(FlagSubmission).filter(FlagSubmission.status == 'successful').all()
+    # Fetch valid flag submissions with challenge and team names
+    valid_flags = (
+        db.query(FlagSubmission, Team.Teamname, Challenge.ChallengeName)
+        .join(Team, FlagSubmission.team_id == Team.ID)
+        .join(Challenge, FlagSubmission.challenge_id == Challenge.ID)
+        .filter(FlagSubmission.status == 'successful')
+        .all()
+    )
     
-    # Fetch shared flag submissions
-    shared_flags = db.query(SharedFlagSubmission).all()
-
-    # Fetch team names for shared flags
-    for shared_flag in shared_flags:
-        shared_flag.team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.team_id).first()[0]
-        shared_flag.original_team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.original_team_id).first()[0]
-
-    return  {
-        "valid_flags": valid_flags,
-        "shared_flags": shared_flags
+    # Structure valid flags with names
+    valid_flags_data = [
+        {
+            "flag": flag,
+            "team_name": team_name,
+            "challenge_name": challenge_name
+        }
+        for flag, team_name, challenge_name in valid_flags
+    ]
+    
+    # Alias the Teams table to avoid duplicate alias error
+    original_team = aliased(Team)
+    
+    # Fetch shared flag submissions with team and original team names
+    shared_flags = (
+        db.query(SharedFlagSubmission, Team.Teamname, Challenge.ChallengeName, original_team.Teamname.label("original_team_name"))
+        .join(Team, SharedFlagSubmission.team_id == Team.ID)
+        .join(Challenge, SharedFlagSubmission.challenge_id == Challenge.ID)
+        .join(original_team, SharedFlagSubmission.original_team_id == original_team.ID)
+        .all()
+    )
+    
+    # Structure shared flags with names
+    shared_flags_data = [
+        {
+            "flag": shared_flag,
+            "team_name": team_name,
+            "challenge_name": challenge_name,
+            "original_team_name": original_team_name
+        }
+        for shared_flag, team_name, challenge_name, original_team_name in shared_flags
+    ]
+    
+    return {
+        "valid_flags": valid_flags_data,
+        "shared_flags": shared_flags_data
     }
-    
 
 @app.post("/validate_flag/{challenge_id}/{user_id}")
 async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Session = Depends(get_db)):
