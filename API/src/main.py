@@ -1251,7 +1251,7 @@ async def admin_panel(db: Session = Depends(get_db)):
     
     # Fetch shared flag submissions with team and original team names
     shared_flags = (
-        db.query(SharedFlagSubmission, Team.Teamname, Challenge.ChallengeName, original_team.Teamname.label("original_team_name"))
+        db.query(SharedFlagSubmission, Team.Teamname, Challenge.ChallengeName, original_team.Teamname.label("original_team_name"), Team.SharedFlag)
         .join(Team, SharedFlagSubmission.team_id == Team.ID)
         .join(Challenge, SharedFlagSubmission.challenge_id == Challenge.ID)
         .join(original_team, SharedFlagSubmission.original_team_id == original_team.ID)
@@ -1264,9 +1264,10 @@ async def admin_panel(db: Session = Depends(get_db)):
             "flag": shared_flag,
             "team_name": team_name,
             "challenge_name": challenge_name,
-            "original_team_name": original_team_name
+            "original_team_name": original_team_name,
+            "shared_flags": shared
         }
-        for shared_flag, team_name, challenge_name, original_team_name in shared_flags
+        for shared_flag, team_name, challenge_name, original_team_name, shared in shared_flags
     ]
     
     return {

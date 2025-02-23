@@ -66,7 +66,7 @@
         await loadGraphValue();
         await loadNotSolved();
         await loadAllFlags();
-        interval = setInterval(loadGraphValue, 300000);
+        interval = setInterval(loadGraphValue, loadAllFlags, 300000);
     });
 
     onDestroy(() => {
@@ -94,6 +94,7 @@
                 <th class="border border-gray-700 px-4 py-2">Team</th>
                 <th class="border border-gray-700 px-4 py-2">Challengename</th>
                 <th class="border border-gray-700 px-4 py-2">Submission Time</th>
+
             </tr>
         </thead>
         <tbody>
@@ -118,6 +119,8 @@
 
                 <th class="border border-gray-700 px-4 py-2">Challengename</th>
                 <th class="border border-gray-700 px-4 py-2">Submission Time</th>
+                <th class="border border-gray-700 px-4 py-2">Shared Flags Counter</th>
+
             </tr>
         </thead>
         <tbody>
@@ -128,6 +131,8 @@
 
         <td class="border border-gray-700 px-4 py-2">{entry.challenge_name}</td>
         <td class="border border-gray-700 px-4 py-2">{entry.flag.submission_time}</td>
+        <td class="border border-gray-700 px-4 py-2">{entry.shared_flags}</td>
+
     </tr>
 {/each}
         </tbody>
