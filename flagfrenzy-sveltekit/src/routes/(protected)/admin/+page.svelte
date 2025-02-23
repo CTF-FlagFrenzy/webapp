@@ -109,7 +109,7 @@
 </div>
 
 <div class="px-8 py-4">
-    <h2 class="text-xl font-bold text-white">Solved Challenges</h2>
+    <h2 class="text-xl font-bold text-white">Shared Challenges</h2>
     <table class="w-full border-collapse border border-gray-700 mt-4 text-white">
         <thead>
             <tr class="bg-gray-800">
