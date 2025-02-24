@@ -67,7 +67,7 @@ async def background_task():
         now = datetime.now(vienna_timezone).time()
         if now >= time(9, 0):  
             insert_teampoints()
-        await asyncio.sleep(60)  
+        await asyncio.sleep(900)  
 
 
 @app.on_event("startup")
