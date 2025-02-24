@@ -62,16 +62,20 @@
         }
     }
 
-    onMount(async () => {
-        await loadGraphValue();
-        await loadNotSolved();
-        await loadAllFlags();
-        interval = setInterval(loadGraphValue, loadAllFlags, 300000);
-    });
+    onMount(async() => {
+    await loadAllFlags();
+    await loadGraphValue();
+    await loadNotSolved();
+    
+    const interval = setInterval(() => {
+      loadAllFlags();
+      loadGraphValue();
+      loadNotSolved();
+    }, 100000);
 
-    onDestroy(() => {
-        clearInterval(interval);
-    });
+    // Cleanup beim Verlassen der Komponente
+    return () => clearInterval(interval);
+  });
 </script>
 
 <div class="px-8 pt-8">
