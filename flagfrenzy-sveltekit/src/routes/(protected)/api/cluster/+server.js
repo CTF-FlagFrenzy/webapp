@@ -18,7 +18,23 @@ export async function GET({ url }) {
         return jsonResponse({ message: "An error occurred", error: err.message }, 500);
     }
 }
+export async function POST({ request }) {
+    const { UserID, ChallengeID} = await request.json();
 
+    try {
+        const response = await fetch(`${API_BASE_URL}/deprovision/${UserID}/${ChallengeID}`, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return jsonResponse(response, response.status);
+    } catch (error) {
+        return jsonResponse({ message: "An error occurred", error }, 500);
+    }
+}
 function jsonResponse(data, status) {
     return new Response(JSON.stringify(data), {
         status: status,

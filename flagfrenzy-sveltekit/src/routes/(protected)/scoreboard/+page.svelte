@@ -28,7 +28,6 @@
       if (!response.ok) throw new Error("Failed to load values");
       teamPoints = '';
       teamPoints = await response.json();
-      console.log(teamPoints)
     } catch (err) {
       errorMessageTeams = err.message;
     }

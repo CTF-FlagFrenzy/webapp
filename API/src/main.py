@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import extract
 from sqlalchemy.sql import cast
 import hashlib
-from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base
+from sqlalchemy.orm import sessionmaker, relationship, Session, declarative_base, aliased
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
 from model.models import User, Team, Challenge, UserMadeChallenge, FlagSubmission, SharedFlagSubmission, TeamPoints, TeamPointsUser
@@ -624,6 +624,9 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
     """
     # if not is_not_allowed_time():
     #     raise HTTPException(status_code=403, detail="The Event hasn't started yet")
+    team = db.query(Team).filter(Team.ID == teams_id).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
     challenges = db.query(Challenge).all()
 
     # Define difficulty order for sorting
@@ -791,6 +794,36 @@ def get_users_made_challenges(db: Session = Depends(get_db)):
     """
     user_made_challenges = db.query(UserMadeChallenge).all()
     return user_made_challenges
+
+@app.get("/user-made-challenges/notsolved")
+def users_made_challenges_notsolved(db: Session = Depends(get_db)):
+    """
+    Retrieve all user-made challenges which are not solved, including the Team name.
+    """
+    user_made_challenges = (
+        db.query(
+            UserMadeChallenge.User_ID,
+            UserMadeChallenge.Challenges_ID,
+            UserMadeChallenge.Firstblood,
+            UserMadeChallenge.Url,
+            Team.Teamname 
+        )
+        .join(User, UserMadeChallenge.User_ID == User.ID) 
+        .join(Team, User.TeamsID == Team.ID)  
+        .filter(UserMadeChallenge.Solved == 0)  
+        .all()
+    )
+
+    return [
+        {
+            "UserID": challenge.User_ID,
+            "ChallengeID": challenge.Challenges_ID,
+            "Firstblood": challenge.Firstblood,
+            "URL": challenge.Url,
+            "Teamname": challenge.Teamname,  
+        }
+        for challenge in user_made_challenges
+    ]
 
 @app.get("/user-made-challenges/{challenge_id}/solved_by_team/{team_id}")
 def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
@@ -995,9 +1028,7 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
         """
         
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        # JSON-String in ein Dictionary umwandeln
         parsed_data = json.loads(result.stdout.strip())
-        # URL extrahieren
         url = parsed_data["url"]
         user_made_challenge.Url = url
         db.commit()
@@ -1005,8 +1036,36 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
         return result.stdout.strip()
     except Exception as ex:
         return {"error": str(ex)}
-    
-    
+
+# --------------------- DEPROVISION -----------------------
+@app.post("/deprovision/{user_id}/{challenge_id}")
+def deprovision_challenge(user_id: str, challenge_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.ID == user_id).first()
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+    API_KEY = os.getenv("API_KEY", "default_secure_key")
+    command = f"""
+    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/deprovision" \
+    -H "Authorization: Bearer {API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d '{{"teamid":"{team.ID}", "challenge":"{challenge.FormatedChallengeName}"}}'
+    """
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    user_made_challenge = db.query(UserMadeChallenge).filter(
+        UserMadeChallenge.User_ID == user.ID,
+        UserMadeChallenge.Challenges_ID == challenge.ID
+    ).first()
+    if not user_made_challenge:
+        raise HTTPException(status_code=404, detail="User-made challenge not found")
+
+    db.delete(user_made_challenge)
+    db.commit()
+    return result
+
 # --------------------- ANTI CHEAT -----------------------
 
 
@@ -1097,7 +1156,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
             status = 'already submitted'
     else:
         # Check if the flag already exists in the database
-        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag).first()
+        existing_submission = db.query(FlagSubmission).filter(FlagSubmission.flag == flag, FlagSubmission.status == "successful").first()
         if existing_submission and existing_submission.team_id != team.ID:
             status = 'shared'
             # Log the shared flag submission in the new table
@@ -1171,22 +1230,53 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
-    # Fetch valid flag submissions
-    valid_flags = db.query(FlagSubmission).filter(FlagSubmission.status == 'successful').all()
+    # Fetch valid flag submissions with challenge and team names
+    valid_flags = (
+        db.query(FlagSubmission, Team.Teamname, Challenge.ChallengeName)
+        .join(Team, FlagSubmission.team_id == Team.ID)
+        .join(Challenge, FlagSubmission.challenge_id == Challenge.ID)
+        .filter(FlagSubmission.status == 'successful')
+        .all()
+    )
     
-    # Fetch shared flag submissions
-    shared_flags = db.query(SharedFlagSubmission).all()
-
-    # Fetch team names for shared flags
-    for shared_flag in shared_flags:
-        shared_flag.team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.team_id).first()[0]
-        shared_flag.original_team_name = db.query(Team.Teamname).filter(Team.ID == shared_flag.original_team_id).first()[0]
-
-    return  {
-        "valid_flags": valid_flags,
-        "shared_flags": shared_flags
+    # Structure valid flags with names
+    valid_flags_data = [
+        {
+            "flag": flag,
+            "team_name": team_name,
+            "challenge_name": challenge_name
+        }
+        for flag, team_name, challenge_name in valid_flags
+    ]
+    
+    # Alias the Teams table to avoid duplicate alias error
+    original_team = aliased(Team)
+    
+    # Fetch shared flag submissions with team and original team names
+    shared_flags = (
+        db.query(SharedFlagSubmission, Team.Teamname, Challenge.ChallengeName, original_team.Teamname.label("original_team_name"), Team.SharedFlag)
+        .join(Team, SharedFlagSubmission.team_id == Team.ID)
+        .join(Challenge, SharedFlagSubmission.challenge_id == Challenge.ID)
+        .join(original_team, SharedFlagSubmission.original_team_id == original_team.ID)
+        .all()
+    )
+    
+    # Structure shared flags with names
+    shared_flags_data = [
+        {
+            "flag": shared_flag,
+            "team_name": team_name,
+            "challenge_name": challenge_name,
+            "original_team_name": original_team_name,
+            "shared_flags": shared
+        }
+        for shared_flag, team_name, challenge_name, original_team_name, shared in shared_flags
+    ]
+    
+    return {
+        "valid_flags": valid_flags_data,
+        "shared_flags": shared_flags_data
     }
-    
 
 @app.post("/validate_flag/{challenge_id}/{user_id}")
 async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Session = Depends(get_db)):
