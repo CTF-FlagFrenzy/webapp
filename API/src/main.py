@@ -624,6 +624,9 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
     """
     # if not is_not_allowed_time():
     #     raise HTTPException(status_code=403, detail="The Event hasn't started yet")
+    team = db.query(Team).filter(Team.ID == teams_id).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
     challenges = db.query(Challenge).all()
 
     # Define difficulty order for sorting
