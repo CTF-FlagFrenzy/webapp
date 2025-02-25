@@ -44,8 +44,10 @@
                 body: JSON.stringify({ UserID: entry.UserID, ChallengeID: entry.ChallengeID }),
                 headers: { "Content-Type": "application/json; charset=UTF-8" }
             });
+            loadNotSolved();
             if (!response.ok) throw new Error("Deprovision fehlgeschlagen.");
             console.log(`Challenge ${entry.ChallengeID} für User ${entry.UserID} deprovisioniert.`);
+        
         } catch (error) {
             console.error("Fehler bei Deprovision:", error);
         }
