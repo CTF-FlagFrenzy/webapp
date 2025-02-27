@@ -67,7 +67,7 @@ async def background_task():
         now = datetime.now(vienna_timezone).time()
         if now >= time(9, 0):  
             insert_teampoints()
-        await asyncio.sleep(900)  
+        await asyncio.sleep(600)  
 
 
 @app.on_event("startup")
@@ -373,6 +373,13 @@ def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
         Teamname=db_team.Teamname,
         Time=datetime.now(vienna_timezone)
     )
+        new_teampoints_users = TeamPointsUser(
+        TeamID=db_team.ID,
+        Points=0,
+        Teamname=db_team.Teamname,
+        Time=datetime.now(vienna_timezone)
+    )
+        db.add(new_teampoints_users)
         db.add(new_teampoints)
         db.commit()
         db.refresh(new_teampoints)

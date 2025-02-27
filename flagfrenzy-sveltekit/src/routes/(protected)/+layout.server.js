@@ -5,7 +5,7 @@ export function load({ locals }) {
 	const email = (userinfo).mail;
 	const givenname = (userinfo).givenName;
 	const surname = (userinfo).surname;
-	const adminUser = ["PINTER Elias, 5AHITS", "STURM Leon Attila, 5BHITS", "PLONER Fabian, 5AHITS", "HUBER Julian, 5AHITS", "BROWN Ilaria, 5BHITS"]
+	const adminUser = ["PINTER Elias, 5AHITS", "STURM Leon Attila, 5BHITS", "PLONER Fabian, 5AHITS", "HUBER Julian, 5AHITS", "BROWN Ilaria, 5BHITS","KAVALAR Johannes, 5AHITS"]
 	return {
 		username,
 		email,
