@@ -378,5 +378,76 @@
     "FormatedChallengeName": "hidden-frequencies",
     "Chain": 0,
     "IsStatic": 1
+  },{
+    "ID":  27,
+    "ChallengeName": "Ceasar Cipher",
+    "Categorie": "Reverse Engineering",
+    "Points": 500,
+    "Description": "-",
+    "Difficulty": "Medium",
+    "Hint1": "x",
+    "Hint2": "x",
+    "Hint3": "x",
+    "Static": "CeaserusCipherusRichtigus",
+    "FormatedChallengeName": "ceasar-cypher",
+    "Chain": 0,
+    "IsStatic": 0
+  },{
+    "ID":  28,
+    "ChallengeName": "Checking Encryption",
+    "Categorie": "Reverse Engineering",
+    "Points": 500,
+    "Description": "-",
+    "Difficulty": "Medium",
+    "Hint1": "x",
+    "Hint2": "x",
+    "Hint3": "x",
+    "Static": "VeryLongUnpredictableStringWithNoMeaningWhatsoeverItsTheChallengeKey",
+    "FormatedChallengeName": "checking-encryption",
+    "Chain": 0,
+    "IsStatic": 0
+  },{
+    "ID":  29,
+    "ChallengeName": "Confused Scripting",
+    "Categorie": "Reverse Engineering",
+    "Points": 500,
+    "Description": "-",
+    "Difficulty": "Medium",
+    "Hint1": "x",
+    "Hint2": "x",
+    "Hint3": "x",
+    "Static": "1378z4eq3hnfiuaudnsdmasdys.-,.",
+    "FormatedChallengeName": "confused-scripting",
+    "Chain": 0,
+    "IsStatic": 0
+  },{
+    "ID":  30,
+    "ChallengeName": "Corrupted File",
+    "Categorie": "Reverse Engineering",
+    "Points": 500,
+    "Description": "-",
+    "Difficulty": "Medium",
+    "Hint1": "x",
+    "Hint2": "x",
+    "Hint3": "x",
+    "Static": "kjasdhasidz8a2e2kwhdoizdshdmas",
+    "FormatedChallengeName": "corrupted-file",
+    "Chain": 0,
+    "IsStatic": 0
+  },{
+    "ID":  31,
+    "ChallengeName": "Corrupted File",
+    "Categorie": "Reverse Engineering",
+    "Points": 500,
+    "Description": "-",
+    "Difficulty": "Medium",
+    "Hint1": "x",
+    "Hint2": "x",
+    "Hint3": "x",
+    "Static": "kjasdhasidz8a2e2kwhdoizdshdmas",
+    "FormatedChallengeName": "corrupted-file",
+    "Chain": 0,
+    "IsStatic": 0
   }
+
 ]
