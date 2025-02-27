@@ -55,7 +55,7 @@ class TeamPointsUser(Base):
     ID = Column(Integer, primary_key=True, autoincrement=True)
     TeamID = Column(Integer, ForeignKey('Teams.ID'), nullable=False)
     Time = Column(DateTime, nullable=False)
-    Points = Column(Float, nullable=False)
+    Points = Column(Integer, nullable=False)
     Teamname = Column(String(35), nullable=False)
 
     team = relationship("Team", back_populates="currentPointsUser")

@@ -808,18 +808,20 @@ def users_made_challenges_notsolved(db: Session = Depends(get_db)):
     Retrieve all user-made challenges which are not solved, including the Team name.
     """
     user_made_challenges = (
-        db.query(
-            UserMadeChallenge.User_ID,
-            UserMadeChallenge.Challenges_ID,
-            UserMadeChallenge.Firstblood,
-            UserMadeChallenge.Url,
-            Team.Teamname 
-        )
-        .join(User, UserMadeChallenge.User_ID == User.ID) 
-        .join(Team, User.TeamsID == Team.ID)  
-        .filter(UserMadeChallenge.Solved == 0)  
-        .all()
+    db.query(
+        UserMadeChallenge.User_ID,
+        UserMadeChallenge.Challenges_ID,
+        UserMadeChallenge.Firstblood,
+        UserMadeChallenge.Url,
+        Team.Teamname,
+        Challenge.ChallengeName  
     )
+    .join(User, UserMadeChallenge.User_ID == User.ID)
+    .join(Team, User.TeamsID == Team.ID)
+    .join(Challenge, UserMadeChallenge.Challenges_ID == Challenge.ID) 
+    .filter(UserMadeChallenge.Solved == 0)
+    .all()
+)
 
     return [
         {
@@ -827,11 +829,11 @@ def users_made_challenges_notsolved(db: Session = Depends(get_db)):
             "ChallengeID": challenge.Challenges_ID,
             "Firstblood": challenge.Firstblood,
             "URL": challenge.Url,
-            "Teamname": challenge.Teamname,  
+            "Teamname": challenge.Teamname,
+            "ChallengeName": challenge.ChallengeName  
         }
         for challenge in user_made_challenges
     ]
-
 @app.get("/user-made-challenges/{challenge_id}/solved_by_team/{team_id}")
 def is_challenge_solved_by_team_route(challenge_id: int, team_id: int, db: Session = Depends(get_db)):
     if is_challenge_solved_by_team(team_id, challenge_id, db):
