@@ -448,13 +448,10 @@ def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
     if team.TeamLeader != user.ID:
         raise HTTPException(status_code=403, detail="You have no permission to delete this team")
 
-    # Alle TeamPoints-Einträge des Teams löschen
     db.query(TeamPoints).filter(TeamPoints.TeamID == team_id).delete()
 
-    # Setze TeamsID auf NULL für alle Mitglieder des Teams
     db.query(User).filter(User.TeamsID == team_id).update({User.TeamsID: None})
 
-    # Team löschen
     db.delete(team)
     db.commit()
 
