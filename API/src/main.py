@@ -1070,7 +1070,7 @@ def deprovision_challenge(user_id: str, challenge_id: int, db: Session = Depends
 
 
 def generate_flag(team_key, challenge_flag):
-    combined = team_key + challenge_flag
+    combined = challenge_flag + team_key
     return hashlib.sha256(combined.encode()).hexdigest()
 
 def calculate_points(base_points, current_time):
