@@ -163,7 +163,7 @@
                     <td class="border border-gray-700 px-4 py-2">{entry.UserID}</td>
                     <td class="border border-gray-700 px-4 py-2">{entry.ChallengeName}</td>
                     <td class="border border-gray-700 px-4 py-2">
-                        <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{entry.Url}" target="_blank">Open Challenge</a>
+                        <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{entry.URL}" target="_blank">Open Challenge</a>
                     </td>
                     <td class="border border-gray-700 px-4 py-2">{entry.Teamname}</td>
                     <td class="border border-gray-700 px-4 py-2">
