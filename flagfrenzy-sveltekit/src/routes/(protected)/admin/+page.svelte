@@ -79,7 +79,7 @@
     return () => clearInterval(interval);
   });
 </script>
-{#if data.adminUser && data.adminUser.includes(user.ID)}
+{#if data.adminUser && data.adminUser.includes(data.username)}
 <div class="px-8 pt-8">
     {#if teamPoints}
         <div class="px-32 hidden sm:block">
