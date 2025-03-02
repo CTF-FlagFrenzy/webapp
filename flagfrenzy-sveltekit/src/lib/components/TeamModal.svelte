@@ -61,7 +61,7 @@
   }
   async function leaveTeam() {
     try {
-        const response = await fetch(`/api/teams/leave?id=${data.username}`, {
+        const response = await fetch(`/api/user/leave?id=${data.username}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json; charset=UTF-8",
