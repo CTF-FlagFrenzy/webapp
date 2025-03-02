@@ -14,7 +14,7 @@ class Team(Base):
     __tablename__ = "Teams"
     
     ID = Column(Integer, primary_key=True, autoincrement=True)
-    Teamname = Column(String(50), nullable=False, unique=True)
+    Teamname = Column(String(35), nullable=False, unique=True)
     Password = Column(String(256), nullable=False)
     Teamkey = Column(String(75), nullable=False, unique=True)
     Points = Column(Float, default=0)
@@ -28,6 +28,7 @@ class Team(Base):
 
     users = relationship("User", back_populates="team", foreign_keys="[User.TeamsID]")
     currentPoints = relationship("TeamPoints", back_populates="team", foreign_keys="[TeamPoints.TeamID]")
+    currentPointsUser = relationship("TeamPointsUser", back_populates="team", foreign_keys="[TeamPointsUser.TeamID]")
     flag_submissions = relationship("FlagSubmission", back_populates="team")
     shared_flag_submissions = relationship("SharedFlagSubmission", foreign_keys="[SharedFlagSubmission.team_id]", back_populates="team")
     
@@ -41,9 +42,23 @@ class TeamPoints(Base):
     TeamID = Column(Integer, ForeignKey('Teams.ID'), nullable=False)
     Time = Column(DateTime, nullable=False)
     Points = Column(Float, nullable=False)
-    Teamname = Column(String(50), nullable=False)
+    Teamname = Column(String(35), nullable=False)
 
     team = relationship("Team", back_populates="currentPoints")
+    
+class TeamPointsUser(Base):
+    """
+    Database model for team points.
+    """
+    __tablename__ = "TeamPointsUser"
+
+    ID = Column(Integer, primary_key=True, autoincrement=True)
+    TeamID = Column(Integer, ForeignKey('Teams.ID'), nullable=False)
+    Time = Column(DateTime, nullable=False)
+    Points = Column(Integer, nullable=False)
+    Teamname = Column(String(35), nullable=False)
+
+    team = relationship("Team", back_populates="currentPointsUser")
     
 class User(Base):
     """

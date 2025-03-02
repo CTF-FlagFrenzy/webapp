@@ -9,7 +9,6 @@
 
   function openModal() {
     isModalOpen = true;
-    console.log('isModalOpen:', isModalOpen); // Debugging
   }
 
   function closeModal() {
