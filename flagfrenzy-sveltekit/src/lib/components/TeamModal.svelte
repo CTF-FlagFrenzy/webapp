@@ -38,6 +38,8 @@
       if (!response.ok) {
         throw new Error("Team konnte nicht beigetreten werden. Bitte überprüfe Teamname und Passwort.");
       }
+      dispatch('teamDeleted');
+      close();
     } catch (error) {
       errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
     } 
@@ -114,12 +116,12 @@
         </tr>
       </thead>
       <tbody class="text-gray-400 text-base">
-        {#each teamdata.Members as member}
+        {#each [...teamdata.Members].sort((a, b) => (a.ID === teamdata.TeamLeader ? -1 : b.ID === teamdata.TeamLeader ? 1 : 0)) as member}
           <tr class="border-b border-custom-100">
             {#if member.ID == teamdata.TeamLeader}
               <td class="pl-4 pt-2 align-top">{member.ID} <span class="text-custom-200 text-xl">&#x265B;</span></td> 
             {:else}
-              <td class="pl-4 pt-2 align-top">{member.ID}</td> 
+              <td class="pl-4 pt-2 align-top">{member.ID}</td>
             {/if}
             <td class="pl-4 pt-2 align-top">{member.Nickname}</td>
           </tr>

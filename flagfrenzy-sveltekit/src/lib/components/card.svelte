@@ -13,6 +13,7 @@
 
   function closeModal() {
     isModalOpen = false;
+    dispatch('refresh');
   }
 
   function colorPicker(difficulty) {

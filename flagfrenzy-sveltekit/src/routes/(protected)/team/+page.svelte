@@ -72,8 +72,8 @@
     </div>
   </div>
   <div class="h-80 max-h-80 bg-custom-110 w-full px-4 rounded-2xl shadow-BackdropShadow">
-    <div class="overflow-y-auto hide-scrollbar">
-      <div class="overflow-x-auto">
+    <div class="h-[300px] overflow-y-auto hide-scrollbar">
+      <div class="hide-scrollbar flex-grow overflow-x-auto">
         {#if teams}
           <table class="w-[400px] styled-table md:!w-full bg-custom-110 mt-4">
             <thead class="text-custom-200 text-xl sticky top-0 bg-custom-110 border-b z-10 border-custom-200">
@@ -118,6 +118,7 @@
         {/if}
       </div>
     </div>
+    <div class="spacer"></div>
   </div>
 </div>
 </div>
@@ -133,8 +134,12 @@
     display: none;
   }
   @media (min-height: 900px) {
-  .custom-h-screen {
-    height: 100vh;
+    .custom-h-screen {
+      height: 100vh;
+    }
   }
-}
+  .spacer {
+    height: 20px; /* Definiert den konstanten Abstand */
+    flex-shrink: 0;
+  }
 </style>

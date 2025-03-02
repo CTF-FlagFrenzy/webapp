@@ -105,7 +105,7 @@
       <div class="place-items-center gap-3.5 px-8 py-4 mb-4 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
         {#each challengesByCategory[category] as challenge}
           <div class="col-span-2">
-            <Card challenge={challenge} user={user} />
+            <Card challenge={challenge} user={user} on:refresh={() => {loadChallenges();loadUsermadeChallenges();}}/>
           </div>
         {/each}
       </div>
