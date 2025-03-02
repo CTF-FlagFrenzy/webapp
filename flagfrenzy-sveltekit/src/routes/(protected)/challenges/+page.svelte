@@ -24,7 +24,6 @@
       }
 
       const userData = await response.json();
-      console.log(userData); 
 
       user = userData;
 
@@ -39,7 +38,6 @@
       if (!response.ok) throw new Error("Failed to load user_made_challenges");
 
       user_made_challenges = await response.json();
-      console.log(user_made_challenges)
     } catch (err) {
       error = err.message;
     }
@@ -50,7 +48,6 @@
       if (!response.ok) throw new Error("Failed to load challenges");
 
       const rawChallengesByCategory = await response.json();
-      console.log(rawChallengesByCategory);
 
       // Map to track solved challenges by ID
       const solvedMap = {};

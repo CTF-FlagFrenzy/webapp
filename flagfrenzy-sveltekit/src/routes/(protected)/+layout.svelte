@@ -32,7 +32,6 @@
       }
 
       const userData = await response.json();
-      console.log(userData); 
 
       user = userData;
 

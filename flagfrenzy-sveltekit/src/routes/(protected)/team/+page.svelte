@@ -34,7 +34,6 @@
       if (!response.ok) throw new Error("Failed to load teams");
 
       teams = await response.json();
-      console.log(teams);
     } catch (err) {
       errorMessage = err.message;
     }
@@ -46,7 +45,6 @@
       if (!response.ok) throw new Error("Failed to load team members");
 
       teamMembers = await response.json();
-      console.log(teamMembers)
     } catch (err) {
       errorMessageTeamMembers = err.message;
     }

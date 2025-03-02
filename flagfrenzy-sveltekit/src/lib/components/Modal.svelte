@@ -28,16 +28,13 @@
   
         
         hints = await response.json();
-        console.log(hints);
       } catch (err) {
         error = err.message;
       }
     }
 async function checkChainCondition() {
-    console.log(data.Chain);
     if (!data.Chain) {
       canSubmit = true;
-      console.log(canSubmit);
       return;
     }
     try {
@@ -149,7 +146,6 @@ async function checkChainCondition() {
         }
       });
       flagStatus = await response.json();
-      console.log(flagStatus);
       if (!response.ok) {
         throw new Error("Flag konnte nicht abgegeben werden.");
       }
@@ -181,7 +177,6 @@ async function checkChainCondition() {
         }
       });
       flagStatus = await response.json();
-      console.log(flagStatus);
       if (!response.ok) {
         throw new Error(".");
       }
