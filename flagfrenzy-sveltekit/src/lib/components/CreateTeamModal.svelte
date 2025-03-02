@@ -2,10 +2,8 @@
   import { createEventDispatcher } from 'svelte';
   
   export let isOpen = false;
-  export let teamname;
   export let data;
-  let password;
-  let error = null;
+  let teamname, password;
   let refreshInterval;
   let errorMessage;
 
@@ -54,6 +52,7 @@
         throw new Error("Team konnte nicht erstellt werden. Bitte überprüfe den Teamname.");
       }
       await joinTeam()
+      dispatch('teamCreated');
       close()
     } catch (error) {
       errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
