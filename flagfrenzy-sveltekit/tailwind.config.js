@@ -34,11 +34,13 @@ export default {
         MediumShadow: '0 0px 20px #FF962E',
         HardShadow: '0 0px 20px #F35977',
         ExpertShadow: '0 0px 20px #B259F3',
+        TeamShadow: '0 0px 20px #2c384e',
         DefaultShadow: '0 0px 20px #A5A2A2',
         BackdropShadow: '-5px 5px 5px #35363c',
         BackdropShadow2: '0px -5px 5px #35363c',
         BackdropShadow3: '-2px 2px 5px 3px #35363c',
         BackdropShadow4: '0px 5px 5px #35363c',
+        BackdropShadow5: '0px 0px 5px 5px#35363c',
       },
       backgroundImage: {
         Hero: "url('/images/Hero.png')",
@@ -50,5 +52,13 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.counter-reset-rules': {counterReset: 'rules',},
+        '.counter-increment-rules': {counterIncrement: 'rules',},
+        '.before-content-counter': {content: "counter(rules) '.'",}
+      })
+    }
+  ],
 }

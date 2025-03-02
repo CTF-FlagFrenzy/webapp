@@ -1,12 +1,13 @@
 <script>
   import { onMount } from "svelte";
 
-  let onlineMembers, totalMembers = 0;
+  let onlineMembers = 0;
+  let totalMembers = 0;
 
   async function fetchDiscordStats() {
     try {
       const response = await fetch(
-        "https://discord.com/api/v9/invites/HgxWtFJT?with_counts=true"
+        "https://discord.com/api/v9/invites/Wns7pxwJKF?with_counts=true"
       );
       const data = await response.json();
 

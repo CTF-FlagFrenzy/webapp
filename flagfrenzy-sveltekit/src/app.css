@@ -23,6 +23,9 @@ body {
 .card-Default {
   @apply shadow-DefaultShadow;
 }
+.card-Team {
+  @apply shadow-TeamShadow;
+}
 .card-EasyPastel {
   @apply text-EasyPastel;
 }

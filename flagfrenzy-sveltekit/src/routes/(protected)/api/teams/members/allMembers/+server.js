@@ -4,7 +4,7 @@ const API_BASE_URL = 'http://api:8000';
 
 export async function GET({ request, url }) {
     try {
-        const response = await fetch(`${API_BASE_URL}/teams/members`);
+        const response = await fetch(`${API_BASE_URL}/team/members`);
         if (!response.ok) {
             throw new Error('Failed to fetch teammembers');
         }
