@@ -371,18 +371,19 @@ def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
         db.add(db_team)
         db.commit()
         db.refresh(db_team)
+        fixed_time = datetime(2024, 3, 20, 9, 0, tzinfo=vienna_timezone)
         # Add and commit to the database
         new_teampoints = TeamPoints(
         TeamID=db_team.ID,
         Points=0,
         Teamname=db_team.Teamname,
-        Time=datetime.now(vienna_timezone)
+        Time=fixed_time
     )
         new_teampoints_users = TeamPointsUser(
         TeamID=db_team.ID,
         Points=0,
         Teamname=db_team.Teamname,
-        Time=datetime.now(vienna_timezone)
+        Time=fixed_time
     )
         db.add(new_teampoints_users)
         db.add(new_teampoints)
