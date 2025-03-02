@@ -65,7 +65,8 @@ def insert_teampoints():
 async def background_task():
     while True:
         now = datetime.now(vienna_timezone).time()
-        if now >= time(9, 0):  
+        current_date = datetime.now().date()  
+        if current_date == allowed_date and now >= time(9, 0):  
             insert_teampoints()
         await asyncio.sleep(600)  
 
@@ -448,13 +449,12 @@ def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
     if team.TeamLeader != user.ID:
         raise HTTPException(status_code=403, detail="You have no permission to delete this team")
 
-    # Alle TeamPoints-Einträge des Teams löschen
     db.query(TeamPoints).filter(TeamPoints.TeamID == team_id).delete()
+    db.query(TeamPointsUser).filter(TeamPointsUser.TeamID == team_id).delete()
+    db.query(User).filter(User.TeamsID == team_id).update({User.Points: 0})
 
-    # Setze TeamsID auf NULL für alle Mitglieder des Teams
     db.query(User).filter(User.TeamsID == team_id).update({User.TeamsID: None})
 
-    # Team löschen
     db.delete(team)
     db.commit()
 
@@ -970,7 +970,7 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     
     if "2" in user_id or "1" in user_id:
         teamPoints = db.query(TeamPointsUser).filter(
-            cast(TeamPointsUser.Time, Time) < "11:30:00"
+            cast(TeamPointsUser.Time, Time) < "11:00:00"
         ).all()
     else:
         teamPoints = db.query(TeamPointsUser).filter(
