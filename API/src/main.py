@@ -438,7 +438,7 @@ def update_team(team_id: int, user_id: str, team_update: TeamUpdate, db: Session
 
 
 @app.delete("/teams/{team_id}/{user_id}")
-def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
+def delete_team(team_id: int, user_id: str, password: str, db: Session = Depends(get_db)):
     """
     Delete a team by ID and update associated users' TeamsID to null.
     """
@@ -447,13 +447,15 @@ def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
 
     team = db.query(Team).filter(Team.ID == team_id).first()
     user = db.query(User).filter(User.ID == user_id).first()
-
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
 
     if team.TeamLeader != user.ID:
         raise HTTPException(status_code=403, detail="You have no permission to delete this team")
-
+    if hashed_password != team.Password:
+        raise HTTPException(status_code=400, detail="Invalid team password")    
+    
     db.query(TeamPoints).filter(TeamPoints.TeamID == team_id).delete()
     db.query(TeamPointsUser).filter(TeamPointsUser.TeamID == team_id).delete()
     db.query(User).filter(User.TeamsID == team_id).update({User.Points: 0})
@@ -464,7 +466,6 @@ def delete_team(team_id: int, user_id: str, db: Session = Depends(get_db)):
     db.commit()
 
     return {"detail": "Team and all related TeamPoints deleted successfully"}
-
 
 # --------------------- USERS -----------------------
 @app.get("/users/")

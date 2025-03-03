@@ -108,7 +108,7 @@
     <tr class="bg-gray-900 border-b border-gray-700">
         <td class="border border-gray-700 px-4 py-2">{entry.team_name}</td>
         <td class="border border-gray-700 px-4 py-2">{entry.challenge_name}</td>
-        <td class="border border-gray-700 px-4 py-2">{entry.flag.submission_time}</td>
+        <td class="border border-gray-700 px-4 py-2">{new Date(entry.flag.submission_time).toLocaleString()}</td>
     </tr>
 {/each}
         </tbody>
@@ -136,7 +136,7 @@
         <td class="border border-gray-700 px-4 py-2">{entry.original_team_name}</td>
 
         <td class="border border-gray-700 px-4 py-2">{entry.challenge_name}</td>
-        <td class="border border-gray-700 px-4 py-2">{entry.flag.submission_time}</td>
+        <td class="border border-gray-700 px-4 py-2">{new Date(entry.flag.submission_time).toLocaleString()}</td>
         <td class="border border-gray-700 px-4 py-2">{entry.shared_flags}</td>
 
     </tr>
