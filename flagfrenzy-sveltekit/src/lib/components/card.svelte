@@ -2,6 +2,9 @@
   import Modal from '$lib/components/Modal.svelte';
   import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
   import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+
 
   export let challenge;
   export let user;
