@@ -26,7 +26,7 @@ export async function DELETE({ url }) {
     }
 
     try {
-        const response = await fetch(`http://api:8000/teams/${id}/${userId}?${password}`, {
+        const response = await fetch(`http://api:8000/teams/${id}/${userId}?password=${password}`, {
             method: "DELETE",
             headers: {
                 'Accept': 'application/json',

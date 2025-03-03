@@ -47,7 +47,7 @@
 
   async function deleteTeam() {
     try {
-        const response = await fetch(`/api/teams?id=${teamdata.TeamsID}&userId=${data.username}&password=&${password}`, {
+        const response = await fetch(`/api/teams?id=${teamdata.TeamsID}&userId=${data.username}&password=${password}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json; charset=UTF-8",
