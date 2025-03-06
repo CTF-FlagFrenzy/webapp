@@ -1304,7 +1304,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 async def admin_panel(db: Session = Depends(get_db)):
     # Fetch valid flag submissions with challenge and team names
     valid_flags = (
-        db.query(FlagSubmission, Team.Teamname, Team.ID, Challenge.ChallengeName, UserMadeChallenge.StartTime, FlagSubmission.submission_time)
+        db.query(FlagSubmission, Team.Teamname, Team.ID, Challenge.ChallengeName, UserMadeChallenge.StartTime, FlagSubmission.submission_time, Challenge.Difficulty)
         .join(Team, FlagSubmission.team_id == Team.ID)
         .join(User, Team.ID == User.TeamsID)
         .join(UserMadeChallenge, FlagSubmission.challenge_id == UserMadeChallenge.Challenges_ID)
@@ -1321,10 +1321,11 @@ async def admin_panel(db: Session = Depends(get_db)):
             "team_name": team_name,
             "team_id": team_id,
             "challenge_name": challenge_name,
+            "challenge_difficulty": challenge_difficulty,
             "start_time": start_time,
             "time_difference": (submission_time - start_time).total_seconds() // 60
         }
-        for flag, team_name, team_id, challenge_name, start_time, submission_time in valid_flags
+        for flag, team_name, team_id, challenge_name, start_time, submission_time, challenge_difficulty in valid_flags
     ]
     
     # Alias the Teams table to avoid duplicate alias error
