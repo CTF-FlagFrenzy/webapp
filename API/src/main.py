@@ -899,8 +899,8 @@ def get_user_made_challenges(teams_id: int, db: Session = Depends(get_db)):
 def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db: Session = Depends(get_db)):
     """
     Create a new user-made challenge.
-    """
-    db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict())
+    """    
+    db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict(), StartTime=datetime.now(vienna_timezone))
     try:
         db.add(db_user_made_challenge)
         db.commit()
@@ -1278,10 +1278,13 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 async def admin_panel(db: Session = Depends(get_db)):
     # Fetch valid flag submissions with challenge and team names
     valid_flags = (
-        db.query(FlagSubmission, Team.Teamname, Challenge.ChallengeName)
+        db.query(FlagSubmission, Team.Teamname, Challenge.ChallengeName, UserMadeChallenge.StartTime, FlagSubmission.submission_time)
         .join(Team, FlagSubmission.team_id == Team.ID)
+        .join(User, Team.ID == User.TeamsID)
+        .join(UserMadeChallenge, FlagSubmission.challenge_id == UserMadeChallenge.Challenges_ID)
         .join(Challenge, FlagSubmission.challenge_id == Challenge.ID)
         .filter(FlagSubmission.status == 'successful')
+        .filter(UserMadeChallenge.User_ID == User.ID)
         .all()
     )
     
@@ -1290,9 +1293,11 @@ async def admin_panel(db: Session = Depends(get_db)):
         {
             "flag": flag,
             "team_name": team_name,
-            "challenge_name": challenge_name
+            "challenge_name": challenge_name,
+            "start_time": start_time,
+            "time_difference": (submission_time - start_time).total_seconds() // 60
         }
-        for flag, team_name, challenge_name in valid_flags
+        for flag, team_name, challenge_name, start_time, submission_time in valid_flags
     ]
     
     # Alias the Teams table to avoid duplicate alias error

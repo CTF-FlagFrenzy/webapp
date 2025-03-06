@@ -112,6 +112,7 @@ class UserMadeChallenge(Base):
     Challenges_ID = Column(Integer, ForeignKey("Challenges.ID"), primary_key=True)
     Firstblood = Column(Integer, default=0)
     Solved = Column(Integer, default=0)
+    StartTime = Column(DateTime(timezone=True))
     Url = Column(String(256))
 
     user = relationship("User", back_populates="challenges")
