@@ -18,6 +18,13 @@
         legend: {
           position: 'bottom',
           display: true,
+          labels: {
+            color: 'white',
+            usePointStyle: true,
+            pointStyle: 'circle',
+            boxWidth: 8,
+            boxHeight: 8,
+          },
         },
       },
       scales: {
@@ -25,12 +32,26 @@
           title: {
             display: true,
             text: 'Time',
+            color: 'white',
+          },
+          ticks: {
+            color: 'white',
+          },
+          grid: {
+            color: '#444444', // Y-Achsen-Gitterlinien in Weiß
           },
         },
         y: {
           title: {
             display: true,
             text: 'Points',
+            color: 'white',
+          },
+          ticks: {
+            color: 'white',
+          },
+          grid: {
+            color: '#444444', // Y-Achsen-Gitterlinien in Weiß
           },
           beginAtZero: true,
         },
@@ -58,7 +79,7 @@
     return data.reduce((acc, curr) => {
       // Zeitstempel um eine Stunde verschieben und im korrekten Format speichern
       const date = new Date(curr.Time);
-      const adjustedTime = date.toLocaleTimeString('en-GB'); // HH:mm:ss
+      const adjustedTime = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // HH:mm:ss
 
       if (!acc[curr.Teamname]) {
         acc[curr.Teamname] = [];
@@ -78,7 +99,7 @@
       .sort((a, b) => new Date(a) - new Date(b))
       .map((timestamp) => {
         const date = new Date(timestamp);
-        return date.toLocaleTimeString('en-GB'); // Nur die Zeit (hh:mm:ss) extrahieren
+        return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // Nur die Zeit (hh:mm:ss) extrahieren
       });
   }
 
@@ -117,4 +138,4 @@
   }
 </script>
 
-<canvas id="teamChart"></canvas>
+<canvas id="teamChart" class="text-white !w-full !h-full"></canvas>

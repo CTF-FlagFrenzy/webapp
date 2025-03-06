@@ -18,6 +18,7 @@ export async function GET() {
 }
 export async function DELETE({ url }) {
     const id = url.searchParams.get('id');
+    const password = url.searchParams.get('password');
     const userId = url.searchParams.get('userId')
     console.log(userId)
     if (!id) {
@@ -25,7 +26,7 @@ export async function DELETE({ url }) {
     }
 
     try {
-        const response = await fetch(`http://api:8000/teams/${id}/${userId}`, {
+        const response = await fetch(`http://api:8000/teams/${id}/${userId}?password=${password}`, {
             method: "DELETE",
             headers: {
                 'Accept': 'application/json',

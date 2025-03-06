@@ -5,6 +5,7 @@
   export let isOpen = false;
   let error = null;
   export let data;
+  let localData;
   let flagToSubmit;
   export let user;
   let hints = {};
@@ -21,6 +22,10 @@
   function close() {
     dispatch('close');
   }
+  function setLocal() {
+    localData = data;
+    console.log(localData);
+  }
   async function loadHints() {
       try {
         const response = await fetch(`/api/challenges/hints?id=${data.ID}`);
@@ -28,16 +33,13 @@
   
         
         hints = await response.json();
-        console.log(hints);
       } catch (err) {
         error = err.message;
       }
     }
 async function checkChainCondition() {
-    console.log(data.Chain);
     if (!data.Chain) {
       canSubmit = true;
-      console.log(canSubmit);
       return;
     }
     try {
@@ -59,6 +61,7 @@ async function checkChainCondition() {
     checkChainCondition();
     loadHints(); 
     checkIfStarted();
+    setLocal();
 
     refreshInterval = setInterval(() => {
       checkIfStarted();
@@ -69,7 +72,6 @@ async function checkChainCondition() {
   async function startChallenge() {
     try {
       challengeStarted = true;
-      data.URL = null;
       const response = await fetch("/api/user_made_challenges", {
         method: "POST",
         body: JSON.stringify({
@@ -149,7 +151,9 @@ async function checkChainCondition() {
         }
       });
       flagStatus = await response.json();
-      console.log(flagStatus);
+      if (flagStatus.status === "invalid") {
+        alert(flagStatus.message)
+      }
       if (!response.ok) {
         throw new Error("Flag konnte nicht abgegeben werden.");
       }
@@ -160,10 +164,12 @@ async function checkChainCondition() {
   }
 
   async function submit() {
-    if (data.IsStatic) {
-      submitStatic();
-    } else {
-      submitButton();
+    if(flagToSubmit !== "") {
+      if (data.IsStatic) {
+        submitStatic();
+      } else {
+        submitButton();
+      }
     }
   }
 
@@ -181,7 +187,9 @@ async function checkChainCondition() {
         }
       });
       flagStatus = await response.json();
-      console.log(flagStatus);
+      if (flagStatus.status === "invalid") {
+        alert(flagStatus.message)
+      }
       if (!response.ok) {
         throw new Error(".");
       }
@@ -209,13 +217,13 @@ async function checkChainCondition() {
       if (challenge) {
         challengeStarted = true;
         if (challenge.Url !== "") {
-          data.URL = challenge.Url; // Speichere die URL, falls vorhanden
+          localData.URL = challenge.Url; // Speichere die URL, falls vorhanden
         } else {
-          data.URL = null; // Falls keine URL gesetzt ist
+          localData.URL = null; // Falls keine URL gesetzt ist
         }
     } else {
       challengeStarted = false;
-      data.URL = null;
+      localData.URL = null;
     }
     } catch (err) {
       error = err.message;
@@ -256,13 +264,13 @@ async function checkChainCondition() {
           <p class="text-custom-200 text-2xl">Solved</p>
         </div>
       {:else}
-        <input class="bg-custom-100 border-2 w-2/3 rounded-full px-2 py-1 text-base transition-all duration-300 outline-none {submitFailed ? 'border-red-500' : 'border-custom-200'}" type="text" bind:value={flagToSubmit} placeholder='Enter Flag: FF&#123;...&#125;' on:input={() => submitFailed = false} on:keydown={(event) => { if (event.key === 'Enter') submit(); }}>
-        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={submit}>Submit</button>
+        <input class="bg-custom-100 border-2 w-2/3 rounded-full px-2 py-1 text-base transition-all duration-300 outline-none {submitFailed ? 'border-red-500' : 'border-custom-200'}" type="text" bind:value={flagToSubmit} placeholder='Enter Flag: FF&#123;...&#125;' on:input={() => submitFailed = false}>
+        <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={submit} disabled={!challengeStarted}>Submit</button>
         {#if !challengeStarted}
           <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={startChallenge}>Start</button>
         {:else}
-          {#if data.URL}
-            <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{data.URL}" target="_blank">Open Challenge</a>
+          {#if localData.URL}
+            <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{localData.URL}" target="_blank">Open Challenge</a>
           {:else}
           <button class="text-custom-200 px-2 py-1 text-base w-1/3 flex justify-center items-center" disabled>
             <svg class="animate-spin h-7 w-7 text-custom-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -2,6 +2,9 @@
   import Modal from '$lib/components/Modal.svelte';
   import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
   import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+
 
   export let challenge;
   export let user;
@@ -9,11 +12,11 @@
 
   function openModal() {
     isModalOpen = true;
-    console.log('isModalOpen:', isModalOpen); // Debugging
   }
 
   function closeModal() {
     isModalOpen = false;
+    dispatch('refresh');
   }
 
   function colorPicker(difficulty) {
