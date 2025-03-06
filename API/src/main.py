@@ -917,7 +917,7 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
         raise HTTPException(status_code=400, detail="A challenge for this team already exists.")
 
     # Challenge erstellen
-    db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict())
+    db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict(), StartTime = datetime.now(vienna_timezone))
     try:
         db.add(db_user_made_challenge)
         db.commit()
@@ -954,10 +954,15 @@ def update_user_made_challenge(
         if not is_challenge_solved_by_team(user.TeamsID, challenge.Chain, db):
             raise HTTPException(status_code=400, detail="Referenced challenge in the chain is not solved yet")
 
-    user_made_challenge = db.query(UserMadeChallenge).filter(
-        UserMadeChallenge.User_ID == user_id,
-        UserMadeChallenge.Challenges_ID == challenge_id
-    ).first()
+    team_members = db.query(User).filter(User.TeamsID == user.TeamsID).all()
+
+    user_made_challenge = (
+        db.query(UserMadeChallenge)
+        .filter(UserMadeChallenge.Challenges_ID == challenge_id)
+        .filter(UserMadeChallenge.User_ID.in_([member.ID for member in team_members]))
+        .first()
+    )
+
 
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
@@ -965,18 +970,22 @@ def update_user_made_challenge(
     team = db.query(Team).filter(Team.ID == user.TeamsID).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
-    firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
-                                                    UserMadeChallenge.Firstblood == 1).first()
+
+    firstblood = db.query(UserMadeChallenge).filter(
+        UserMadeChallenge.Challenges_ID == challenge_id,
+        UserMadeChallenge.Firstblood == 1
+    ).first()
 
     if not firstblood and update_data.Solved == 1:
-        user.Points += challenge.Points*0.4
-        team.Points += challenge.Points*0.4
+        user.Points += challenge.Points * 0.4
+        team.Points += challenge.Points * 0.4
         user_made_challenge.Firstblood = 1
         team.FirstBloods += 1
-        teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+
+        # Team-Punkte aktualisieren
         new_teampoints = TeamPoints(
-            TeamID=teampoints.ID,
-            Points=teampoints.Points,
+            TeamID=team.ID,
+            Points=team.Points,
             Teamname=team.Teamname,
             Time=datetime.now(vienna_timezone)
         )
@@ -984,8 +993,8 @@ def update_user_made_challenge(
         db.commit()
         db.refresh(new_teampoints)
         db.refresh(team)
-        
 
+    # Challenge als gelöst markieren
     user_made_challenge.Solved = update_data.Solved
 
     db.commit()
@@ -1295,7 +1304,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 async def admin_panel(db: Session = Depends(get_db)):
     # Fetch valid flag submissions with challenge and team names
     valid_flags = (
-        db.query(FlagSubmission, Team.Teamname, Challenge.ChallengeName, UserMadeChallenge.StartTime, FlagSubmission.submission_time)
+        db.query(FlagSubmission, Team.Teamname, Team.ID, Challenge.ChallengeName, UserMadeChallenge.StartTime, FlagSubmission.submission_time)
         .join(Team, FlagSubmission.team_id == Team.ID)
         .join(User, Team.ID == User.TeamsID)
         .join(UserMadeChallenge, FlagSubmission.challenge_id == UserMadeChallenge.Challenges_ID)
@@ -1310,11 +1319,12 @@ async def admin_panel(db: Session = Depends(get_db)):
         {
             "flag": flag,
             "team_name": team_name,
+            "team_id": team_id,
             "challenge_name": challenge_name,
             "start_time": start_time,
             "time_difference": (submission_time - start_time).total_seconds() // 60
         }
-        for flag, team_name, challenge_name, start_time, submission_time in valid_flags
+        for flag, team_name, team_id, challenge_name, start_time, submission_time in valid_flags
     ]
     
     # Alias the Teams table to avoid duplicate alias error
