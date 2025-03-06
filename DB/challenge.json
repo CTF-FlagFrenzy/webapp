@@ -432,6 +432,8 @@
     "Hint3": "Something went wrong.",
     "Static": "kjasdhasidz8a2e2kwhdoizdshdmas",
     "FormatedChallengeName": "corrupted-file",
+    "Chain": 0,
+    "IsStatic": 0
   },{
     "ID":  31,
     "ChallengeName": "The Neverending Zip",
@@ -444,6 +446,51 @@
     "Hint3": "There are tools that can help with complex archiving tasks... Scripts",
     "Static": "M5OQXpXsE^Us",
     "FormatedChallengeName": "the-neverending-zip",
+    "Chain": 0,
+    "IsStatic": 0
+  },
+  {
+    "ID":  32,
+    "ChallengeName": "Transmission Received",
+    "Categorie": "Forensics",
+    "Points": 1000,
+    "Description": "-",
+    "Difficulty": "Hard",
+    "Hint1": "The signal is not just noise—think about how images can be sent over radio waves.",
+    "Hint2": "Some amateur radio enthusiasts might recognize this type of transmission. Try searching for ways to decode images from sound.",
+    "Hint3": "Think of old-school analog TV signals, but much slower...",
+    "Static": "01JN3EADQF59H8SQ2KDC51V5HW",
+    "FormatedChallengeName": "transmission-received",
+    "Chain": 0,
+    "IsStatic": 0
+  },
+  {
+    "ID":  33,
+    "ChallengeName": "Phantom Prequency",
+    "Categorie": "Forensics",
+    "Points": 500,
+    "Description": "-",
+    "Difficulty": "Medium",
+    "Hint1": "One message is loud, but the real one is much quieter.",
+    "Hint2": "Check frequencies above the audible range.",
+    "Hint3": "A spectrogram will help you see what you can not hear.",
+    "Static": "01JHQ6WHZMBCSEGDTF9Y8YFC99",
+    "FormatedChallengeName": "phantom-frequency",
+    "Chain": 0,
+    "IsStatic": 0
+  },
+  {
+    "ID":  34,
+    "ChallengeName": "PYCked Apart",
+    "Categorie": "Reverse Engineering",
+    "Points": 250,
+    "Description": "-",
+    "Difficulty": "Easy",
+    "Hint1": "Python automatically compiles .py files to .pyc. Maybe you can reverse this process?",
+    "Hint2": "Some tools, like uncompyle6, pycdc or the website pylingual.io, might help you reconstruct the original source code.",
+    "Hint3": "Finding the decompiled code is just the first step. Look at how it interacts with external files to locate the flag!",
+    "Static": "01JEB55RPNPJW08X1GB5SR03DF",
+    "FormatedChallengeName": "pycked-apart",
     "Chain": 0,
     "IsStatic": 0
   }
