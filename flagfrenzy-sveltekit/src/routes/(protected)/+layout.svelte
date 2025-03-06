@@ -74,7 +74,7 @@
       <a href="/team" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/team'}>Team</a>
     </nav>
     {#if user}
-      <button class="hidden lg:block text-custom-200 border-2 border-custom-200 rounded-full px-8 py-2 avatar-{user.Avatar} bg-no-repeat bg-center bg-cover w-16 h-16 mx-4" on:click={toggleMenu2}></button>
+      <button class="hidden lg:block text-custom-200 border-2 border-custom-200 rounded-full px-8 py-2 avatar-{user.user.Avatar} bg-no-repeat bg-center bg-cover w-16 h-16 mx-4" on:click={toggleMenu2}></button>
     {:else}
       <p>Loading user data...</p>
     {/if}
@@ -83,7 +83,7 @@
   {#if isOpen2}
     <nav class="hidden absolute right-0 items-center bg-custom-110 text-custom-200 p-4 z-10 space-y-4 md:block rounded-bl-lg shadow-BackdropShadow3">
       <a href="/profile" class="block text-2xl text-center" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/profile'}>Profile</a>
-      {#if data.adminUser && data.adminUser.includes(user.ID)}
+      {#if data.adminUser && data.adminUser.includes(user.user.ID)}
         <a href="/admin" class="block text-2xl text-center" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/admin'}>Admin</a>
       {/if}
       <button class="text-custom-200 px-4 pb-2 text-2xl block w-full text-center" on:click={()=>window.location.href="/logout"}>Logout</button>

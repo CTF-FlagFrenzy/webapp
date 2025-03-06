@@ -32,10 +32,10 @@
       const userData = await response.json();
       console.log(userData);
       user = userData;
-      Avatar = userData.Avatar;
-      Nickname = userData.Nickname;
-      Email = userData.Email;
-      userID = userData.ID;
+      Avatar = userData.user.Avatar;
+      Nickname = userData.user.Nickname;
+      Email = userData.user.Email;
+      userID = userData.user.ID;
 
     } catch (error) {
       console.error("Fehler beim Fetchen:", error);
@@ -53,7 +53,6 @@
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
         }  
-    
       });
       if (!response.ok) {
         throw new Error("Team konnte nicht beigetreten werden. Bitte überprüfe Teamname und Passwort.");
@@ -93,8 +92,8 @@
   <!-- Ellipse mit Schatten -->
   <ellipse cx="100" cy="50" rx="80" ry="40" fill="#151a22" transform="rotate(20, 100, 50)" filter="url(#hard-shadow)"/>
 
-  <text x="50" y="20" font-size="8" font-weight="bold" fill="#F3CC59" text-anchor="middle">#1</text>
-  <text x="50" y="27" font-size="6" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Cyber Cookies</text>
+  <text x="50" y="20" font-size="8" font-weight="bold" fill="#F3CC59" text-anchor="middle">#{user?.team_placement}</text>
+  <text x="50" y="27" font-size="6" font-weight="bold" fill="#FFFFFF" text-anchor="middle">{user?.team_name}</text>
 
   <!-- Avatar-Bild perfekt in der Ellipse -->
   <foreignObject x="20" y="10" width="160" height="80">
@@ -144,7 +143,7 @@
   </foreignObject>
 
   <!-- Punkte-Anzeige -->
-  <text x="150" y="75" font-size="8" font-weight="bold" fill="#FFFFFF" >{user?.Points}</text>
+  <text x="150" y="75" font-size="8" font-weight="bold" fill="#FFFFFF" >{user?.team_points}</text>
 </svg>
 
 <form on:submit|preventDefault={updateUser} class="px-4 pb-4">
@@ -154,10 +153,10 @@
       <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-white w-5/6 md:w-2/3 lg:w-3/6" type="text" placeholder="Enter Nickname" bind:value={Nickname} />
 
       <h1 class="text-custom-200 text-2xl font-serif font-bold pb-2">Name & Class</h1>
-      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6" type="text" value={user?.ID} readonly />
+      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6" type="text" value={user?.user.ID} readonly />
 
       <h1 class="text-custom-200 text-2xl font-serif font-bold pb-2">Email</h1>
-      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6" type="email" value={user?.Email} readonly />
+      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6" type="email" value={Email} readonly />
       <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-2xl w-5/6 md:w-2/3 lg:w-3/6" type="submit">Save Changes</button>
     </div>
   </div>

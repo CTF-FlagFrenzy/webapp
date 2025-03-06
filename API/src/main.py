@@ -485,7 +485,25 @@ def get_user(user_id: str, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.ID == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+
+    teams_ranked = db.query(Team).order_by(Team.Points.desc()).all()
+    team_ranking = {team.ID: rank + 1 for rank, team in enumerate(teams_ranked)}
+
+    team_points = team.Points
+    team_name = team.Teamname
+    team_placement = team_ranking.get(team.ID, None)  
+
+    return {
+        "user": user,
+        "team_id": user.TeamsID,
+        "team_name": team_name,
+        "team_points": team_points,
+        "team_placement": team_placement
+    }
 
 
 @app.post("/users/")
