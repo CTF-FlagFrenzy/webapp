@@ -900,6 +900,23 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
     """
     Create a new user-made challenge.
     """
+    user = db.query(User).filter(User.ID == user_made_challenge.User_ID).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    existing_challenge = (
+        db.query(UserMadeChallenge)
+        .join(User, User.ID == UserMadeChallenge.User_ID) 
+        .join(Challenge, Challenge.ID == UserMadeChallenge.Challenges_ID)
+        .filter(User.TeamsID == user.TeamsID) 
+        .filter(Challenge.ID == user_made_challenge.Challenges_ID)
+        .first()
+    )
+    
+    if existing_challenge:
+        raise HTTPException(status_code=400, detail="A challenge for this team already exists.")
+
+    # Challenge erstellen
     db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict())
     try:
         db.add(db_user_made_challenge)
@@ -912,8 +929,8 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
         )
     except Exception as ex:
         raise HTTPException(status_code=422, detail=str(ex))
-    return db_user_made_challenge
 
+    return db_user_made_challenge
 
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
 def update_user_made_challenge(
