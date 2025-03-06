@@ -289,7 +289,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "R2LQXpy^Us",
     "FormatedChallengeName": "hidden-job",
-    "Chain": 0, 
+    "Chain": "Hidden Job - Part 2", 
     "IsStatic": 0
 
   },
@@ -305,8 +305,8 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
-    "Chain": 0, 
-    "IsStatic": 0
+    "Chain": "Hidden Job - Part 3", 
+    "IsStatic": 1
 
   },{
     "ID":  22,
@@ -432,8 +432,19 @@
     "Hint3": "x",
     "Static": "kjasdhasidz8a2e2kwhdoizdshdmas",
     "FormatedChallengeName": "corrupted-file",
+  },{
+    "ID":  31,
+    "ChallengeName": "The Neverending Zip",
+    "Categorie": "Forensics",
+    "Points": 500,
+    "Description": "A seemingly simple zip archive hides a secret, but it's buried deep... really deep. Can you unravel the onion and reach the core?",
+    "Difficulty": "Easy",
+    "Hint1": "Consider how to handle tasks that repeat.",
+    "Hint2": "Time is a factor.",
+    "Hint3": "There are tools that can help with complex archiving tasks... Scripts",
+    "Static": "M5OQXpXsE^Us",
+    "FormatedChallengeName": "the-neverending-zip",
     "Chain": 0,
     "IsStatic": 0
   }
-
 ]
