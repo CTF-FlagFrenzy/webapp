@@ -27,7 +27,7 @@
         }  
       });
       if (!response.ok) {
-        throw new Error("Team konnte nicht beigetreten werden. Bitte überprüfe Teamname und Passwort.");
+        throw new Error("Could not join team. Please check team name and password.");
       }
     } catch (error) {
       errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
@@ -49,7 +49,7 @@
         }
       });
       if (!response.ok) {
-        throw new Error("Team konnte nicht erstellt werden. Bitte überprüfe den Teamname.");
+        throw new Error("Team could not be created. Please check the team name.");
       }
       await joinTeam()
       dispatch('teamCreated');

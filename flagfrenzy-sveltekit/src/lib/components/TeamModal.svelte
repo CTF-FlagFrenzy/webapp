@@ -36,7 +36,7 @@
         }  
       });
       if (!response.ok) {
-        throw new Error("Team konnte nicht beigetreten werden. Bitte überprüfe Teamname und Passwort.");
+        throw new Error("Could not join team. Please check team name and password.");
       }
       dispatch('teamDeleted');
       close();

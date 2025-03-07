@@ -765,9 +765,9 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     hint3_time = datetime.strptime("12:00", "%H:%M").time()
 
     hints = {
-        'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 wird um 10 Uhr verfügbar sein.",
-        'Hint2': challenge.Hint2 if current_time >= hint2_time else "Hint2 wird um 11 Uhr verfügbar sein.",
-        'Hint3': challenge.Hint3 if current_time >= hint3_time else "Hint3 wird um 12 Uhr verfügbar sein."
+        'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 will be available at 10am.",
+        'Hint2': challenge.Hint2 if current_time >= hint2_time else "Hint2 will be available at 11am.",
+        'Hint3': challenge.Hint3 if current_time >= hint3_time else "Hint3 will be available at 12am."
     }
     
     return hints
