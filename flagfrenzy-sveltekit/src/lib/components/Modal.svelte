@@ -43,7 +43,7 @@ async function checkChainCondition() {
       return;
     }
     try {
-        const teamResponse = await fetch(`/api/user_made_challenges/challenge?id=${user.TeamsID}&challenge_id=${data.Chain}`);
+        const teamResponse = await fetch(`/api/user_made_challenges/challenge?id=${user.user.TeamsID}&challenge_id=${data.Chain}`);
         if (teamResponse.ok) {
           const teamChallenge = await teamResponse.json();
           canSubmit = teamChallenge.solved;
@@ -76,7 +76,7 @@ async function checkChainCondition() {
         method: "POST",
         body: JSON.stringify({
           Challenges_ID: data.ID,
-          User_ID: user.ID
+          User_ID: user.user.ID
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
@@ -93,7 +93,7 @@ async function checkChainCondition() {
   }
   async function deploy() {
     try {
-      const response = await fetch(`/api/cluster?user_id=${user.ID}&challenge_id=${data.ID}`, {
+      const response = await fetch(`/api/cluster?user_id=${user.user.ID}&challenge_id=${data.ID}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
@@ -117,7 +117,7 @@ async function checkChainCondition() {
       submitFailed = true;
     }
     try {
-      const response = await fetch(`/api/user_made_challenges?id=${user.ID}&challenge_id=${data.ID}`, {
+      const response = await fetch(`/api/user_made_challenges?id=${user.user.ID}&challenge_id=${data.ID}`, {
         method: "PUT",
         body: JSON.stringify({
           Solved: solved
@@ -143,7 +143,7 @@ async function checkChainCondition() {
         method: "POST",
         body: JSON.stringify({
           ChallengeID: data.ID,
-          UserID: user.ID,
+          UserID: user.user.ID,
           Flag: flagToSubmit
         }),
         headers: {
@@ -179,7 +179,7 @@ async function checkChainCondition() {
         method: "POST",
         body: JSON.stringify({
           ChallengeID: data.ID, 
-          user_id: user.ID,
+          user_id: user.user.ID,
           Flag: flagToSubmit
         }),
         headers: {
@@ -209,7 +209,7 @@ async function checkChainCondition() {
   
   async function checkIfStarted() {
     try {
-      const response = await fetch(`/api/user_made_challenges?id=${user.TeamsID}`);
+      const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`);
       if (!response.ok) throw new Error("Failed to load user_made_challenges");
 
       user_made_challenges = await response.json();
