@@ -684,8 +684,7 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
-    # if not is_not_allowed_time():
-    #     raise HTTPException(status_code=403, detail="The Event hasn't started yet")
+    
     team = db.query(Team).filter(Team.ID == teams_id).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -713,6 +712,10 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
 
     # Convert to JSON format with category names as keys and include 'solved' status
     categorized_challenges_json = {}
+    adminUser = ["PINTER Elias, 5AHITS", "STURM Leon Attila, 5BHITS", "PLONER Fabian, 5AHITS", "HUBER Julian, 5AHITS", "BROWN Ilaria, 5BHITS","KAVALAR Johannes, 5AHITS", "FLASCHBERGER Florian, 5AHITS", "HAFNER Florian, 5AHITS", "ROMAUCH Daniel, 5AHITS"]
+    is_admin = any(user.ID in adminUser for user in users)
+    if not is_not_allowed_time() and not is_admin:
+        raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     for category, challenges in categorized_challenges.items():
         challenges_json = [
             {

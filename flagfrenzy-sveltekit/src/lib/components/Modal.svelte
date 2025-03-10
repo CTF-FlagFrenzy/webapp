@@ -85,7 +85,7 @@ async function checkChainCondition() {
       checkChainCondition();
       deploy();
       if (!response.ok) {
-        throw new Error("Challenge konnte nicht gestartet werden.");
+        throw new Error("Challenge could not be started.");
       }
     } catch (error) {
       console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
