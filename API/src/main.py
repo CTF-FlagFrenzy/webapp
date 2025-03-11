@@ -1058,7 +1058,7 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
         ).all()
     else:
         teamPoints = db.query(TeamPointsUser).filter(
-            cast(TeamPointsUser.Time, Time) < "19:30:00"
+            cast(TeamPointsUser.Time, Time) < "14:30:00"
         ).all()
     return teamPoints
 
