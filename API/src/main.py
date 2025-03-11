@@ -29,7 +29,7 @@ import json
 
 start_time = time(9, 0)  
 end_time = time(15, 0) 
-allowed_date = date(2025, 3, 20)
+allowed_date = date(2025, 3, 11)
 vienna_timezone = ZoneInfo("Europe/Vienna")
 def is_not_allowed_time():
     current_time = datetime.now(vienna_timezone).time()  
@@ -66,9 +66,9 @@ async def background_task():
     while True:
         now = datetime.now(vienna_timezone).time()
         current_date = datetime.now().date()  
-        if current_date == allowed_date and now >= time(9, 0):  
+        if current_date == allowed_date or current_date == date(2025,3,13) and now >= time(9, 0):  
             insert_teampoints()
-        await asyncio.sleep(600)  
+        await asyncio.sleep(60)  
 
 
 @app.on_event("startup")
@@ -1058,7 +1058,7 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
         ).all()
     else:
         teamPoints = db.query(TeamPointsUser).filter(
-            cast(TeamPointsUser.Time, Time) < "14:30:00"
+            cast(TeamPointsUser.Time, Time) < "19:30:00"
         ).all()
     return teamPoints
 
