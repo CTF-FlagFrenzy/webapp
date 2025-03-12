@@ -113,7 +113,7 @@
   <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 rounded-lg z-20 max-h-3/5 max-w-2xl w-11/12 bg-custom-110 card-Team text-white">
     <button class="absolute top-2.5 right-2.5 text-xl cursor-pointer bg-none" on:click={close}>✖</button>
     <div class="flex justify-between pb-4">
-      <h2 class="text-3xl text-white">{teamdata.Teamname}</h2>
+      <h2 class="text-3xl text-white w-[350px]">{teamdata.Teamname}</h2>
       <h3 class="text-2xl mr-4">Points: {teamdata.Points}</h3>
     </div>
     <table class="styled-table w-full mb-4 table-fixed">
