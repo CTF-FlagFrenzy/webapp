@@ -76,8 +76,8 @@
   <div class="fixed inset-0 bg-black bg-opacity-75 z-10" on:click={close} tabindex="0" role="button" ></div>
   <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-8 rounded-lg z-20 max-h-3/5 max-w-2xl w-11/12 bg-custom-110 card-Default text-white">
     <button class="absolute top-2.5 right-2.5 text-xl cursor-pointer bg-none" on:click={close}>✖</button>
-    <div class="flex justify-between pb-4">
-      <h2 class="text-3xl">Create a Team</h2>
+    <div class="flex justify-center items-center pb-4">
+      <h2 class="text-3xl text-center">Create a Team</h2>
     </div>
     <div class="flex flex-col justify-center items-center">
         <form class="py-4">
