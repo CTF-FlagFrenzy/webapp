@@ -68,7 +68,7 @@ async def background_task():
         current_date = datetime.now().date()  
         if current_date == allowed_date or current_date == date(2025,3,13) and now >= time(9, 0):  
             insert_teampoints()
-        await asyncio.sleep(60)  
+        await asyncio.sleep(600)  
 
 
 @app.on_event("startup")
