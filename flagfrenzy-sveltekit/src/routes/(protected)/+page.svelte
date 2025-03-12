@@ -11,33 +11,33 @@
         },
         {
             text: "A heartfelt thank you to Barmherzige Brüder for supporting the third-place team with amazing prizes! Your generosity helps us recognize and reward excellence in cybersecurity, making this competition even more exciting. We truly appreciate your support!",
-            logo: "/images/barmherzige_brueder_logo.png",
+            logo: "/images/Logo_BHB_IT-Services.png",
             bg: "/images/Queen.png",
-            url: "https://www.bpn-group.com/de/"
+            url: "https://www.barmherzige-brueder.at/portal/itservices/home"
         },
         {
             text: "We sincerely appreciate Spar ICS for supporting our competition and ensuring that the second-place team is recognized with fantastic prizes. Your generosity in providing financial support for merchandise further enhances the experience for all participants. Thank you for investing in the future of cybersecurity!",
             logo: "/images/spar_ics_logo.png",
             bg: "/images/Spy.png",
-            url: "https://www.bpn-group.com/de/"
+            url: "https://www.spar-ics.com"
         },
         {
             text: "A big shoutout to NTS for rewarding the third-place team and going the extra mile by offering financial support for merchandise or even travel expenses for ACSC 2025! Your contribution makes a real difference in inspiring the next generation of cybersecurity professionals. Thank you for your generosity!",
-            logo: "/images/nts_logo.png",
+            logo: "/images/Logo_NTS_Combo1_2017_RGB_White.png",
             bg: "/images/Warrior.png",
-            url: "https://www.bpn-group.com/de/"
+            url: "https://www.nts.eu"
         },
         {
-            text: "We are incredibly grateful to Kelag for recognizing young talent by awarding prizes to the first-place team in the junior category. Your additional support for ACSC 2025 travel expenses and merchandise funding helps ensure that aspiring cybersecurity enthusiasts have the best possible opportunities. Thank you for your commitment!",
-            logo: "/images/kelag_logo.svg",
+            text: "We are incredibly grateful to 5 min for recognizing young talent by awarding prizes to the first-place team in the junior category. Your additional support for ACSC 2025 travel expenses and merchandise funding helps ensure that aspiring cybersecurity enthusiasts have the best possible opportunities. Thank you for your commitment!",
+            logo: "/images/logo_5_min.png",
             bg: "/images/Hacker.png",
-            url: "https://www.bpn-group.com/de/"
+            url: "https://www.5min.at/"
         },
         {
             text: "A massive thank you to 3Banken for helping make FlagFrenzy an unforgettable experience! Your contribution toward travel expenses for ACSC 2025 and merchandise support ensures that participants can continue to grow and develop their cybersecurity skills beyond the competition. Your generosity means the world to us!",
             logo: "/images/3_banken_logo.svg",
             bg: "/images/3_banken_bg.png",
-            url: "https://www.bpn-group.com/de/"
+            url: "https://www.3bankenit.at/"
         }
     ]);
     let currentSlide = writable(0);
@@ -81,7 +81,7 @@
         {#each $slides as slide, i}
             <div class="absolute grid grid-cols-1 lg:grid-cols-2 w-full h-full justify-between items-center p-5 transition-opacity duration-500 bg-cover bg-center" style="background-image: url({slide.bg}); opacity: {i === $currentSlide ? 1 : 0};">
                 <div class="absolute inset-0 bg-custom-100 opacity-80"></div>
-                <div class="relative z-10 text-lg font-bold text-white px-10 shadow-md text-justify">{slide.text}</div>
+                <div class="relative z-10 text-lg font-bold text-white px-10 text-justify">{slide.text}</div>
                 <a href={slide.url} class="z-10 flex justify-center items-center w-full h-full">
                     <img class="max-h-[80px]" src={slide.logo} alt="Slide Logo">
                 </a>
