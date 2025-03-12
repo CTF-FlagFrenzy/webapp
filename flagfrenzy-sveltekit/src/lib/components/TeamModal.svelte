@@ -36,7 +36,7 @@
         }  
       });
       if (!response.ok) {
-        throw new Error("Could not join team. Please check team name and password.");
+        throw new Error("Could not join team. Please check the password.");
       }
       password="";
       dispatch('teamDeleted');
@@ -55,11 +55,12 @@
                 "Content-Type": "application/json; charset=UTF-8",
             },
         });
-        if (response.ok) {
-          password="";
-          dispatch('teamDeleted');
-          close();
-        } 
+        if (!response.ok) {
+          throw new Error("Could not delete team. Please check the password.");
+        }
+        password="";
+        dispatch('teamDeleted');
+        close();
     } catch (error) {
       errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
       password="";
@@ -73,11 +74,12 @@
                 "Content-Type": "application/json; charset=UTF-8",
             },
         });
-        if (response.ok) {
-          password="";
-          dispatch('teamDeleted');
-          close();
-        } 
+        if (!response.ok) {
+          throw new Error("Could not leave team. Please check the password.");
+        }
+        password="";
+        dispatch('teamDeleted');
+        close();
     } catch (error) {
       errorMessage = error.message || "Es ist ein unbekannter Fehler aufgetreten.";
       password="";
@@ -139,11 +141,11 @@
         <form class="flex flex-row">
           {#if data.username == teamdata.TeamLeader}
             <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="password" placeholder="Password" bind:value={password} required on:input={() => errorMessage = ""}>
-            <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 ml-4" on:click={deleteTeam()}>Delete</button>
+            <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 ml-4" on:click={deleteTeam}>Delete</button>
           {:else if teamdata.Members.some(member => member.ID === data.username)}
             <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="password" placeholder="Password" bind:value={password} required on:input={() => errorMessage = ""}>
             <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 ml-4" type="submit" on:click={leaveTeam}>Leave</button>
-          {:else}
+          {:else if teamdata.Members.length < 4}
             <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="password" placeholder="Password" bind:value={password} required on:input={() => errorMessage = ""}>
             <button class="text-custom-200 border-2 border-custom-200 rounded-2xl ml-4 px-2 py-1 text-xl w-1/3 text-center" type="submit" on:click={joinTeam}>Join</button>
           {/if}
