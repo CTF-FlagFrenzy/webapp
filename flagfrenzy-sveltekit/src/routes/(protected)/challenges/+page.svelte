@@ -98,7 +98,7 @@
 {:else if challengesByCategory}
   <div class="pt-8 w-full">
     {#each Object.keys(challengesByCategory) as category}
-      <h1 class="text-whita text-4xl font-serif font-bold pt-4 text-center md:text-5xl">{category}</h1>
+      <h1 class="text-whita text-4xl font-bold pt-4 text-center md:text-5xl">{category}</h1>
       
       <div class="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 w-full px-8 relative">
         <hr class="border-t-2 border-custom-200 opacity-80 my-4 sm:col-start-1 sm:col-end-3 sm:w-full sm:mx-auto md:col-start-2 md:col-end-[-2] md:w-full lg:col-start-2 lg:col-end-[-2]">

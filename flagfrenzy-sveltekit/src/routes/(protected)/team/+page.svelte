@@ -64,7 +64,7 @@
 </script>
 <div class="custom-h-screen">
 <div class="mx-4 md:!mx-52 flex flex-col mb-16 justify-around">
-  <h1 class="text-whita text-4xl font-serif font-bold pt-4 text-center md:text-5xl mt-8 mb-4">Teams</h1>
+  <h1 class="text-whita text-4xl font-bold pt-4 text-center md:text-5xl mt-8 mb-4">Teams</h1>
   <div class="w-full items-center flex justify-around">
     <div class="py-4 flex flex-row justify-around w-full md:!w-1/2 gap-1 md:!gap-3.5">
       <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-3/7 md:!w-2/6 lg:!w-3/6 xl:!w-3/5" type="text" placeholder="Search a team" bind:value={search}>
