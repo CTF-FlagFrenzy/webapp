@@ -69,7 +69,7 @@
         <ul class="text-white w-2/4">
           <li><a href="/">NTS</a></li>
           <li><a href="/">Spar ICS</a></li>
-          <li><a href="/">Kelag</a></li>
+          <li><a href="/">5 Min</a></li>
         </ul>
       </div>
     </div>
