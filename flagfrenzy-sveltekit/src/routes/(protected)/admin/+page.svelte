@@ -98,9 +98,12 @@
         <thead>
             <tr class="bg-gray-800">
                 <th class="border border-gray-700 px-4 py-2">Team</th>
-                <th class="border border-gray-700 px-4 py-2">Challengename</th>
-                <th class="border border-gray-700 px-4 py-2">Starttime</th>
+                <th class="border border-gray-700 px-4 py-2">TeamID</th>
 
+                <th class="border border-gray-700 px-4 py-2">Challenge Difficulty</th>
+                <th class="border border-gray-700 px-4 py-2">Challengename</th>
+
+                <th class="border border-gray-700 px-4 py-2">Starttime</th>
                 <th class="border border-gray-700 px-4 py-2">Submission Time</th>
                 <th class="border border-gray-700 px-4 py-2">Time Difference</th>
 
@@ -111,7 +114,11 @@
             {#each (allFlags && allFlags.valid_flags) || [] as entry}
     <tr class="bg-gray-900 border-b border-gray-700">
         <td class="border border-gray-700 px-4 py-2">{entry.team_name}</td>
+        <td class="border border-gray-700 px-4 py-2">{entry.team_id}</td>
+
         <td class="border border-gray-700 px-4 py-2">{entry.challenge_name}</td>
+                <td class="border border-gray-700 px-4 py-2">{entry.challenge_difficulty}</td>
+
         <td class="border border-gray-700 px-4 py-2">{new Date(entry.start_time).toLocaleString()}</td>
 
         <td class="border border-gray-700 px-4 py-2">{new Date(entry.flag.submission_time).toLocaleString()}</td>

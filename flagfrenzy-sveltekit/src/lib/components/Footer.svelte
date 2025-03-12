@@ -41,7 +41,7 @@
             </div>
           </div>
         </div>
-        <a class="bg-green-500 rounded-md text-sm font-semibold hover:bg-green-600 transition text-white px-2 py-2 sm:!px-4 md:!px-4 lg:!px-2 xl:!px-4 " href="https://discord.gg/HgxWtFJT">Join</a>
+        <a class="bg-green-500 rounded-md text-sm font-semibold hover:bg-green-600 transition text-white px-2 py-2 sm:!px-4 md:!px-4 lg:!px-2 xl:!px-4 " href="https://discord.gg/Wns7pxwJKF">Join</a>
       </div>
     </div>
 	</div>
@@ -69,7 +69,7 @@
         <ul class="text-white w-2/4">
           <li><a href="/">NTS</a></li>
           <li><a href="/">Spar ICS</a></li>
-          <li><a href="/">Kelag</a></li>
+          <li><a href="/">5 Min</a></li>
         </ul>
       </div>
     </div>

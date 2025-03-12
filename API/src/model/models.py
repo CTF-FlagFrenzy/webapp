@@ -67,7 +67,7 @@ class User(Base):
     __tablename__ = "User"
 
     ID = Column(String(150), primary_key=True)
-    Nickname = Column(String(50), nullable=False)
+    Nickname = Column(String(30), nullable=False)
     Points = Column(Float, default=0)
     TeamsID = Column(Integer, ForeignKey("Teams.ID"), nullable=True)
     Email = Column(String(50), nullable=False)

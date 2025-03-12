@@ -9,6 +9,7 @@
   export let data;
   let user = {};
   let user_made_challenges = {};
+  let teamsID;
 
   async function getUser() {
     try {
@@ -26,6 +27,7 @@
       const userData = await response.json();
 
       user = userData;
+      teamsID = user.user.TeamsID;
 
     } catch (error) {
       console.error("Fehler beim Fetchen:", error);
@@ -34,7 +36,7 @@
 
   async function loadUsermadeChallenges() {
     try {
-      const response = await fetch(`/api/user_made_challenges?id=${user.TeamsID}`);
+      const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`);
       if (!response.ok) throw new Error("Failed to load user_made_challenges");
 
       user_made_challenges = await response.json();
@@ -44,7 +46,7 @@
   }
   async function loadChallenges() {
     try {
-      const response = await fetch(`/api/challenges?id=${user.TeamsID}`);
+      const response = await fetch(`/api/challenges?id=${user.user.TeamsID}`);
       if (!response.ok) throw new Error("Failed to load challenges");
 
       const rawChallengesByCategory = await response.json();
@@ -85,7 +87,7 @@
     if (interval) clearInterval(interval); // Ensure interval is cleared
   });
 </script>
-{#if !user.TeamsID}
+{#if !teamsID}
   <div class="flex justify-center h-screen items-center">
     <h1 class="text-4xl">Join a Team first.</h1>
   </div>

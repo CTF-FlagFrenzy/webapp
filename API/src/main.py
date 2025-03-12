@@ -66,7 +66,7 @@ async def background_task():
     while True:
         now = datetime.now(vienna_timezone).time()
         current_date = datetime.now().date()  
-        if current_date == allowed_date and now >= time(9, 0):  
+        if current_date == allowed_date or current_date == date(2025,3,13) and now >= time(9, 0):  
             insert_teampoints()
         await asyncio.sleep(600)  
 
@@ -485,7 +485,27 @@ def get_user(user_id: str, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.ID == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+
+    team = db.query(Team).filter(Team.ID == user.TeamsID).first()
+    
+    if not team:
+        return {
+            "user": user
+        }
+    teams_ranked = db.query(Team).order_by(Team.Points.desc()).all()
+    team_ranking = {team.ID: rank + 1 for rank, team in enumerate(teams_ranked)}
+
+    team_points = team.Points
+    team_name = team.Teamname
+    team_placement = team_ranking.get(team.ID, None)  
+
+    return {
+        "user": user,
+        "team_id": user.TeamsID,
+        "team_name": team_name,
+        "team_points": team_points,
+        "team_placement": team_placement
+    }
 
 
 @app.post("/users/")
@@ -666,8 +686,7 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
     """
     Retrieve all challenges, sorted by difficulty, and grouped by category.
     """
-    # if not is_not_allowed_time():
-    #     raise HTTPException(status_code=403, detail="The Event hasn't started yet")
+    
     team = db.query(Team).filter(Team.ID == teams_id).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -695,6 +714,10 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
 
     # Convert to JSON format with category names as keys and include 'solved' status
     categorized_challenges_json = {}
+    adminUser = ["PINTER Elias, 5AHITS", "STURM Leon Attila, 5BHITS", "PLONER Fabian, 5AHITS", "HUBER Julian, 5AHITS", "BROWN Ilaria, 5BHITS","KAVALAR Johannes, 5AHITS", "FLASCHBERGER Florian, 5AHITS", "HAFNER Florian, 5AHITS", "ROMAUCH Daniel, 5AHITS"]
+    is_admin = any(user.ID in adminUser for user in users)
+    if not is_not_allowed_time() and not is_admin:
+        raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     for category, challenges in categorized_challenges.items():
         challenges_json = [
             {
@@ -747,9 +770,9 @@ def get_challenge_hints(challenge_id: int, db: Session = Depends(get_db)):
     hint3_time = datetime.strptime("12:00", "%H:%M").time()
 
     hints = {
-        'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 wird um 10 Uhr verfügbar sein.",
-        'Hint2': challenge.Hint2 if current_time >= hint2_time else "Hint2 wird um 11 Uhr verfügbar sein.",
-        'Hint3': challenge.Hint3 if current_time >= hint3_time else "Hint3 wird um 12 Uhr verfügbar sein."
+        'Hint1': challenge.Hint1 if current_time >= hint1_time else "Hint1 will be available at 10am.",
+        'Hint2': challenge.Hint2 if current_time >= hint2_time else "Hint2 will be available at 11am.",
+        'Hint3': challenge.Hint3 if current_time >= hint3_time else "Hint3 will be available at 12am."
     }
     
     return hints
@@ -899,8 +922,25 @@ def get_user_made_challenges(teams_id: int, db: Session = Depends(get_db)):
 def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db: Session = Depends(get_db)):
     """
     Create a new user-made challenge.
-    """    
-    db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict(), StartTime=datetime.now(vienna_timezone))
+    """
+    user = db.query(User).filter(User.ID == user_made_challenge.User_ID).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    existing_challenge = (
+        db.query(UserMadeChallenge)
+        .join(User, User.ID == UserMadeChallenge.User_ID) 
+        .join(Challenge, Challenge.ID == UserMadeChallenge.Challenges_ID)
+        .filter(User.TeamsID == user.TeamsID) 
+        .filter(Challenge.ID == user_made_challenge.Challenges_ID)
+        .first()
+    )
+    
+    if existing_challenge:
+        raise HTTPException(status_code=400, detail="A challenge for this team already exists.")
+
+    # Challenge erstellen
+    db_user_made_challenge = UserMadeChallenge(**user_made_challenge.dict(), StartTime = datetime.now(vienna_timezone))
     try:
         db.add(db_user_made_challenge)
         db.commit()
@@ -912,8 +952,8 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
         )
     except Exception as ex:
         raise HTTPException(status_code=422, detail=str(ex))
-    return db_user_made_challenge
 
+    return db_user_made_challenge
 
 @app.put("/user-made-challenges/{user_id}/{challenge_id}")
 def update_user_made_challenge(
@@ -937,10 +977,15 @@ def update_user_made_challenge(
         if not is_challenge_solved_by_team(user.TeamsID, challenge.Chain, db):
             raise HTTPException(status_code=400, detail="Referenced challenge in the chain is not solved yet")
 
-    user_made_challenge = db.query(UserMadeChallenge).filter(
-        UserMadeChallenge.User_ID == user_id,
-        UserMadeChallenge.Challenges_ID == challenge_id
-    ).first()
+    team_members = db.query(User).filter(User.TeamsID == user.TeamsID).all()
+
+    user_made_challenge = (
+        db.query(UserMadeChallenge)
+        .filter(UserMadeChallenge.Challenges_ID == challenge_id)
+        .filter(UserMadeChallenge.User_ID.in_([member.ID for member in team_members]))
+        .first()
+    )
+
 
     if not user_made_challenge:
         raise HTTPException(status_code=404, detail="User-made challenge not found")
@@ -948,18 +993,22 @@ def update_user_made_challenge(
     team = db.query(Team).filter(Team.ID == user.TeamsID).first()
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
-    firstblood = db.query(UserMadeChallenge).filter(UserMadeChallenge.Challenges_ID == challenge_id,
-                                                    UserMadeChallenge.Firstblood == 1).first()
+
+    firstblood = db.query(UserMadeChallenge).filter(
+        UserMadeChallenge.Challenges_ID == challenge_id,
+        UserMadeChallenge.Firstblood == 1
+    ).first()
 
     if not firstblood and update_data.Solved == 1:
-        user.Points += challenge.Points*0.4
-        team.Points += challenge.Points*0.4
+        user.Points += challenge.Points * 0.4
+        team.Points += challenge.Points * 0.4
         user_made_challenge.Firstblood = 1
         team.FirstBloods += 1
-        teampoints = db.query(Team).filter(Team.ID == team.ID).first()
+
+        # Team-Punkte aktualisieren
         new_teampoints = TeamPoints(
-            TeamID=teampoints.ID,
-            Points=teampoints.Points,
+            TeamID=team.ID,
+            Points=team.Points,
             Teamname=team.Teamname,
             Time=datetime.now(vienna_timezone)
         )
@@ -967,8 +1016,8 @@ def update_user_made_challenge(
         db.commit()
         db.refresh(new_teampoints)
         db.refresh(team)
-        
 
+    # Challenge als gelöst markieren
     user_made_challenge.Solved = update_data.Solved
 
     db.commit()
@@ -1278,7 +1327,7 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 async def admin_panel(db: Session = Depends(get_db)):
     # Fetch valid flag submissions with challenge and team names
     valid_flags = (
-        db.query(FlagSubmission, Team.Teamname, Challenge.ChallengeName, UserMadeChallenge.StartTime, FlagSubmission.submission_time)
+        db.query(FlagSubmission, Team.Teamname, Team.ID, Challenge.ChallengeName, UserMadeChallenge.StartTime, FlagSubmission.submission_time, Challenge.Difficulty)
         .join(Team, FlagSubmission.team_id == Team.ID)
         .join(User, Team.ID == User.TeamsID)
         .join(UserMadeChallenge, FlagSubmission.challenge_id == UserMadeChallenge.Challenges_ID)
@@ -1293,11 +1342,13 @@ async def admin_panel(db: Session = Depends(get_db)):
         {
             "flag": flag,
             "team_name": team_name,
+            "team_id": team_id,
             "challenge_name": challenge_name,
+            "challenge_difficulty": challenge_difficulty,
             "start_time": start_time,
             "time_difference": (submission_time - start_time).total_seconds() // 60
         }
-        for flag, team_name, challenge_name, start_time, submission_time in valid_flags
+        for flag, team_name, team_id, challenge_name, start_time, submission_time, challenge_difficulty in valid_flags
     ]
     
     # Alias the Teams table to avoid duplicate alias error

@@ -1,9 +1,9 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { writable } from 'svelte/store';
 
   export let data;
-  let Avatar, Nickname = '';
+  let Avatar, Nickname, Email, userID = '';
   let avatars = [
       '/images/Hero.png',
       '/images/Hacker.png',
@@ -14,6 +14,7 @@
   ];
   let currentIndex = 0;
   let user;
+  let shadow;
 
 
   async function getUser() {
@@ -30,9 +31,12 @@
       }
 
       const userData = await response.json();
+      console.log(userData);
       user = userData;
-      Avatar = userData.Avatar;
-      Nickname = userData.Nickname;
+      Avatar = userData.user.Avatar;
+      Nickname = userData.user.Nickname;
+      Email = userData.user.Email;
+      userID = userData.user.ID.split(",")[0];
 
     } catch (error) {
       console.error("Fehler beim Fetchen:", error);
@@ -50,7 +54,6 @@
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
         }  
-    
       });
       if (!response.ok) {
         throw new Error("Team konnte nicht beigetreten werden. Bitte überprüfe Teamname und Passwort.");
@@ -67,6 +70,22 @@
     Avatar = fullPath.replace('/images/', '').replace('.png', '');
   }
 
+  function getShadowFilter() {
+    if(Avatar == "Hero") {
+      shadow = 'purple-shadow';
+    } else if(Avatar == "Hacker") {
+      shadow = 'orange-shadow';
+    } else if(Avatar == "Queen") {
+      shadow = 'purple-shadow';
+    } else if(Avatar == "Anonymous") {
+      shadow = 'green-shadow';
+    } else if(Avatar == "Spy") {
+      shadow = 'red-shadow';
+    } else if(Avatar == "Warrior") {
+      shadow = 'white-shadow';
+    }
+  }
+
   onMount(async () => {
     await getUser();
     if (Avatar) {
@@ -75,42 +94,101 @@
       if (foundIndex !== -1) {
         currentIndex = foundIndex;
       }
+      getShadowFilter();
     }
   });
 </script>
 
-<h1 class="text-custom-200 text-2xl font-serif font-bold pt-4 px-4 text-center">Profile Settings</h1>
-<form on:submit|preventDefault={updateUser} class="px-4 pb-4">
-  <div class="gap-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-    <div class="relative w-full flex justify-center">
-      <div class="relative w-4/5">
-        <img src={avatars[currentIndex]} alt="Avatar Vorschau" class="w-full border-2 border-custom-200 rounded-2xl" />
-        <button type="button"
-          class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-opacity-70"
-          on:click={() => selectAvatar((currentIndex - 1 + avatars.length) % avatars.length)}>
-          &lt;
+<h1 class="text-white text-4xl font-bold pt-4 px-4 text-center mb-4">Profile</h1>
+<div class="flex flex-col justify-center items-center text-center">
+  <svg width="95%" height="100%" viewBox="0 0 200 120" class="md:mx-4">
+    <defs>
+      <filter id="red-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#F35977" flood-opacity="1"/>
+      </filter>
+      <filter id="green-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#59F359" flood-opacity="1"/>
+      </filter>
+      <filter id="purple-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#B259F3" flood-opacity="1"/>
+      </filter>
+      <filter id="orange-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#FF962E" flood-opacity="1"/>
+      </filter>
+      <filter id="white-shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#A5A2A2" flood-opacity="1"/>
+      </filter>
+    </defs>
+
+    <!-- Ellipse with shadow -->
+    <ellipse cx="100" cy="50" rx="80" ry="40" fill="#151a22" transform="rotate(20, 100, 50)" filter="url(#{shadow})"/>
+    <!-- Teamname and Place -->
+    <text x="50" y="20" font-size="7" font-weight="bold" fill="#F3CC59" text-anchor="middle">#{user?.team_placement}</text>
+    <text x="50" y="27" font-size="6" font-weight="bold" fill="#FFFFFF" text-anchor="middle" class="fonts-test">{user?.team_name}</text>
+
+    <!-- Avatar-Bild perfekt in der Ellipse -->
+    <foreignObject x="20" y="10" width="160" height="80">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="relative w-full h-full flex items-center justify-center">
+        <img src="{avatars[currentIndex]}" alt="Avatar Vorschau" class="w-auto h-auto max-w-[80%] max-h-[80%] rounded-full"/>
+        
+        <!-- Left Button -->
+        <button type="button" style="font-size: 4px;"
+            class="absolute left-[50px] top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full w-[6px] h-[6px] flex items-center justify-center"
+            on:click={() => selectAvatar((currentIndex - 1 + avatars.length) % avatars.length)}>
+            &lt;
         </button>
-        <button type="button"
-          class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-opacity-70"
-          on:click={() => selectAvatar((currentIndex + 1) % avatars.length)}>
-          &gt;
+        <!-- Right Button -->
+        <button type="button" style="font-size: 4px;"
+            class="absolute right-[50px] top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full w-[6px] h-[6px] flex items-center justify-center"
+            on:click={() => selectAvatar((currentIndex + 1) % avatars.length)}>
+            &gt;
         </button>
       </div>
-    </div>
+    </foreignObject>
+
+    <!-- Nickname -->
+    <text x="167" y="5" font-size="4" font-weight="bold" fill="#FFFFFF" text-anchor="middle" class="hidden md:block">Nickname</text>
+    <foreignObject x="140" y="6" width="54" height="6">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full items-center justify-center hidden md:flex">
+        <input type="text" class="bg-transparent text-white text-center font-normal w-full h-auto outline-none" 
+              style="font-size: 3.5px;" 
+              placeholder="Enter Nickname" bind:value={Nickname} maxlength="30"/>
+      </div>
+    </foreignObject>
+    <!-- Name -->
+    <text x="25" y="71" font-size="4" font-weight="700" font-family="Roboto" fill="#FFFFFF" text-anchor="middle" class="hidden md:block">Name</text>
+    <text x="25" y="75" font-size="3.5" font-weight="400" font-family="Roboto" fill="#9ca3af" text-anchor="middle" class="hidden md:block">{userID}</text>
+    <!-- Email -->
+    <text x="35" y="90" font-size="4" font-weight="700" fill="#FFFFFF" text-anchor="middle" class="hidden md:block">Email</text>
+    <text x="35" y="94" font-size="3.5" font-weight="400" font-family="Roboto" fill="#9ca3af" text-anchor="middle" class="hidden md:block">{Email}</text>
+    <!-- Points -->
+    <text x="150" y="75" font-size="8" font-weight="bold" fill="#FFFFFF" class="fonts-test">{user?.team_points}</text>
+
+    <foreignObject x="85" y="100" width="30" height="10">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full items-center justify-center hidden md:flex">
+        <button class="text-white border-[1px] border-white rounded-2xl pt-[1px] text-[3.5px] font-normal w-full text-center" type="submit">Save Changes</button>
+      </div>
+    </foreignObject>
+  </svg>
+</div>
+<form on:submit|preventDefault={updateUser} class="px-4 pb-4">
+  <div class="gap-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1">
     <div class="flex flex-col justify-center items-center text-center h-full">
-      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-2">Nickname</h1>
-      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-white w-5/6 md:w-2/3 lg:w-3/6" type="text" placeholder="Enter Nickname" bind:value={Nickname} />
+      <h1 class="text-white text-2xl pb-2 font-bold md:hidden">Nickname</h1>
+      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-white w-5/6 md:w-2/3 lg:w-3/6 md:hidden" type="text" placeholder="Enter Nickname" bind:value={Nickname} maxlength="30"/>
 
-      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-2">Name & Class</h1>
-      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6" type="text" value={user?.ID} readonly />
+      <h1 class="text-white text-2xl font-bold pb-2 md:hidden">Name</h1>
+      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl font-normal text-gray-400 w-5/6 md:w-2/3 lg:w-3/6 md:hidden" type="text" value={userID} readonly />
 
-      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-2">Email</h1>
-      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6" type="email" value={user?.Email} readonly />
-
-      <h1 class="text-custom-200 text-2xl font-serif font-bold pb-2">Points</h1>
-      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-8 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6" type="text" value={user?.Points} readonly />
-
-      <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-2xl w-5/6 md:w-2/3 lg:w-3/6" type="submit">Save Changes</button>
+      <h1 class="text-white text-2xl font-bold pb-2 md:hidden">Email</h1>
+      <input class="bg-custom-100 border-2 border-custom-200 rounded-3xl px-2 py-1 mb-4 text-xl text-gray-400 w-5/6 md:w-2/3 lg:w-3/6 md:hidden" type="email" value={Email} readonly />
+      <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-2xl w-5/6 md:w-2/3 lg:w-3/6 md:hidden" type="submit">Save Changes</button>
     </div>
   </div>
 </form>
+
+<style>
+  .fonts-test{
+    font-family: "Jersey 10";
+  }
+</style>
