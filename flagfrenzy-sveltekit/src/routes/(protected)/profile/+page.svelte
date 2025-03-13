@@ -86,6 +86,34 @@
     }
   }
 
+  function getColor(placement) {
+    if (placement === 1) return "#F3CC59";
+    if (placement === 2) return "#D2EAFE";
+    if (placement === 3) return "#A87A00";
+    return "#FFFFFF";
+  }
+
+  function splitText(text, maxLength) {
+    if (!text) return [];
+
+    let words = text.split(" ");
+    let lines = [];
+    let currentLine = "";
+
+    for (let word of words) {
+      if ((currentLine + " " + word).trim().length > maxLength) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine += (currentLine.length > 0 ? " " : "") + word;
+      }
+    }
+    if (currentLine.length > 0) {
+      lines.push(currentLine);
+    }
+    return lines;
+  }
+
   onMount(async () => {
     await getUser();
     if (Avatar) {
@@ -99,8 +127,7 @@
   });
 </script>
 
-<h1 class="text-white text-4xl font-bold pt-4 px-4 text-center mb-4">Profile</h1>
-<div class="flex flex-col justify-center items-center text-center">
+<div class="flex flex-col justify-center items-center text-center mt-4">
   <svg width="95%" height="100%" viewBox="0 0 200 120" class="md:mx-4">
     <defs>
       <filter id="red-shadow" x="-50%" y="-50%" width="200%" height="200%">
@@ -123,8 +150,12 @@
     <!-- Ellipse with shadow -->
     <ellipse cx="100" cy="50" rx="80" ry="40" fill="#151a22" transform="rotate(20, 100, 50)" filter="url(#{shadow})"/>
     <!-- Teamname and Place -->
-    <text x="50" y="20" font-size="7" font-weight="bold" fill="#F3CC59" text-anchor="middle">#{user?.team_placement}</text>
-    <text x="50" y="27" font-size="6" font-weight="bold" fill="#FFFFFF" text-anchor="middle" class="fonts-test">{user?.team_name}</text>
+    <text x="50" y="20" font-size="7" font-weight="bold" fill={getColor(user?.team_placement)} text-anchor="middle" class="fonts-test">#{user?.team_placement}</text>
+    <text x="50" y="27" font-size="6" font-weight="bold" fill="#FFFFFF" text-anchor="middle" class="fonts-test">
+      {#each splitText(user?.team_name, 23) as line, i}
+        <tspan x="50" dy="{i * 7}">{line}</tspan>
+      {/each}
+    </text>
 
     <!-- Avatar-Bild perfekt in der Ellipse -->
     <foreignObject x="20" y="10" width="160" height="80">
@@ -147,22 +178,22 @@
     </foreignObject>
 
     <!-- Nickname -->
-    <text x="167" y="5" font-size="4" font-weight="bold" fill="#FFFFFF" text-anchor="middle" class="hidden md:block">Nickname</text>
+    <text x="167" y="5" font-size="4" font-weight="bold" fill="#9ca3af" text-anchor="middle" class="hidden md:block">Nickname</text>
     <foreignObject x="140" y="6" width="54" height="6">
       <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full items-center justify-center hidden md:flex">
-        <input type="text" class="bg-transparent text-white text-center font-normal w-full h-auto outline-none" 
+        <input type="text" class="bg-transparent text-gray-400 text-center font-normal w-full h-auto outline-none" 
               style="font-size: 3.5px;" 
               placeholder="Enter Nickname" bind:value={Nickname} maxlength="30"/>
       </div>
     </foreignObject>
     <!-- Name -->
-    <text x="25" y="71" font-size="4" font-weight="700" font-family="Roboto" fill="#FFFFFF" text-anchor="middle" class="hidden md:block">Name</text>
+    <text x="25" y="71" font-size="4" font-weight="700" font-family="Roboto" fill="#9ca3af" text-anchor="middle" class="hidden md:block">Name</text>
     <text x="25" y="75" font-size="3.5" font-weight="400" font-family="Roboto" fill="#9ca3af" text-anchor="middle" class="hidden md:block">{userID}</text>
     <!-- Email -->
-    <text x="35" y="90" font-size="4" font-weight="700" fill="#FFFFFF" text-anchor="middle" class="hidden md:block">Email</text>
+    <text x="35" y="90" font-size="4" font-weight="700" fill="#9ca3af" text-anchor="middle" class="hidden md:block">Email</text>
     <text x="35" y="94" font-size="3.5" font-weight="400" font-family="Roboto" fill="#9ca3af" text-anchor="middle" class="hidden md:block">{Email}</text>
     <!-- Points -->
-    <text x="150" y="75" font-size="8" font-weight="bold" fill="#FFFFFF" class="fonts-test">{user?.team_points}</text>
+    <text x="140" y="75" font-size="8" font-weight="bold" fill="#FFFFFF" class="fonts-test">{user?.team_points}</text>
 
     <foreignObject x="85" y="100" width="30" height="10">
       <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full items-center justify-center hidden md:flex">
@@ -189,6 +220,6 @@
 
 <style>
   .fonts-test{
-    font-family: "Jersey 10";
+    font-family: "Caveat", cursive;
   }
 </style>
