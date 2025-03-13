@@ -289,7 +289,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "R2LQXpy^Us",
     "FormatedChallengeName": "hidden-job",
-    "Chain": "Hidden Job - Part 2", 
+    "Chain": 19, 
     "IsStatic": 0
 
   },
@@ -305,7 +305,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
-    "Chain": "Hidden Job - Part 3", 
+    "Chain": 20, 
     "IsStatic": 1
 
   },{
