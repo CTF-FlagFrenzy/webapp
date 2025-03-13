@@ -469,7 +469,7 @@
     "ChallengeName": "Phantom Frequency",
     "Categorie": "Forensics",
     "Points": 500,
-    "Description": "We've intercepted a mysterious transmission, but something seems off. A message can be clearly heard, but is it telling the whole truth? We think there is another message hidden together with the obvious one. Can you find out whrer that message is and retreive it? (Flags follog the FF{abc123} format, please note that letters have to be lowercase!",
+    "Description": "We've intercepted a mysterious transmission, but something seems off. A message can be clearly heard, but is it telling the whole truth? We think there is another message hidden together with the obvious one. Can you find out whrer that message is and retreive it? (Flags follow the FF{abc123} format, please note that letters have to be lowercase!",
     "Difficulty": "Medium",
     "Hint1": "One message is loud, but the real one is much quieter.",
     "Hint2": "Check frequencies above the audible range.",
