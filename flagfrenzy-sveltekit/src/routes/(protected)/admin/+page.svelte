@@ -166,10 +166,11 @@
             <tr class="bg-gray-800">
                 <th class="border border-gray-700 px-4 py-2">UserID</th>
                 <th class="border border-gray-700 px-4 py-2">Challenge Name</th>
-                <th class="border border-gray-700 px-4 py-2">URL</th>
-                <th class="border border-gray-700 px-4 py-2">Teamname</th>
                 <th class="border border-gray-700 px-4 py-2">TeamID</th>
                 <th class="border border-gray-700 px-4 py-2">Difficulty</th>
+                <th class="border border-gray-700 px-4 py-2">URL</th>
+                <th class="border border-gray-700 px-4 py-2">Teamname</th>
+            
 
                 <th class="border border-gray-700 px-4 py-2">Aktionen</th>
             </tr>
