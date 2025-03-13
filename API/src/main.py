@@ -874,6 +874,8 @@ def users_made_challenges_notsolved(db: Session = Depends(get_db)):
         UserMadeChallenge.Firstblood,
         UserMadeChallenge.Url,
         Team.Teamname,
+        Team.ID,
+        Challenge.Difficulty,
         Challenge.ChallengeName  
     )
     .join(User, UserMadeChallenge.User_ID == User.ID)
@@ -890,7 +892,9 @@ def users_made_challenges_notsolved(db: Session = Depends(get_db)):
             "Firstblood": challenge.Firstblood,
             "URL": challenge.Url,
             "Teamname": challenge.Teamname,
-            "ChallengeName": challenge.ChallengeName  
+            "ChallengeName": challenge.ChallengeName ,
+            "TeamID": challenge.ID,
+            "Difficulty": challenge.Difficulty
         }
         for challenge in user_made_challenges
     ]

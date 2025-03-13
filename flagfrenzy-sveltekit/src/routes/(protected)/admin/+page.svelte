@@ -168,6 +168,9 @@
                 <th class="border border-gray-700 px-4 py-2">Challenge Name</th>
                 <th class="border border-gray-700 px-4 py-2">URL</th>
                 <th class="border border-gray-700 px-4 py-2">Teamname</th>
+                <th class="border border-gray-700 px-4 py-2">TeamID</th>
+                <th class="border border-gray-700 px-4 py-2">Difficulty</th>
+
                 <th class="border border-gray-700 px-4 py-2">Aktionen</th>
             </tr>
         </thead>
@@ -176,6 +179,10 @@
                 <tr class="bg-gray-900 border-b border-gray-700">
                     <td class="border border-gray-700 px-4 py-2">{entry.UserID}</td>
                     <td class="border border-gray-700 px-4 py-2">{entry.ChallengeName}</td>
+                    <td class="border border-gray-700 px-4 py-2">{entry.TeamID}</td>
+                    <td class="border border-gray-700 px-4 py-2">{entry.Difficulty}</td>
+
+
                     <td class="border border-gray-700 px-4 py-2">
                         <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{entry.URL}" target="_blank">Open Challenge</a>
                     </td>
