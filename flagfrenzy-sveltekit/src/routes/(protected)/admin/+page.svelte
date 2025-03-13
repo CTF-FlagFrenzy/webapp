@@ -122,7 +122,7 @@
         <td class="border border-gray-700 px-4 py-2">{new Date(entry.start_time).toLocaleString()}</td>
 
         <td class="border border-gray-700 px-4 py-2">{new Date(entry.flag.submission_time).toLocaleString()}</td>
-        <td class="border border-gray-700 px-4 py-2">{entry.time_difference}</td>
+        <td class="border border-gray-700 px-4 py-2">{entry.time_difference} Min</td>
     </tr>
 {/each}
         </tbody>
