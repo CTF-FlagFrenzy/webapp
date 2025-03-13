@@ -381,7 +381,7 @@
   },{
     "ID":  27,
     "ChallengeName": "Ceasar Cipher",
-    "Categorie": "Reverse Engineering",
+    "Categorie": "Cryptography",
     "Points": 250,
     "Description": "We have intercepted a string from 100BC with an unknown alien encryption technology. Try to solve it",
     "Difficulty": "Easy",
@@ -395,7 +395,7 @@
   },{
     "ID":  28,
     "ChallengeName": "Checking Encryption",
-    "Categorie": "Reverse Engineering",
+    "Categorie": "Cryptography",
     "Points": 1000,
     "Description": "We got a string of characters, but some letters seem to have been modified. Find it out.",
     "Difficulty": "Hard",
