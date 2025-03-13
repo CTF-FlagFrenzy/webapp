@@ -269,7 +269,7 @@ async function checkChainCondition() {
         {#if !challengeStarted}
           <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={startChallenge}>Start</button>
         {:else}
-        {#if data.IsStatic == 0}
+        {#if data.IsStatic == 0 || data.ID == 26}
           {#if localData.URL}
             <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{localData.URL}" target="_blank">Open Challenge</a>
           {:else}
