@@ -107,7 +107,7 @@
     "IsStatic": 0
   },{
     "ID":  8,
-    "ChallengeName": "Profile Prodigy - Part 1",
+    "ChallengeName": "Profile Prodigy 1",
     "Categorie": "OSINT",
     "Points": 250,
     "Description": "Your mission is to uncover the first flag hidden within information related to Tanja Alina Weiss. Somewhere in the details provided, a flag is subtly concealed. The flag could appear in unexpected places, so stay sharp!",
@@ -121,7 +121,7 @@
     "IsStatic": 1
   },{
     "ID":  9,
-    "ChallengeName": "Profile Prodigy - Part 2",
+    "ChallengeName": "Profile Prodigy 2",
     "Categorie": "OSINT",
     "Points": 250,
     "Description": "Identify the destination that Tanja considers her most favorite place she has visited so far.",
@@ -135,7 +135,7 @@
     "IsStatic": 1
   },{
     "ID":  10,
-    "ChallengeName": "Profile Prodigy - Part 3",
+    "ChallengeName": "Profile Prodigy 3",
     "Categorie": "OSINT",
     "Points": 250,
     "Description": "Uncover her birthday. The answer may require careful deduction and attention to detail. Submit your findings in the format FF{DD-MM-YYYY}.",
@@ -149,7 +149,7 @@
     "IsStatic": 1
   },{
     "ID":  11,
-    "ChallengeName": "Time Traveler's Hunt - Part 1",
+    "ChallengeName": "Time Traveler's Hunt 1",
     "Categorie": "OSINT",
     "Points": 250,
     "Description": "The time traveler’s first clue is hidden in plain sight on their old blog. The blog was hosted at www.faketimemachine.rf.gd, but it has since vanished. Use your time machine to recover their lost notes and find the first piece of the time capsule.",
@@ -163,7 +163,7 @@
     "IsStatic": 1
   }, {
     "ID":  12,
-    "ChallengeName": "Time Traveler's Hunt - Part 2",
+    "ChallengeName": "Time Traveler's Hunt 2",
     "Categorie": "OSINT",
     "Points": 500,
     "Description": "Great work, traveler! You’ve found the first piece of the time capsule. But the next clue is more subtle. The second flag is hidden deeper within the echoes of the blog—inspect it carefully.",
@@ -177,7 +177,7 @@
     "IsStatic": 1
   }, {
     "ID":  13,
-    "ChallengeName": "Time Traveler's Hunt - Part 3",
+    "ChallengeName": "Time Traveler's Hunt 3",
     "Categorie": "OSINT",
     "Points": 500,
     "Description": "You’re almost there! The third and final piece of the time capsule requires your problem-solving skills.",
@@ -191,7 +191,7 @@
     "IsStatic": 1
   },{
     "ID":  14,
-    "ChallengeName": "Git Secrets: Layers of Discovery - Part 1",
+    "ChallengeName": "Git Secrets: Layers of Discovery 1",
     "Categorie": "OSINT",
     "Points": 250,
     "Description": "The infamous PhantomCoder0916 has been hiding encrypted messages in their Git repository, PhantomCode. Your mission is to track down and uncover these secrets before they disappear forever. Each clue brings you closer to understanding what PhantomCoder0916 is up to. A strange commit appeared in the PhantomCode repository. Rumors say it contains a secret message, but it's buried among countless fake commits. Can you find what PhantomCoder0916 was trying to communicate?",
@@ -205,7 +205,7 @@
     "IsStatic": 1
   },{
     "ID":  15,
-    "ChallengeName": "Git Secrets: Layers of Discovery - Part 2",
+    "ChallengeName": "Git Secrets: Layers of Discovery 2",
     "Categorie": "OSINT",
     "Points": 500,
     "Description": "A crucial file once existed in the repository but was mysteriously deleted. What was in it? Why did PhantomCoder0916 erase it? Your task is to retrieve what was lost before it's gone for good.",
@@ -219,7 +219,7 @@
     "IsStatic": 1
   },{
     "ID":  16,
-    "ChallengeName": "Git Secrets: Layers of Discovery - Part 3",
+    "ChallengeName": "Git Secrets: Layers of Discovery 3",
     "Categorie": "OSINT",
     "Points": 500,
     "Description": "Not all secrets are erased—some are cleverly hidden in plain sight. PhantomCoder0916 has been marking important milestones in the repository, but one of these marks conceals something unusual. Can you find the hidden message?",
@@ -233,7 +233,7 @@
     "IsStatic": 1
   },{
     "ID":  17,
-    "ChallengeName": "Git Secrets: Layers of Discovery - Part 4",
+    "ChallengeName": "Git Secrets: Layers of Discovery 4",
     "Categorie": "OSINT",
     "Points": 500,
     "Description": "Someone has been tampering with the repository—an unknown user who shouldn’t have access. But who is it? PhantomCoder0916 may have created a fake identity to cover their tracks. Find the imposter and expose their email address to uncover the final piece of the puzzle. Submit your findings in the format FF{email-address}",
@@ -247,8 +247,8 @@
     "IsStatic": 1
   },{
     "ID":  18,
-    "ChallengeName": "Hidden Job - Part 1",
-    "Categorie": "Web Challenge",
+    "ChallengeName": "Hidden Job 1",
+    "Categorie": "Others",
     "Points": 250,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Easy",
@@ -263,8 +263,8 @@
   },
   {
     "ID":  19,
-    "ChallengeName": "Hidden Job - Part 2",
-    "Categorie": "Web Challenge",
+    "ChallengeName": "Hidden Job 2",
+    "Categorie": "Others",
     "Points": 500,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Medium",
@@ -279,8 +279,8 @@
   },
   {
     "ID":  20,
-    "ChallengeName": "Hidden Job - Part 3",
-    "Categorie": "Web Challenge",
+    "ChallengeName": "Hidden Job 3",
+    "Categorie": "Others",
     "Points": 500,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Medium",
@@ -289,14 +289,14 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "R2LQXpy^Us",
     "FormatedChallengeName": "hidden-job",
-    "Chain": "Hidden Job - Part 2", 
+    "Chain": 19, 
     "IsStatic": 0
 
   },
   {
     "ID":  21,
-    "ChallengeName": "Hidden Job - Part 4",
-    "Categorie": "Web Challenge",
+    "ChallengeName": "Hidden Job 4",
+    "Categorie": "Others",
     "Points": 500,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Medium",
@@ -305,7 +305,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
-    "Chain": "Hidden Job - Part 3", 
+    "Chain": 20, 
     "IsStatic": 1
 
   },{
@@ -338,7 +338,7 @@
     "IsStatic": 1
   },{
     "ID":  24,
-    "ChallengeName": "Stealth Invoice - Part 1",
+    "ChallengeName": "Stealth Invoice 1",
     "Categorie": "Forensics",
     "Points": 250,
     "Description": "Our security experts gathered an invoice during an investigation. It is believed that there is hidden information in the mentioned document - can you find it?",
@@ -352,7 +352,7 @@
     "IsStatic": 0
   },{
     "ID":  25,
-    "ChallengeName": "Stealth Invoice - Part 2",
+    "ChallengeName": "Stealth Invoice 2",
     "Categorie": "Forensics",
     "Points": 250,
     "Description": "Our security experts gathered an invoice during an investigation. It is believed that there is hidden information in the mentioned document - can you find it?",
@@ -381,7 +381,7 @@
   },{
     "ID":  27,
     "ChallengeName": "Ceasar Cipher",
-    "Categorie": "Reverse Engineering",
+    "Categorie": "Cryptography",
     "Points": 250,
     "Description": "We have intercepted a string from 100BC with an unknown alien encryption technology. Try to solve it",
     "Difficulty": "Easy",
@@ -395,7 +395,7 @@
   },{
     "ID":  28,
     "ChallengeName": "Checking Encryption",
-    "Categorie": "Reverse Engineering",
+    "Categorie": "Cryptography",
     "Points": 1000,
     "Description": "We got a string of characters, but some letters seem to have been modified. Find it out.",
     "Difficulty": "Hard",
@@ -454,7 +454,7 @@
     "ChallengeName": "Transmission Received",
     "Categorie": "Forensics",
     "Points": 1000,
-    "Description": "-",
+    "Description": "You have intercepted a mysterious WAV audio file. The transmission seems encoded, but you may have heared something like this before. Can you decode the message hidden within?",
     "Difficulty": "Hard",
     "Hint1": "The signal is not just noise, think about how images can be sent over radio waves.",
     "Hint2": "Some amateur radio enthusiasts might recognize this type of transmission. Try searching for ways to decode images from sound.",
@@ -469,7 +469,7 @@
     "ChallengeName": "Phantom Frequency",
     "Categorie": "Forensics",
     "Points": 500,
-    "Description": "-",
+    "Description": "We've intercepted a mysterious transmission, but something seems off. A message can be clearly heard, but is it telling the whole truth? We think there is another message hidden together with the obvious one. Can you find out whrer that message is and retreive it? (Flags follog the FF{abc123} format, please note that letters have to be lowercase!",
     "Difficulty": "Medium",
     "Hint1": "One message is loud, but the real one is much quieter.",
     "Hint2": "Check frequencies above the audible range.",
@@ -484,14 +484,44 @@
     "ChallengeName": "PYCked Apart",
     "Categorie": "Reverse Engineering",
     "Points": 250,
-    "Description": "-",
+    "Description": "We've hidden the secret within a Python file, but the source code is nowhere to be found! Your task is to decompile the .pyc file and analyze its logic to figure out how the flag is stored in a separate file. Can you reverse-engineer the code and retrieve the flag?",
     "Difficulty": "Easy",
-    "Hint1": "Python automatically compiles .py files to .pyc. Maybe you can reverse this process?",
-    "Hint2": "Some tools, like the website pylingual.io, might help you reconstruct the original source code.",
+    "Hint1": "Python files can be compiled from .py files to .pyc. Maybe you can reverse this process?",
+    "Hint2": "Some tools, like pycdc, might help you reconstruct the original source code.",
     "Hint3": "Finding the decompiled code is just the first step. Look at how it interacts with external files to locate the flag!",
     "Static": "01JEB55RPNPJW08X1GB5SR03DF",
     "FormatedChallengeName": "pycked-apart",
     "Chain": 0,
+    "IsStatic": 0
+  },
+  {
+    "ID":  35,
+    "ChallengeName": "Decryption Master 1",
+    "Categorie": "Others",
+    "Points": 250,
+    "Description": "Are you the Decryption Master that can find interesting information, hidden on the Linux system? IMPORTANT! Use the link provided in order to access the system via SSH (port 80)!",
+    "Difficulty": "Easy",
+    "Hint1": "Honestly, its not that hard!",
+    "Hint2": "Think, what do you want to know about the system in the first place?",
+    "Hint3": "Start off with some basic commands to get an overview of the system.",
+    "Static": "j3L2k3'sz\\",
+    "FormatedChallengeName": "decryption-master",
+    "Chain": 0,
+    "IsStatic": 0
+  },
+  {
+    "ID":  36,
+    "ChallengeName": "Decryption Master 2",
+    "Categorie": "Others",
+    "Points": 1000,
+    "Description": "Are you the Decryption Master that can find interesting information, hidden on the Linux system? IMPORTANT! Use the link provided in order to access the system via SSH (port 80)!",
+    "Difficulty": "Hard",
+    "Hint1": "Honestly, its not that hard!",
+    "Hint2": "Inspect interesting files on the system.",
+    "Hint3": "Numbers never lie.",
+    "Static": "4j*3$9r0Sv",
+    "FormatedChallengeName": "decryption-master",
+    "Chain": 35,
     "IsStatic": 0
   }
 ]
