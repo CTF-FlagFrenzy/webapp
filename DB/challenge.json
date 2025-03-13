@@ -487,7 +487,7 @@
     "Description": "We've hidden the secret within a Python file, but the source code is nowhere to be found! Your task is to decompile the .pyc file and analyze its logic to figure out how the flag is stored in a separate file. Can you reverse-engineer the code and retrieve the flag?",
     "Difficulty": "Easy",
     "Hint1": "Python files can be compiled from .py files to .pyc. Maybe you can reverse this process?",
-    "Hint2": "Some tools, like the website pylingual.io, might help you reconstruct the original source code.",
+    "Hint2": "Some tools, like pycdc, might help you reconstruct the original source code.",
     "Hint3": "Finding the decompiled code is just the first step. Look at how it interacts with external files to locate the flag!",
     "Static": "01JEB55RPNPJW08X1GB5SR03DF",
     "FormatedChallengeName": "pycked-apart",
