@@ -91,7 +91,7 @@ class Challenge(Base):
     Points = Column(Integer, default=100)
     Description = Column(Text(1000), nullable=False)
     Difficulty = Column(String(30), default="Easy")
-    Static = Column(String(50), nullable=False)
+    Static = Column(String(100), nullable=False)
     Chain = Column(Integer, nullable=True, default=None)
     Hint1 = Column(Text(400), nullable=True, default=None)
     Hint2 = Column(Text(400), nullable=True, default=None)
