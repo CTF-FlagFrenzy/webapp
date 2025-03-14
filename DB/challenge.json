@@ -248,7 +248,7 @@
   },{
     "ID":  18,
     "ChallengeName": "Hidden Job 1",
-    "Categorie": "Web Challenge",
+    "Categorie": "Others",
     "Points": 250,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Easy",
@@ -264,7 +264,7 @@
   {
     "ID":  19,
     "ChallengeName": "Hidden Job 2",
-    "Categorie": "Web Challenge",
+    "Categorie": "Others",
     "Points": 500,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Medium",
@@ -280,7 +280,7 @@
   {
     "ID":  20,
     "ChallengeName": "Hidden Job 3",
-    "Categorie": "Web Challenge",
+    "Categorie": "Others",
     "Points": 500,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Medium",
@@ -289,14 +289,14 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "R2LQXpy^Us",
     "FormatedChallengeName": "hidden-job",
-    "Chain": "Hidden Job - Part 2", 
+    "Chain": 19, 
     "IsStatic": 0
 
   },
   {
     "ID":  21,
     "ChallengeName": "Hidden Job 4",
-    "Categorie": "Web Challenge",
+    "Categorie": "Others",
     "Points": 500,
     "Description": "You stumbled upon a flyer… but is the organization behind it hiding something?",
     "Difficulty": "Medium",
@@ -305,7 +305,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
-    "Chain": "Hidden Job - Part 3", 
+    "Chain": 20, 
     "IsStatic": 1
 
   },{
