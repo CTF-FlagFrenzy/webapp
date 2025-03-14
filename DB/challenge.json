@@ -247,6 +247,34 @@
     "IsStatic": 1
   },{
     "ID":  18,
+    "ChallengeName": "Binary Puzzeling",
+    "Categorie": "Cryptography",
+    "Points": 500,
+    "Description": "We have found an endpoint that prints some strange data. According to some captured documentation this endpoint contains the password of a administrative account. As always, the password is in the format FF{somelongstring}",
+    "Difficulty": "Medium",
+    "Hint1": "Maybe the data is not in a human readable format.",
+    "Hint2": "Characters can be represented in binary.",
+    "Hint3": "Maybe it is not just one whole string as output, but two",
+    "Static": "k^kpB2Y99nKwhjex8!G1zn6RhnPtUZsQF0g&",
+    "FormatedChallengeName": "binary-puzzeling",
+    "Chain": 0,
+    "IsStatic": 0
+  },{
+    "ID":  19,
+    "ChallengeName": "Security Maths",
+    "Categorie": "Others",
+    "Points": 500,
+    "Description": "Prof. Schmidt’s coordinates to his favourite holiday destination were stolen. Unfortunately, he separated them into three pieces (due to security policies) which makes finding them quite difficult. However, the thief left some hints about their locations. Now it's your turn to find them! (The student's favourite eating location; This place is quite interesting, but sadly, experiments are rather rare; 'Das ist aber SCHADE!'",
+    "Difficulty": "Medium",
+    "Hint1": "Both are rather easy if you know what you have to do...",
+    "Hint2": "SYT: URI model | Maths: Length of an unknown side is needed",
+    "Hint3": "SYT: First R, then I | Maths: Sinus and cosine rule may help",
+    "Static": "Honolulu",
+    "FormatedChallengeName": "security-maths",
+    "Chain": 0,
+    "IsStatic": 1
+  },{
+    "ID":  20,
     "ChallengeName": "Hidden Job 1",
     "Categorie": "Others",
     "Points": 250,
@@ -262,7 +290,7 @@
 
   },
   {
-    "ID":  19,
+    "ID":  21,
     "ChallengeName": "Hidden Job 2",
     "Categorie": "Others",
     "Points": 500,
@@ -278,7 +306,7 @@
 
   },
   {
-    "ID":  20,
+    "ID":  22,
     "ChallengeName": "Hidden Job 3",
     "Categorie": "Others",
     "Points": 500,
@@ -289,12 +317,12 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "R2LQXpy^Us",
     "FormatedChallengeName": "hidden-job",
-    "Chain": 19, 
+    "Chain": 21, 
     "IsStatic": 0
 
   },
   {
-    "ID":  21,
+    "ID":  23,
     "ChallengeName": "Hidden Job 4",
     "Categorie": "Others",
     "Points": 500,
@@ -305,37 +333,9 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
-    "Chain": 20, 
+    "Chain": 22, 
     "IsStatic": 1
 
-  },{
-    "ID":  22,
-    "ChallengeName": "Binary Puzzeling",
-    "Categorie": "Cryptography",
-    "Points": 500,
-    "Description": "We have found an endpoint that prints some strange data. According to some captured documentation this endpoint contains the password of a administrative account. As always, the password is in the format FF{somelongstring}",
-    "Difficulty": "Medium",
-    "Hint1": "Maybe the data is not in a human readable format.",
-    "Hint2": "Characters can be represented in binary.",
-    "Hint3": "Maybe it is not just one whole string as output, but two",
-    "Static": "k^kpB2Y99nKwhjex8!G1zn6RhnPtUZsQF0g&",
-    "FormatedChallengeName": "binary-puzzeling",
-    "Chain": 0,
-    "IsStatic": 0
-  },{
-    "ID":  23,
-    "ChallengeName": "Security Maths",
-    "Categorie": "Others",
-    "Points": 500,
-    "Description": "Prof. Schmidt’s coordinates to his favourite holiday destination were stolen. Unfortunately, he separated them into three pieces (due to security policies) which makes finding them quite difficult. However, the thief left some hints about their locations. Now it's your turn to find them! (The student's favourite eating location; This place is quite interesting, but sadly, experiments are rather rare; 'Das ist aber SCHADE!'",
-    "Difficulty": "Medium",
-    "Hint1": "Both are rather easy if you know what you have to do...",
-    "Hint2": "SYT: URI model | Maths: Length of an unknown side is needed",
-    "Hint3": "SYT: First R, then I | Maths: Sinus and cosine rule may help",
-    "Static": "Honolulu",
-    "FormatedChallengeName": "security-maths",
-    "Chain": 0,
-    "IsStatic": 1
   },{
     "ID":  24,
     "ChallengeName": "Stealth Invoice 1",
