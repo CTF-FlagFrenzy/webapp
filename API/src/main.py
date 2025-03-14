@@ -1106,7 +1106,7 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     """
     try:
         challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
-        if challenge.IsStatic == 1 and not challenge.ID == 26:
+        if challenge.IsStatic == 1 and not challenge.ID == 21:
             return {"detail": "Static challenge cannot be deployed"}
         else:
             user = db.query(User).filter(User.ID == user_id).first()
