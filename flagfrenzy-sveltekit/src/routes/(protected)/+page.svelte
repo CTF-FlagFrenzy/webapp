@@ -45,7 +45,7 @@
 
     const nextSlide = () => {
         slides.subscribe(v => {
-            currentSlide.update(n => (n + 1) % 3);
+            currentSlide.update(n => (n + 1) % 6);
         })();
     };
 
@@ -96,7 +96,7 @@
     </div>
 
     <div class="mx-8 flex flex-col mb-8 sm:!mx-20 bg-custom-110 px-6 py-4 border-2 border-custom-200 rounded-xl shadow-BackdropShadow">
-        <h1 class="text-3xl text-center font-bold mb-4 text-white">RULES</h1>
+        <h1 class="text-3xl text-center font-bold mb-4 text-white" id="Rules">RULES</h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-lg text-white list-none counter-reset-rules">
             <div class="pr-0 lg:!pr-6 lg:border-r border-custom-200">

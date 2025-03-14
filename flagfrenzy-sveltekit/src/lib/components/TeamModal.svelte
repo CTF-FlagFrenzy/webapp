@@ -4,9 +4,9 @@
   export let isOpen = false;
   export let data;
   export let teamdata;
-  let password;
+  let password = "";
   let refreshInterval;
-  let errorMessage;
+  let errorMessage = "";
 
   const dispatch = createEventDispatcher();
 
@@ -87,6 +87,7 @@
   }
 
   $: if (isOpen) {
+    errorMessage = "";
     refreshInterval = setInterval(() => {
     }, 5000);
   } else {
