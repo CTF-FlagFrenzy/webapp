@@ -17,7 +17,7 @@
   },
   {
     "ID":  2,
-    "ChallengeName": "The SQL Heist",
+    "ChallengeName": "Dark Paper",
     "Categorie": "Web Challenge",
     "Points": 250,
     "Description": "You are on a news webpage but want to access information that is not easily available through the search function.",
@@ -488,7 +488,7 @@
     "Hint3": "Run east, and you just might stumble upon a hidden boss.",
     "Static": "#74q$j&zcB",
     "FormatedChallengeName": "hidden-job",
-    "Chain": 0, 
+    "Chain": 33, 
     "IsStatic": 0
 
   },
