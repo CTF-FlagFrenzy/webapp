@@ -168,9 +168,9 @@
     <!-- Ellipse with shadow -->
     <ellipse cx="100" cy="50" rx="80" ry="40" fill="#151a22" transform="rotate(20, 100, 50)" filter="url(#{shadow})"/>
     <!-- Teamname and Place -->
-    <text x="50" y="20" font-size="7" font-weight="bold" fill={getColor(user?.team_placement)} text-anchor="middle" class="fonts-test">#{user?.team_placement}</text>
+    <text x="50" y="20" font-size="7" font-weight="bold" fill={getColor(user?.team_placement)} text-anchor="middle" class="fonts-test">#{user?.team_placement ?? ' -'}</text>
     <text x="50" y="27" font-size="6" font-weight="bold" fill="#9ca3af" text-anchor="middle" class="fonts-test">
-      {#each splitText(user?.team_name, 23) as line, i}
+      {#each splitText(user?.team_name ?? '-', 23) as line, i}
         <tspan x="50" dy="{i * 7}">{line}</tspan>
       {/each}
     </text>
@@ -211,7 +211,7 @@
     <text x="35" y="90" font-size="4" font-weight="700" fill="#9ca3af" text-anchor="middle" class="hidden md:block">Email</text>
     <text x="35" y="94" font-size="3.5" font-weight="400" font-family="Roboto" fill="#9ca3af" text-anchor="middle" class="hidden md:block">{Email}</text>
     <!-- Points -->
-    <text x="140" y="75" font-size="8" font-weight="bold" fill="#9ca3af" class="fonts-test">{user?.team_points}</text>
+    <text x="140" y="75" font-size="8" font-weight="bold" fill="#9ca3af" class="fonts-test">{user?.team_points ?? '-'}</text>
 
     <foreignObject x="85" y="100" width="30" height="10">
       <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full items-center justify-center hidden md:flex">

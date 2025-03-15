@@ -4,9 +4,9 @@
 
   const slides1 = writable([
     {
-      text: "Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue. The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security professional. The battleground for all cybersecurity enthusiasts!",
+      text: "My name is Elias Pinter and I was the team leader of the Platform team and responsible for the backend of the web app. I learned a lot about the possibilities of ORMs. I like very much to work with APIs and databases. The backend is one of the most important things because it communicates with the cluster and the GUI. As team leader, I was responsible for the successful completion of the Platform, which includes the cluster, backend, anti-cheat and GUI. I wish you good luck!",
       img: "/images/Pinter.jpg",
-      heading: "Pinter Elias - Teamleader",
+      heading: "Pinter Elias - Team leader",
       role: "Backend"
     },
     {
@@ -37,13 +37,13 @@
 
   const slides2 = writable([
     {
-      text: "Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue. The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security professional. The battleground for all cybersecurity enthusiasts!",
+      text: "My role in this project was that of the deputy project manager and the team leader of the Challenges team. I was also responsible for creating the challenges in the OSINT and Steganography categories. I especially enjoyed developing and testing these challenges, always keeping in mind that they were meant to engage and challenge the participants of the CTF event. It was exciting to figure out how to design tasks that were neither too easy nor too difficult. Along the way, I learned various new techniques that will definitely be useful in the future.",
       img: "/images/Brown.jpg",
       heading: "Brown Ilaria - Teamleader",
       role: "OSINT"
     },
     {
-      text: "Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue. The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security professional. The battleground for all cybersecurity enthusiasts!",
+      text: "In the course of the school's annual TopHack event, I was able to participate in the project FlagFrenzy as a controller which resulted in learning to do management with Jira. Additionally, as part of the challenge team, I helped with the development of the challenges - especially in the categories “Others” and “Forensics”. Overall, it was a great honor for me to be part of such a great team and to prepare the CTF together with my colleagues.",
       img: "/images/Romauch.jpg",
       heading: "Romauch Daniel",
       role: "OTHERS"
