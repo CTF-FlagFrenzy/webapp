@@ -17,7 +17,6 @@
             });
             if (!response.ok) throw new Error("Flags konnten nicht geladen werden.");
             allFlags = await response.json();
-            console.log("Loaded Flags:", allFlags);
         } catch (error) {
             console.error("Fehler beim Laden der Flags:", error);
         }
@@ -31,7 +30,6 @@
             });
             if (!response.ok) throw new Error("NotSolved challenges konnten nicht geladen werden.");
             notSolved = await response.json();
-            console.log("Loaded NotSolved Challenges:", notSolved);
         } catch (error) {
             console.error("Fehler beim Laden der NotSolved Challenges:", error);
         }
@@ -199,6 +197,10 @@
         </tbody>
     </table>
 </div>
+{:else}
+<script>
+    throw error(403, { message: 'Unauthorized access' });
+</script>
 {/if}
 
 <style>
