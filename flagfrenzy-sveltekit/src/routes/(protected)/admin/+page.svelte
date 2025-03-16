@@ -1,6 +1,8 @@
 <script>
     import Graph from '$lib/components/graph.svelte';
+    import { error } from '@sveltejs/kit';
     import { onMount, onDestroy } from 'svelte';
+    import { goto } from '$app/navigation';
 
     let allFlags = [];
     let notSolved = [];
@@ -61,11 +63,17 @@
             errorMessageTeams = err.message;
         }
     }
+    function checkAdmin() {
+        if(data.adminUser && !data.adminUser.includes(data.username)) {
+            goto('/error', { replaceState: true });
+        }
+    }
 
     onMount(async() => {
     await loadAllFlags();
     await loadGraphValue();
     await loadNotSolved();
+    checkAdmin();
     
     const interval = setInterval(() => {
       loadAllFlags();
@@ -197,10 +205,6 @@
         </tbody>
     </table>
 </div>
-{:else}
-<script>
-    throw error(403, { message: 'Unauthorized access' });
-</script>
 {/if}
 
 <style>

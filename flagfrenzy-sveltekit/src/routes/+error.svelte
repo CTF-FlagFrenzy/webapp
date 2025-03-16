@@ -91,12 +91,20 @@
 {/if}
 
   <main class="h-auto text-white">
-    <div class="error-container h-screen flex flex-col justify-center items-center text-center">
-      <h1 class=" text-red-600 text-4xl">There was an {$page.status} Error</h1>
-      <p class=" text-gray-400 text-lg font-normal">{$page.error?.message ?? 'An unexpected error occurred'}</p>
-      <br>
-      <p class=" text-xl">Please try again or contact the support.</p>
-    </div>
+    {#if $page.status != "404"}
+      <div class="error-container h-screen flex flex-col justify-center items-center text-center">
+        <h1 class=" text-red-600 text-4xl">There was an {$page.status} Error</h1>
+        <p class=" text-gray-400 text-lg font-normal">{$page.error?.message ?? 'An unexpected error occurred'}</p>
+        <br>
+        <p class=" text-xl">Please try again or contact the support.</p>
+      </div>
+    {:else}
+      <div class="error-container h-screen flex flex-col justify-center items-center text-center">
+        <h1 class=" text-red-600 text-4xl">404 Page not found</h1>
+        <br>
+        <p class=" text-xl">Nice try, but not here. Try hacking another website.</p>
+      </div>
+    {/if}
   </main>
   
   <Footer />

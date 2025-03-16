@@ -6,13 +6,13 @@
         {
             text: "A huge thank you to BPN for recognizing and rewarding the champions of FlagFrenzy! Your support in providing prizes for the first-place team adds immense motivation to the competition and helps us celebrate the best cybersecurity minds. We truly appreciate your commitment to fostering cybersecurity talent!",
             logo: "/images/bpn_logo.png",
-            bg: "/images/Hero.png",
+            bg: "/images/bpn_bg.jpg",
             url: "https://www.bpn-group.com/de/"
         },
         {
             text: "A heartfelt thank you to Barmherzige Brüder for supporting the third-place team with amazing prizes! Your generosity helps us recognize and reward excellence in cybersecurity, making this competition even more exciting. We truly appreciate your support!",
             logo: "/images/Logo_BHB_IT-Services.png",
-            bg: "/images/Queen.png",
+            bg: "/images/bhb_bg.png",
             url: "https://www.barmherzige-brueder.at/portal/itservices/home"
         },
         {
@@ -24,13 +24,13 @@
         {
             text: "A big shoutout to NTS for rewarding the third-place team and going the extra mile by offering financial support for merchandise or even travel expenses for ACSC 2025! Your contribution makes a real difference in inspiring the next generation of cybersecurity professionals. Thank you for your generosity!",
             logo: "/images/Logo_NTS_Combo1_2017_RGB_White.png",
-            bg: "/images/Warrior.png",
+            bg: "/images/nts_bg.png",
             url: "https://www.nts.eu"
         },
         {
             text: "We are incredibly grateful to 5 min for recognizing young talent by awarding prizes to the first-place team in the junior category. Your additional support for ACSC 2025 travel expenses and merchandise funding helps ensure that aspiring cybersecurity enthusiasts have the best possible opportunities. Thank you for your commitment!",
             logo: "/images/logo_5_min.png",
-            bg: "/images/Hacker.png",
+            bg: "/images/5_min_bg.png",
             url: "https://www.5min.at/"
         },
         {
@@ -79,9 +79,9 @@
 
     <div class="relative w-full h-[600px] sm:!h-[400px] overflow-hidden mb-14 shadow-BackdropShadow5">
         {#each $slides as slide, i}
-            <div class="absolute grid grid-cols-1 lg:grid-cols-2 w-full h-full justify-between items-center p-5 transition-opacity duration-500 bg-cover bg-center" style="background-image: url({slide.bg}); opacity: {i === $currentSlide ? 1 : 0};">
+            <div class="absolute grid grid-cols-1 lg:grid-cols-2 w-full h-full justify-between items-center p-5 transition-opacity duration-500 bg-cover bg-center" class:bg-top={slide.bg === "/images/5_min_bg.png"} style="background-image: url({slide.bg}); opacity: {i === $currentSlide ? 1 : 0};">
                 <div class="absolute inset-0 bg-custom-100 opacity-80"></div>
-                <div class="relative z-10 text-lg font-bold text-white px-10 text-justify">{slide.text}</div>
+                <div class="relative z-10 text-lg font-bold text-white px-4 lg:!px-10 text-justify">{slide.text}</div>
                 <a href={slide.url} class="z-10 flex justify-center items-center w-full h-full">
                     <img class="max-h-[80px]" src={slide.logo} alt="Slide Logo">
                 </a>
