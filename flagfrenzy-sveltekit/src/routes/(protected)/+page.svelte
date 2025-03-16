@@ -18,7 +18,7 @@
         {
             text: "We sincerely appreciate Spar ICS for supporting our competition and ensuring that the second-place team is recognized with fantastic prizes. Your generosity in providing financial support for merchandise further enhances the experience for all participants. Thank you for investing in the future of cybersecurity!",
             logo: "/images/spar_ics_logo.png",
-            bg: "/images/Spy.png",
+            bg: "/images/spar_ics_bg.jpg",
             url: "https://www.spar-ics.com"
         },
         {
