@@ -95,7 +95,7 @@ class IPFilterMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         try:
             client_ip = request.headers.get("X-Forwarded-For", request.client.host)
-
+            print(f"Client IP: {client_ip}")
             if client_ip not in ALLOWED_IPS:
                 raise HTTPException(status_code=403, detail=f"Access forbidden for {client_ip}")
 
