@@ -10,7 +10,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const deadline = new Date(2025, 2, 26, 12, 15); // 28. Februar 2025, 23:59 Uhr
+  const deadline = new Date(2025, 2, 20, 9, 0); // 28. Februar 2025, 23:59 Uhr
   let isExpired = false;
 
   function close() {
