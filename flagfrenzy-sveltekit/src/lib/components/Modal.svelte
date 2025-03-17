@@ -6,7 +6,7 @@
   let error = null;
   export let data;
   let localData;
-  let flagToSubmit;
+  let flagToSubmit = "";
   export let user;
   let hints = {};
   let canSubmit;
