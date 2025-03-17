@@ -1,8 +1,10 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from pydantic import BaseModel
 from sqlalchemy import (
     create_engine, Column, String, Integer, ForeignKey, Text, Table, Time
 )
+import socket
+from starlette.middleware.base import BaseHTTPMiddleware
 import asyncio
 from zoneinfo import ZoneInfo
 from sqlalchemy import extract
@@ -76,6 +78,32 @@ async def startup_event():
     asyncio.create_task(background_task())
 
 # --------------------- MIDDLEWARE -----------------------
+ALLOWED_HOSTS = {"127.0.0.1", "172.27.0.50", "172.27.0.51", "172.27.0.52", "172.27.0.53", "172.27.0.54", "flagfrenzy-sveltekit"}
+
+def resolve_allowed_hosts():
+    resolved_ips = set()
+    for host in ALLOWED_HOSTS:
+        try:
+            ip = socket.gethostbyname(host) 
+            resolved_ips.add(ip)
+        except socket.gaierror:
+            print(f"Warnung: Konnte {host} nicht auflösen")
+    return resolved_ips
+
+ALLOWED_IPS = resolve_allowed_hosts()  
+class IPFilterMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        try:
+            client_ip = request.headers.get("X-Forwarded-For", request.client.host)
+
+            if client_ip not in ALLOWED_IPS:
+                raise HTTPException(status_code=403, detail=f"Access forbidden for {client_ip}")
+
+            return await call_next(request)
+        except Exception as e:  
+            raise HTTPException(status_code=500, detail=str(e))
+
+app.add_middleware(IPFilterMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -436,26 +464,6 @@ def update_team(team_id: int, user_id: str, team_update: TeamUpdate, db: Session
         db.refresh(team)
     return team
 
-
-@app.put("/teams/{team_id}",  response_model=TeamResponse)
-def strike_team(team_id: int, db: Session = Depends(get_db)):
-    """
-    Give the team a strike
-    """
-    
-    team = db.query(Team).filter(Team.ID == team_id).first()
-   
-    if team:
-        team.SharedFlag += 1
-        if team.SharedFlag == 2:
-            team.Disabled = 1
-            team.Points = 0
-        
-        db.commit()
-        db.refresh(team)
-    else:
-        raise HTTPException(status_code=404, detail="Team not found")
-    return team
 
 @app.delete("/teams/{team_id}/{user_id}")
 def delete_team(team_id: int, user_id: str, password: str, db: Session = Depends(get_db)):
