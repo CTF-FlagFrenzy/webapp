@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import Footer from '$lib/components/Footer.svelte';
-  import "../../app.css";
+  import "../app.css";
   import { page } from '$app/stores';
   import { fade, slide } from 'svelte/transition';
 
@@ -40,26 +40,7 @@
     }
   }
 
-  async function addUser() {
-      try {
-        const response = await fetch("/api/user/", {
-          method: "POST",
-          body: JSON.stringify({
-            name: data.username,
-            email: data.email,
-          }),
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          }
-        });
-      } catch (error) {
-        console.error("Fehler beim Fetchen:", error);
-      } 
-    } 
-
     onMount(async () => {
-    await addUser(); 
-    await getUser();
   });
 </script>
   
@@ -76,7 +57,7 @@
     {#if user}
       <button class="hidden lg:block text-custom-200 border-2 border-custom-200 rounded-full px-8 py-2 avatar-{user.user.Avatar} bg-no-repeat bg-center bg-cover w-16 h-16 mx-4" on:click={toggleMenu2}></button>
     {:else}
-      <p>Loading user data...</p>
+    <button on:click={toggleMenu2} class="hidden lg:block text-custom-200 focus:outline-none text-3xl mx-4">{isOpen ? '✖' : '☰'}</button>
     {/if}
     <button on:click={toggleMenu} class="lg:hidden text-custom-200 focus:outline-none text-3xl">{isOpen ? '✖' : '☰'}</button>
   </header>
@@ -110,7 +91,20 @@
 {/if}
 
   <main class="h-auto text-white">
-    <slot />
+    {#if $page.status != "404"}
+      <div class="error-container h-screen flex flex-col justify-center items-center text-center">
+        <h1 class=" text-red-600 text-4xl">There was an {$page.status} Error</h1>
+        <p class=" text-gray-400 text-lg font-normal">{$page.error?.message ?? 'An unexpected error occurred'}</p>
+        <br>
+        <p class=" text-xl">Please try again or contact the support.</p>
+      </div>
+    {:else}
+      <div class="error-container h-screen flex flex-col justify-center items-center text-center">
+        <h1 class=" text-red-600 text-4xl">404 Page not found</h1>
+        <br>
+        <p class=" text-xl">Nice try, but not here. Try hacking another website.</p>
+      </div>
+    {/if}
   </main>
   
   <Footer />

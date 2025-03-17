@@ -62,8 +62,8 @@
       ? teams.filter(team => team.Teamname.toLowerCase().includes(search.toLowerCase()))
       : teams;
 </script>
-<div class="custom-h-screen">
-<div class="mx-4 md:!mx-52 flex flex-col mb-16 justify-around">
+<div class="h-screen">
+<div class="mx-4 md:!mx-52 flex flex-col mb-16 h-full">
   <h1 class="text-whita text-4xl font-bold pt-4 text-center md:text-5xl mt-8 mb-4">Teams</h1>
   <div class="w-full items-center flex justify-around">
     <div class="py-4 flex flex-row justify-around w-full md:!w-1/2 gap-1 md:!gap-3.5">
@@ -71,8 +71,8 @@
       <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-3/7 md:!w-3/6 lg:!w-2/6  xl:!w-1/5" type="submit" on:click={openCreateTeamModal}>Create</button>
     </div>
   </div>
-  <div class="h-80 max-h-80 bg-custom-110 w-full px-4 rounded-2xl shadow-BackdropShadow">
-    <div class="h-[300px] overflow-y-auto hide-scrollbar">
+  <div class="h-1/2  bg-custom-110 w-full px-4 rounded-2xl shadow-BackdropShadow">
+    <div class="h-[95%] overflow-y-auto hide-scrollbar">
       <div class="hide-scrollbar flex-grow overflow-x-auto">
         {#if teams}
           <table class="w-[400px] styled-table md:!w-full bg-custom-110 mt-4">
@@ -134,8 +134,8 @@
     display: none;
   }
   @media (min-height: 900px) {
-    .custom-h-screen {
-      height: 100vh;
+    .custom-h-box {
+      height: 40rem;
     }
   }
   .spacer {

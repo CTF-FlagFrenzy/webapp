@@ -4,37 +4,37 @@
 
     const slides = writable([
         {
-            text: "A huge thank you to BPN for recognizing and rewarding the champions of FlagFrenzy! Your support in providing prizes for the first-place team adds immense motivation to the competition and helps us celebrate the best cybersecurity minds. We truly appreciate your commitment to fostering cybersecurity talent!",
+            text: "A big shoutout to BPN for generously sponsoring the first-place prizes! Your contribution fuels the competitive spirit and rewards excellence, making the event even more exciting for all participants.",
             logo: "/images/bpn_logo.png",
-            bg: "/images/Hero.png",
+            bg: "/images/bpn_bg.jpg",
             url: "https://www.bpn-group.com/de/"
         },
         {
-            text: "A heartfelt thank you to Barmherzige Brüder for supporting the third-place team with amazing prizes! Your generosity helps us recognize and reward excellence in cybersecurity, making this competition even more exciting. We truly appreciate your support!",
+            text: "Thank you to BARMHERZIGE BRÜDER IT-SERVICES for providing fantastic merchandise! Your support adds an extra layer of excitement, giving participants something to remember beyond the competition itself.",
             logo: "/images/Logo_BHB_IT-Services.png",
-            bg: "/images/Queen.png",
+            bg: "/images/bhb_bg.png",
             url: "https://www.barmherzige-brueder.at/portal/itservices/home"
         },
         {
-            text: "We sincerely appreciate Spar ICS for supporting our competition and ensuring that the second-place team is recognized with fantastic prizes. Your generosity in providing financial support for merchandise further enhances the experience for all participants. Thank you for investing in the future of cybersecurity!",
+            text: "A special thanks to SPAR ICS for recognizing and supporting young talent by sponsoring the first-place prizes in the Junior category! Your contribution empowers the next generation of cybersecurity professionals.",
             logo: "/images/spar_ics_logo.png",
-            bg: "/images/Spy.png",
+            bg: "/images/spar_ics_bg.jpg",
             url: "https://www.spar-ics.com"
         },
         {
-            text: "A big shoutout to NTS for rewarding the third-place team and going the extra mile by offering financial support for merchandise or even travel expenses for ACSC 2025! Your contribution makes a real difference in inspiring the next generation of cybersecurity professionals. Thank you for your generosity!",
+            text: "Huge appreciation to NTS for rewarding the third-place team! Your generosity helps motivate participants and ensures that their hard work gets the recognition it deserves.",
             logo: "/images/Logo_NTS_Combo1_2017_RGB_White.png",
-            bg: "/images/Warrior.png",
+            bg: "/images/nts_bg.png",
             url: "https://www.nts.eu"
         },
         {
-            text: "We are incredibly grateful to 5 min for recognizing young talent by awarding prizes to the first-place team in the junior category. Your additional support for ACSC 2025 travel expenses and merchandise funding helps ensure that aspiring cybersecurity enthusiasts have the best possible opportunities. Thank you for your commitment!",
+            text: "A huge thank you to 5 Minuten for spreading the word about our event through PR and social media! Your support helps us reach a wider audience and bring more visibility to the competition.",
             logo: "/images/logo_5_min.png",
-            bg: "/images/Hacker.png",
+            bg: "/images/5_min_bg.png",
             url: "https://www.5min.at/"
         },
         {
-            text: "A massive thank you to 3Banken for helping make FlagFrenzy an unforgettable experience! Your contribution toward travel expenses for ACSC 2025 and merchandise support ensures that participants can continue to grow and develop their cybersecurity skills beyond the competition. Your generosity means the world to us!",
+            text: "A heartfelt thank you to 3 Banken IT for supporting the second-place winners with amazing prizes! Your commitment to fostering cybersecurity talent makes a lasting impact on our participants’ journey.",
             logo: "/images/3_banken_logo.svg",
             bg: "/images/3_banken_bg.png",
             url: "https://www.3bankenit.at/"
@@ -45,7 +45,7 @@
 
     const nextSlide = () => {
         slides.subscribe(v => {
-            currentSlide.update(n => (n + 1) % 3);
+            currentSlide.update(n => (n + 1) % 6);
         })();
     };
 
@@ -79,9 +79,9 @@
 
     <div class="relative w-full h-[600px] sm:!h-[400px] overflow-hidden mb-14 shadow-BackdropShadow5">
         {#each $slides as slide, i}
-            <div class="absolute grid grid-cols-1 lg:grid-cols-2 w-full h-full justify-between items-center p-5 transition-opacity duration-500 bg-cover bg-center" style="background-image: url({slide.bg}); opacity: {i === $currentSlide ? 1 : 0};">
+            <div class="absolute grid grid-cols-1 lg:grid-cols-2 w-full h-full justify-between items-center p-5 transition-opacity duration-500 bg-cover bg-center" class:bg-top={slide.bg === "/images/5_min_bg.png"} style="background-image: url({slide.bg}); opacity: {i === $currentSlide ? 1 : 0};">
                 <div class="absolute inset-0 bg-custom-100 opacity-80"></div>
-                <div class="relative z-10 text-lg font-bold text-white px-10 text-justify">{slide.text}</div>
+                <div class="relative z-10 text-lg font-bold text-white px-4 lg:!px-16 text-justify">{slide.text}</div>
                 <a href={slide.url} class="z-10 flex justify-center items-center w-full h-full">
                     <img class="max-h-[80px]" src={slide.logo} alt="Slide Logo">
                 </a>
@@ -96,7 +96,7 @@
     </div>
 
     <div class="mx-8 flex flex-col mb-8 sm:!mx-20 bg-custom-110 px-6 py-4 border-2 border-custom-200 rounded-xl shadow-BackdropShadow">
-        <h1 class="text-3xl text-center font-bold mb-4 text-white">RULES</h1>
+        <h1 class="text-3xl text-center font-bold mb-4 text-white" id="Rules">RULES</h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-lg text-white list-none counter-reset-rules">
             <div class="pr-0 lg:!pr-6 lg:border-r border-custom-200">

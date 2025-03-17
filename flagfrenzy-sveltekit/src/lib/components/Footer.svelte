@@ -62,14 +62,14 @@
     <div class="flex items-center justify-center h-24">
       <div class="flex justify-center items-center w-full sm:w-1/2 md:w-1/2 lg:w-11/12 xl:w-3/4">
         <ul class="text-white w-2/4">
-          <li><a href="/">BPN</a></li>
-          <li><a href="/">Barmherzige Brüder</a></li>
-          <li><a href="/">3Banken</a></li>
+          <li><a href="https://www.bpn-group.com/de/">BPN</a></li>
+          <li><a href="https://www.barmherzige-brueder.at/portal/itservices/home">BARMHERZIGE BRÜDER</a></li>
+          <li><a href="https://www.3bankenit.at/">3Banken IT</a></li>
         </ul>
         <ul class="text-white w-2/4">
-          <li><a href="/">NTS</a></li>
-          <li><a href="/">Spar ICS</a></li>
-          <li><a href="/">5 Min</a></li>
+          <li><a href="https://www.nts.eu">NTS</a></li>
+          <li><a href="https://www.spar-ics.com">Spar ICS</a></li>
+          <li><a href="https://www.5min.at/">5 Min</a></li>
         </ul>
       </div>
     </div>

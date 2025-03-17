@@ -1,6 +1,8 @@
 <script>
     import Graph from '$lib/components/graph.svelte';
+    import { error } from '@sveltejs/kit';
     import { onMount, onDestroy } from 'svelte';
+    import { goto } from '$app/navigation';
 
     let allFlags = [];
     let notSolved = [];
@@ -17,7 +19,6 @@
             });
             if (!response.ok) throw new Error("Flags konnten nicht geladen werden.");
             allFlags = await response.json();
-            console.log("Loaded Flags:", allFlags);
         } catch (error) {
             console.error("Fehler beim Laden der Flags:", error);
         }
@@ -31,7 +32,6 @@
             });
             if (!response.ok) throw new Error("NotSolved challenges konnten nicht geladen werden.");
             notSolved = await response.json();
-            console.log("Loaded NotSolved Challenges:", notSolved);
         } catch (error) {
             console.error("Fehler beim Laden der NotSolved Challenges:", error);
         }
@@ -63,11 +63,17 @@
             errorMessageTeams = err.message;
         }
     }
+    function checkAdmin() {
+        if(data.adminUser && !data.adminUser.includes(data.username)) {
+            goto('/error', { replaceState: true });
+        }
+    }
 
     onMount(async() => {
     await loadAllFlags();
     await loadGraphValue();
     await loadNotSolved();
+    checkAdmin();
     
     const interval = setInterval(() => {
       loadAllFlags();

@@ -2,163 +2,198 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
 
+  const slides1 = writable([
+    {
+      text: "My name is Elias Pinter and I was the team leader of the Platform team and responsible for the backend of the web app. I learned a lot about the possibilities of ORMs. I like very much to work with APIs and databases. The backend is one of the most important things because it communicates with the cluster and the GUI. As team leader, I was responsible for the successful completion of the Platform, which includes the cluster, backend, anti-cheat and GUI. I wish you good luck!",
+      img: "/images/Pinter.jpg",
+      heading: "Pinter Elias - Team leader",
+      role: "Backend"
+    },
+    {
+      text: "As part of the development team, I focused on implementing the anti-cheat functionality for our platform. My main tasks included creating mechanisms to validate flag submissions, detect shared flags, and apply penalties for incorrect submissions. What I enjoyed the most was designing the logic to calculate points based on submission time and handling various edge cases. Through this project, I learned a lot about secure coding practices and the importance of robust validation in maintaining the integrity of a competitive environment.",
+      img: "/images/Huber.jpg",
+      heading: "Huber Julian",
+      role: "Anti-Cheat"
+    },
+    {
+      text: "As part of the development team, I was responsible for the frontend of the web app. Throughout this project, I learned how to effectively use Tailwind CSS for styling and how to work with SVGs to create dynamic and visually appealing UI elements. One of the most exciting aspects of this experience was translating design concepts into an interactive and responsive interface. This project gave me valuable insights into modern frontend development and the importance of user experience in web applications.",
+      img: "/images/Sturm.jpg",
+      heading: "Sturm Leon",
+      role: "Frontend"
+    },
+    {
+      text: "I conducted the management of the cluster through the utilization of a local private Docker registry, employing HTTPS for storing and organizing all challenges. Initially, I attempted to deploy them with Docker Swarm, however, I soon discovered that this wasn‘t an option due to the fact that Swarm doesn‘t support rootless Docker. This necessitated my transition to K3s, a process that proved to be both time-consuming and daunting. Despite the challenges encountered, I ultimately completed the process. Reflecting upon it, I recognize the invaluable opportunity to expand my skillset and accumulate knowledge.",
+      img: "/images/Ploner.jpg",
+      heading: "Ploner Fabian - Project Manager",
+      role: "Cluster"
+    }
+  ]);
+  let currentSlide1 = writable(0);
+  let interval;
+  
+  const nextSlide1 = () => {
+    currentSlide1.update(n => (n + 1) % 4);
+  };
+
+  const slides2 = writable([
+    {
+      text: "My role in this project was that of the deputy project manager and the team leader of the Challenges team. I was also responsible for creating the challenges in the OSINT and Steganography categories. I especially enjoyed developing and testing these challenges, always keeping in mind that they were meant to engage and challenge the participants of the CTF event. It was exciting to figure out how to design tasks that were neither too easy nor too difficult. Along the way, I learned various new techniques that will definitely be useful in the future.",
+      img: "/images/Brown.jpg",
+      heading: "Brown Ilaria - Teamleader",
+      role: "OSINT"
+    },
+    {
+      text: "In the course of the school's annual TopHack event, I was able to participate in the project FlagFrenzy as a controller which resulted in learning to do management with Jira. Additionally, as part of the challenge team, I helped with the development of the challenges - especially in the categories “Others” and “Forensics”. Overall, it was a great honor for me to be part of such a great team and to prepare the CTF together with my colleagues.",
+      img: "/images/Romauch.jpg",
+      heading: "Romauch Daniel",
+      role: "OTHERS"
+    },
+    {
+      text: `I'm a passionate cybersecurity enthusiast who excels in solving complex challenges. My best achievement was successfully completing the "Hidden Job" challenge, where I combined web analysis, reverse engineering, and physical awareness to uncover hidden flags. Through this experience, I learned the importance of meticulous analysis and the value of exploring every detail. I utilized various tools and techniques, including web tools and URL hopping, to achieve my goals. This challenge honed my skills and deepened my understanding of cybersecurity principles.`,
+      img: "/images/Flaschberger.jpg",
+      heading: "Flaschberger Florian",
+      role: "REVERSE"
+    },
+    {
+      text: "I was part of the challenges team, responsible for cryptography and reverse engineering challenges, as well as quality management. It was exciting to come up with interesting challenges and turn those ideas into playable tasks. The added complexity of incorporating dynamic flags in every challenge was a great way to test my problem-solving skills. Through this project, I learned a lot about dividing work efficiently and handling unfamiliar systems. It was a valuable experience that improved both my technical and teamwork skills.",
+      img: "/images/Kavalar.jpg",
+      heading: "Kavalar Johannes",
+      role: "CRYPTO"
+    },
+    {
+      text: "Better late than never! I joined the team mid development and contributed three of the challenges in that time since. I very much liked the development of the challenges and the overall progress of this project. Because I joined late, I couldn’t contribute more challenges, nevertheless I learned a lot about how CTF challenges are built. Lastly, I learned how to become a member of an established team in timely fashion. Have fun and succeed with the challenges!",
+      img: "/images/Hafner.jpg",
+      heading: "Hafner Florian",
+      role: "FORENSICS"
+    }
+  ]);
+  let currentSlide2 = writable(0);
+  let interval2;
+  
+  const nextSlide2 = () => {
+    currentSlide2.update(n => (n + 1) % 5);
+  };
+
   onMount(() => {
-      interval = setInterval(nextSlide, 10000);
+      interval = setInterval(nextSlide1, 10000);
+      interval2 = setInterval(nextSlide2, 10000);
       return () => clearInterval(interval);
   });
 </script>
 <div class=" w-full mb-4">
-  <div class="col-span-1 flex items-center justify-center h-80 w-full">
-    <img alt="Project logo" src={'/images/3_banken_bg.png'} class="w-full h-80" />
+  <div class="col-span-1 flex items-center justify-center h-[18rem] md:!h-[28rem] w-full">
+    <img alt="Project team" src={'/images/team.jpg'} class="w-full h-[18rem] md:!h-[28rem] object-cover object-top shadow-BackdropShadow4" />
   </div>
-  <h1 class="text-custom-200 text-4xl font-bold px-4 text-center float-none mt-4">Management</h1>
-  <div class="mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="mb-8">
-      <div class="w-24 h-32 bg-white float-right ml-4"></div>
-      <p class="text-justify">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security professional.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-      <div class="w-24 h-32 bg-white float-left mr-4 mt-2"></div>
-      <p class="text-justify">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
+  <h1 class="text-custom-200 text-4xl font-bold px-4 text-center mt-8">Management</h1>
+  <div class="flex flex-col lg:!flex-row mx-4 md:!mx-36 mt-4 items-center">
+    <div class="flex flex-row mb-4 gap-4">
+      <div>
+        <img alt="Project supervisor" src={'/images/Rabensteiner.jpg'} class="w-[10rem] h-[16rem] object-cover object-top mt-2 max-w-none" />
+        <h3 class="text-center w-[10rem] break-words text-lg">Prof. Rabensteiner Reiner</h3>
+      </div>
+      <div>
+        <img alt="Projectleader" src={'/images/Ploner.jpg'} class="w-[10rem] h-[16rem] object-cover object-top mt-2 max-w-none" />
+        <h3 class="text-center w-[10rem] break-words text-lg">Ploner<br>Fabian</h3>
+      </div>
     </div>
+    <p class="text-justify mx-4 lg:!mx-12">The project, under the management of PLONER Fabian and the supervision of RABENSTEINER Reiner, progressed with strong leadership and clear direction. While initial internal conflicts arose, they were quickly resolved through firm yet respectful project management, fostering a focused and cooperative team dynamic. Communication, structured from the project manager through the team leader to team members, worked efficiently for the most part. However, good management alone is not enough—motivated and committed team members played a crucial role in the project’s success. Once aligned, the team worked together perfectly, ensuring smooth execution and problem-solving. From a management perspective, the project was nearly flawless, with only minor errors, demonstrating the importance of both strong leadership and a dedicated, well-coordinated team.</p>
   </div>
-  <hr class="border-t-2 border-custom-200 opacity-80 pt-8 w-auto mx-4 md:!mx-24">
-  <h1 class="text-custom-200 text-4xl font-bold px-4 text-center float-none">Team Platform</h1>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Pinter Elias - Teamleader</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">Backend</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-  </div>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Huber Julian</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">Anti-Cheat</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
+
+
+  <hr class="border-t-2 border-custom-200 opacity-80 pt-8 w-auto mx-4 md:!mx-24 mt-4">
+  <h1 class="text-custom-200 text-4xl font-bold px-4 text-center mb-4 ">Team Platform</h1>
+  <div class="relative w-full h-[920px] md:!h-[660px] lg:!h-[500px] overflow-hidden mb-14 shadow-BackdropShadow5 hidden lg:!block">
+    {#each $slides1 as slide, i}
+      <div class="flex flex-col mb-12 !mx-4 lg:!mx-48 lg:!flex-row h-full justify-center" style="opacity: {i === $currentSlide1 ? 1 : 0}; display: {i === $currentSlide1 ? '' : 'none'};">
+        <div class="flex flex-col items-center justify-center">
+          <h2 class="text-white text-2xl font-bold px-4 text-center float-none">{slide.heading}</h2>
+          <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">{slide.role}</h2>
+          <blockquote class="text-gray-400 text-base text-justify md:!mx-12">{slide.text}</blockquote>
+        </div>
+        <div class="flex items-center justify-center">
+          <img alt="Teamleader" src={slide.img} class="w-[10rem] h-[16rem] object-cover object-top mt-2 max-w-none" />
+        </div>
+      </div>
+    {/each}
+
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-3">
+        {#each $slides1 as _, i}
+            <div class="w-3 h-3 rounded-full bg-white opacity-50 cursor-pointer { $currentSlide1 === i ? 'opacity-100 bg-yellow-500' : '' }" on:click={() => currentSlide1.set(i)}></div>
+        {/each}
     </div>
   </div>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Sturm Leon</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">Frontend</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-  </div>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Ploner Fabian - Projectleader</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">Cluster</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
+  <div class="relative w-full h-[920px] md:!h-[660px] lg:!h-[500px] overflow-hidden mb-14 shadow-BackdropShadow5 lg:!hidden">
+    {#each $slides1 as slide, i}
+      <div class="flex flex-col mb-12 !mx-4 lg:!mx-48 lg:!flex-row h-full justify-center" style="opacity: {i === $currentSlide1 ? 1 : 0}; display: {i === $currentSlide1 ? '' : 'none'};">
+        <div class="flex items-center justify-center">
+          <img alt="Teamleader" src={slide.img} class="w-[10rem] h-[16rem] object-cover object-top mt-2 max-w-none" />
+        </div>
+        <div class="flex flex-col items-center justify-center">
+          <h2 class="text-white text-2xl font-bold px-4 text-center float-none">{slide.heading}</h2>
+          <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">{slide.role}</h2>
+          <blockquote class="text-gray-400 text-base text-justify">{slide.text}</blockquote>
+        </div>
+      </div>
+    {/each}
+
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-3">
+        {#each $slides1 as _, i}
+            <div class="w-3 h-3 rounded-full bg-white opacity-50 cursor-pointer { $currentSlide1 === i ? 'opacity-100 bg-yellow-500' : '' }" on:click={() => currentSlide1.set(i)}></div>
+        {/each}
     </div>
   </div>
 
-  <hr class="border-t-2 border-custom-200 opacity-80 pt-8 w-auto mx-4 md:!mx-24">
-  <h1 class="text-custom-200 text-4xl font-bold px-4 text-center float-none">Team Challenges</h1>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Brown Ilaria - Teamleader</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">OSINT</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-  </div>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Romauch Daniel</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">OTHERS</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
-    </div>
-  </div>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Flaschberger Florian</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">CRYPTOGRAPHY</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-  </div>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Kavalar Johannes</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">FORENSICS</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
-    </div>
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
-    </div>
-  </div>
-  <div class="flex flex-row mb-12 mx-4 md:!mx-48 mt-8">
-    <div class="flex items-center justify-center">
-      <div class=" w-32 h-40 bg-white mt-2 mx-12" />
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <h2 class="text-white text-2xl font-bold px-4 text-center float-none">Hafner Florian</h2>
-      <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">STEGO</h2>
-      <p class="text-justify text-gray-400 mx-12">
-        Dies ist ein Beispieltext, der um zwei Bilder fließt. Das erste Bild befindet sich in der oberen rechten Ecke, während das zweite Bild in der unteren linken Ecke ist. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna vitae massa dapibus congue.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your.
-        The battleground for all cybersecurity enthusiasts! Whether you're an experienced hacker or just beginning your journey into hacking, this platform is designed to challenge your skills, expand your technical knowledge, and push you to think like a true security.
-      </p>
+
+  <hr class="border-t-2 border-custom-200 opacity-80 pt-8 w-auto mx-4 md:!mx-24 mt-4">
+  <h1 class="text-custom-200 text-4xl font-bold px-4 text-center mb-4 ">Team Challenges</h1>
+  <div class="relative w-full h-[920px] md:!h-[660px] lg:!h-[500px] overflow-hidden mb-14 shadow-BackdropShadow5">
+    {#each $slides2 as slide, i}
+      <div class="flex flex-col mb-12 !mx-4 lg:!mx-48 lg:!flex-row h-full justify-center" style="opacity: {i === $currentSlide2 ? 1 : 0}; display: {i === $currentSlide2 ? '' : 'none'};">
+        <div class="flex items-center justify-center">
+          <img alt="Teamleader" src={slide.img} class="w-[10rem] h-[16rem] object-cover object-top mt-2 max-w-none" />
+        </div>
+        <div class="flex flex-col items-center justify-center">
+          <h2 class="text-white text-2xl font-bold px-4 text-center float-none">{slide.heading}</h2>
+          <h2 class="text-gray-200 text-xl font-bold px-4 mb-2 text-center float-none">{slide.role}</h2>
+          <blockquote class="text-gray-400 text-base text-justify md:!mx-12">{slide.text}</blockquote>
+        </div>
+      </div>
+    {/each}
+
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-3">
+        {#each $slides2 as _, i}
+            <div class="w-3 h-3 rounded-full bg-white opacity-50 cursor-pointer { $currentSlide2 === i ? 'opacity-100 bg-yellow-500' : '' }" on:click={() => currentSlide2.set(i)}></div>
+        {/each}
     </div>
   </div>
 </div>
+
 <style>
+  blockquote {
+    position: relative;
+    padding: 0.5em 2em 0.5em 3em;
+  }
+/* Thanks: http://callmenick.com/post/styling-blockquotes-with-css-pseudo-classes */
+  blockquote:before {
+    font-family: Georgia, serif;
+    position: absolute;
+    font-size: 5em;
+    line-height: 1;
+    top: 0;
+    left: 0;
+    color: #F3CC59;
+    content: "\201C";
+  }
+  blockquote:after {
+    font-family: Georgia, serif;
+    position: absolute;
+   /* display: block; don't use this, it raised the quote too high from the bottom - defeated line-height? */
+    float:right;
+    font-size:5em;
+    line-height: 1;
+    right:0;
+    color: #F3CC59;
+    bottom:-0.5em;
+    content: "\201D";
+  }
 </style>

@@ -14,7 +14,7 @@
   ];
   let currentIndex = 0;
   let user;
-  let shadow;
+  let shadow, color;
 
 
   async function getUser() {
@@ -85,6 +85,23 @@
       shadow = 'white-shadow';
     }
   }
+  function getAvatarColor() {
+    if(Avatar == "Hero") {
+      color = '#B259F3';
+    } else if(Avatar == "Hacker") {
+      color = '#FF962E';
+    } else if(Avatar == "Queen") {
+      color = '#B259F3';
+    } else if(Avatar == "Anonymous") {
+      color = '#59F359';
+    } else if(Avatar == "Spy") {
+      color = '#F35977';
+    } else if(Avatar == "Warrior") {
+      color = '#A5A2A2';
+    }else {
+      color = '#FFFFFF';
+    }
+  }
 
   function getColor(placement) {
     if (placement === 1) return "#F3CC59";
@@ -123,6 +140,7 @@
         currentIndex = foundIndex;
       }
       getShadowFilter();
+      getAvatarColor();
     }
   });
 </script>
@@ -150,9 +168,9 @@
     <!-- Ellipse with shadow -->
     <ellipse cx="100" cy="50" rx="80" ry="40" fill="#151a22" transform="rotate(20, 100, 50)" filter="url(#{shadow})"/>
     <!-- Teamname and Place -->
-    <text x="50" y="20" font-size="7" font-weight="bold" fill={getColor(user?.team_placement)} text-anchor="middle" class="fonts-test">#{user?.team_placement}</text>
-    <text x="50" y="27" font-size="6" font-weight="bold" fill="#FFFFFF" text-anchor="middle" class="fonts-test">
-      {#each splitText(user?.team_name, 23) as line, i}
+    <text x="50" y="20" font-size="7" font-weight="bold" fill={getColor(user?.team_placement)} text-anchor="middle" class="fonts-test">#{user?.team_placement ?? ' -'}</text>
+    <text x="50" y="27" font-size="6" font-weight="bold" fill="#9ca3af" text-anchor="middle" class="fonts-test">
+      {#each splitText(user?.team_name ?? '-', 23) as line, i}
         <tspan x="50" dy="{i * 7}">{line}</tspan>
       {/each}
     </text>
@@ -178,11 +196,11 @@
     </foreignObject>
 
     <!-- Nickname -->
-    <text x="167" y="5" font-size="4" font-weight="bold" fill="#9ca3af" text-anchor="middle" class="hidden md:block">Nickname</text>
-    <foreignObject x="140" y="6" width="54" height="6">
+    <text x="172" y="14" font-size="4" font-weight="bold" fill="#ffffff" text-anchor="middle" class="hidden md:block">Nickname</text>
+    <foreignObject x="145" y="15" width="54" height="6">
       <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full items-center justify-center hidden md:flex">
-        <input type="text" class="bg-transparent text-gray-400 text-center font-normal w-full h-auto outline-none" 
-              style="font-size: 3.5px;" 
+        <input type="text" class="bg-transparent text-white text-center font-normal w-full h-auto outline-none" 
+              style="font-size: 3.5px;"
               placeholder="Enter Nickname" bind:value={Nickname} maxlength="30"/>
       </div>
     </foreignObject>
@@ -193,11 +211,11 @@
     <text x="35" y="90" font-size="4" font-weight="700" fill="#9ca3af" text-anchor="middle" class="hidden md:block">Email</text>
     <text x="35" y="94" font-size="3.5" font-weight="400" font-family="Roboto" fill="#9ca3af" text-anchor="middle" class="hidden md:block">{Email}</text>
     <!-- Points -->
-    <text x="140" y="75" font-size="8" font-weight="bold" fill="#FFFFFF" class="fonts-test">{user?.team_points}</text>
+    <text x="140" y="75" font-size="8" font-weight="bold" fill="#9ca3af" class="fonts-test">{user?.team_points ?? '-'}</text>
 
     <foreignObject x="85" y="100" width="30" height="10">
       <div xmlns="http://www.w3.org/1999/xhtml" class="w-full h-full items-center justify-center hidden md:flex">
-        <button class="text-white border-[1px] border-white rounded-2xl pt-[1px] text-[3.5px] font-normal w-full text-center" type="submit">Save Changes</button>
+        <button class="text-white border-[0.5px] rounded-2xl pt-[1px] text-[3.5px] font-normal w-full text-center" type="submit" on:click={updateUser} style="border-color: {color};">Save Changes</button>
       </div>
     </foreignObject>
   </svg>

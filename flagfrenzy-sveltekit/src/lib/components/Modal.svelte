@@ -20,6 +20,7 @@
   const dispatch = createEventDispatcher();
 
   function close() {
+    flagToSubmit="";
     dispatch('close');
   }
   function setLocal() {

@@ -76,7 +76,7 @@
     await loadChallenges(); // Initial load
     await loadUsermadeChallenges();
     // Start interval to refresh data
-    interval = setInterval(loadChallenges, 10000); // Refresh every 10 seconds
+    interval = setInterval(loadChallenges, 3000); // Refresh every 10 seconds
 
     return () => {
       clearInterval(interval); // Clean up interval when component is destroyed
