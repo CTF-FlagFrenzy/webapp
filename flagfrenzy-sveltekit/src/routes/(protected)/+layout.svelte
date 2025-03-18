@@ -36,30 +36,31 @@
       user = userData;
 
     } catch (error) {
-      console.error("Fehler beim Fetchen:", error);
     }
   }
 
   async function addUser() {
-      try {
-        const response = await fetch("/api/user/", {
-          method: "POST",
-          body: JSON.stringify({
-            name: data.username,
-            email: data.email,
-          }),
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          }
-        });
-      } catch (error) {
-        console.error("Fehler beim Fetchen:", error);
-      } 
+    try {
+      const response = await fetch("/api/user/", {
+        method: "POST",
+        body: JSON.stringify({
+          name: data.username,
+          email: data.email,
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        }
+      });
+    } catch (error) {
     } 
+  } 
 
-    onMount(async () => {
-    await addUser(); 
+  onMount(async () => {
     await getUser();
+    if(!user) {
+      await addUser();
+      await getUser();
+    } 
   });
 </script>
   
@@ -83,9 +84,6 @@
   {#if isOpen2}
     <nav class="hidden absolute right-0 items-center bg-custom-110 text-custom-200 p-4 z-10 space-y-4 md:block rounded-bl-lg shadow-BackdropShadow3">
       <a href="/profile" class="block text-2xl text-center" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/profile'}>Profile</a>
-      {#if data.adminUser && data.adminUser.includes(user.user.ID)}
-        <a href="/admin" class="block text-2xl text-center" on:click={() => (isOpen2 = false)} class:active-tab={currentPath === '/admin'}>Admin</a>
-      {/if}
       <button class="text-custom-200 px-4 pb-2 text-2xl block w-full text-center" on:click={()=>window.location.href="/logout"}>Logout</button>
     </nav>
   {/if}
@@ -100,11 +98,6 @@
     <a href="/scoreboard" on:click={() => (isOpen = false)} class:active-tab={currentPath === '/scoreboard'}>Scoreboard</a>
     <a href="/team" on:click={() => (isOpen = false)} class:active-tab={currentPath === '/team'}>Team</a>
     <a href="/profile" on:click={() => (isOpen = false)} class:active-tab={currentPath === '/profile'}>Profile</a>
-    
-    {#if data.adminUser && data.adminUser.includes(user.ID)}
-      <a href="/admin" on:click={() => (isOpen = false)} class:active-tab={currentPath === '/admin'}>Admin</a>
-    {/if}
-    
     <a href="/logout" on:click={() => (isOpen = false)} class:active-tab={currentPath === '/logout'}>Logout</a>
   </nav>
 {/if}
