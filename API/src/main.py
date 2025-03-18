@@ -742,9 +742,7 @@ def get_challenges(teams_id: int,db: Session = Depends(get_db)):
 
     # Convert to JSON format with category names as keys and include 'solved' status
     categorized_challenges_json = {}
-    adminUser = ["PINTER Elias, 5AHITS", "STURM Leon Attila, 5BHITS", "PLONER Fabian, 5AHITS", "HUBER Julian, 5AHITS", "BROWN Ilaria, 5BHITS","KAVALAR Johannes, 5AHITS", "FLASCHBERGER Florian, 5AHITS", "HAFNER Florian, 5AHITS", "ROMAUCH Daniel, 5AHITS"]
-    is_admin = any(user.ID in adminUser for user in users)
-    if not is_not_allowed_time() and not is_admin:
+    if not is_not_allowed_time():
         raise HTTPException(status_code=403, detail="The Event hasn't started yet")
     for category, challenges in categorized_challenges.items():
         challenges_json = [
@@ -991,7 +989,6 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
 def update_user_made_challenge(
     user_id: str,
     challenge_id: int,
-    update_data: UserMadeChallengeUpdate,
     db: Session = Depends(get_db)
 ):
     """
@@ -1031,7 +1028,7 @@ def update_user_made_challenge(
         UserMadeChallenge.Firstblood == 1
     ).first()
 
-    if not firstblood and update_data.Solved == 1:
+    if not firstblood:
         user.Points += challenge.Points * 0.4
         team.Points += challenge.Points * 0.4
         user_made_challenge.Firstblood = 1
@@ -1050,7 +1047,7 @@ def update_user_made_challenge(
         db.refresh(team)
 
     # Challenge als gelöst markieren
-    user_made_challenge.Solved = update_data.Solved
+    user_made_challenge.Solved = 1
 
     db.commit()
     db.refresh(user_made_challenge)
