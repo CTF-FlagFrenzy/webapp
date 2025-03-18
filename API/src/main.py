@@ -386,55 +386,57 @@ def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
     existing_team = db.query(Team).filter(Team.TeamLeader == user_id).first()
     if existing_team:
         raise HTTPException(status_code=400, detail="User is already a team leader.")
-    hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
-    team_key = generate_random_key()
-    db_team = Team(
-        Teamkey=team_key, 
-        **team.dict(exclude={"Password"}), 
-        Password=hashed_password, 
-        TeamLeader=user_id
-    )
-    try:
-        db.add(db_team)
-        db.commit()
-        db.refresh(db_team)
-        fixed_time = datetime(2024, 3, 20, 9, 0, tzinfo=vienna_timezone)
-        # Add and commit to the database
-        new_teampoints = TeamPoints(
-        TeamID=db_team.ID,
-        Points=0,
-        Teamname=db_team.Teamname,
-        Time=fixed_time
-    )
-        new_teampoints_users = TeamPointsUser(
-        TeamID=db_team.ID,
-        Points=0,
-        Teamname=db_team.Teamname,
-        Time=fixed_time
-    )
-        db.add(new_teampoints_users)
-        db.add(new_teampoints)
-        db.commit()
-        db.refresh(new_teampoints)
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=400, detail="Team with this name already exists."
+    user = db.query(User).filter(User.ID == user_id).first()
+    if user.TeamsID == None:
+        hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
+        team_key = generate_random_key()
+        db_team = Team(
+            Teamkey=team_key, 
+            **team.dict(exclude={"Password"}), 
+            Password=hashed_password, 
+            TeamLeader=user_id
         )
-    except Exception as ex:
-        raise HTTPException(status_code=422, detail=str(ex))
-    API_KEY = os.getenv("API_KEY", "default_secure_key")
+        try:
+            db.add(db_team)
+            db.commit()
+            db.refresh(db_team)
+            fixed_time = datetime(2024, 3, 20, 9, 0, tzinfo=vienna_timezone)
+            # Add and commit to the database
+            new_teampoints = TeamPoints(
+            TeamID=db_team.ID,
+            Points=0,
+            Teamname=db_team.Teamname,
+            Time=fixed_time
+        )
+            new_teampoints_users = TeamPointsUser(
+            TeamID=db_team.ID,
+            Points=0,
+            Teamname=db_team.Teamname,
+            Time=fixed_time
+        )
+            db.add(new_teampoints_users)
+            db.add(new_teampoints)
+            db.commit()
+            db.refresh(new_teampoints)
+        except IntegrityError:
+            db.rollback()
+            raise HTTPException(
+                status_code=400, detail="Team with this name already exists."
+            )
+        except Exception as ex:
+            raise HTTPException(status_code=422, detail=str(ex))
+        API_KEY = os.getenv("API_KEY", "default_secure_key")
 
-    command = f"""
-    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/teamkey" \
-    -H "Authorization: Bearer {API_KEY}" \
-    -H "Content-Type: application/json" \
-    -d '{{"teamid":"{db_team.ID}", "teamkey":"{db_team.Teamkey}"}}'
-    """
+        command = f"""
+        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/teamkey" \
+        -H "Authorization: Bearer {API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{{"teamid":"{db_team.ID}", "teamkey":"{db_team.Teamkey}"}}'
+        """
 
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    print(result)
-    return db_team
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print(result)
+        return db_team
 
 
 @app.put("/teams/{team_id}/{user_id}",  response_model=TeamResponse)
