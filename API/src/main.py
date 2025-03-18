@@ -1439,9 +1439,6 @@ async def validate_static_flag(flag: str, user_id:str, challenge_id: int, db: Se
             user.Points += calculate_point
             team.Points += calculate_point
 
-            # Log the successful flag submission
-            new_submission = FlagSubmission(flag=flag, challenge_id=challenge_id, team_id=team.ID, status='successful', submission_time=submission_time)
-            db.add(new_submission)
             db.commit()
             API_KEY = os.getenv("API_KEY", "default_secure_key")
 
