@@ -386,7 +386,6 @@ def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
     existing_team = db.query(Team).filter(Team.TeamLeader == user_id).first()
     if existing_team:
         raise HTTPException(status_code=400, detail="User is already a team leader.")
-
     hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
     team_key = generate_random_key()
     db_team = Team(
