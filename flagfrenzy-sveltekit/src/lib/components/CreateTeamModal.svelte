@@ -24,6 +24,7 @@
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true"
         }  
       });
       if (!response.ok) {
@@ -46,6 +47,7 @@
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true"
         }
       });
       if (!response.ok) {

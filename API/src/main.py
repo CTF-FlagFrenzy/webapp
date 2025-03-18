@@ -78,7 +78,7 @@ async def startup_event():
     asyncio.create_task(background_task())
 
 # --------------------- MIDDLEWARE -----------------------
-ALLOWED_HOSTS = {"127.0.0.1", "172.27.0.50", "172.27.0.51", "172.27.0.52", "172.27.0.53", "172.27.0.54", "flagfrenzy-sveltekit"}
+ALLOWED_HOSTS = {"127.0.0.1", "192.168.17.1","172.27.0.50", "172.27.0.51", "172.27.0.52", "172.27.0.53", "172.27.0.54", "flagfrenzy-sveltekit"}
 
 def resolve_allowed_hosts():
     resolved_ips = set()
@@ -386,55 +386,57 @@ def create_team(user_id: str, team: TeamCreate, db: Session = Depends(get_db)):
     existing_team = db.query(Team).filter(Team.TeamLeader == user_id).first()
     if existing_team:
         raise HTTPException(status_code=400, detail="User is already a team leader.")
-    hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
-    team_key = generate_random_key()
-    db_team = Team(
-        Teamkey=team_key, 
-        **team.dict(exclude={"Password"}), 
-        Password=hashed_password, 
-        TeamLeader=user_id
-    )
-    try:
-        db.add(db_team)
-        db.commit()
-        db.refresh(db_team)
-        fixed_time = datetime(2024, 3, 20, 9, 0, tzinfo=vienna_timezone)
-        # Add and commit to the database
-        new_teampoints = TeamPoints(
-        TeamID=db_team.ID,
-        Points=0,
-        Teamname=db_team.Teamname,
-        Time=fixed_time
-    )
-        new_teampoints_users = TeamPointsUser(
-        TeamID=db_team.ID,
-        Points=0,
-        Teamname=db_team.Teamname,
-        Time=fixed_time
-    )
-        db.add(new_teampoints_users)
-        db.add(new_teampoints)
-        db.commit()
-        db.refresh(new_teampoints)
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=400, detail="Team with this name already exists."
+    user = db.query(User).filter(User.ID == user_id).first()
+    if user.TeamsID == None:
+        hashed_password = hashlib.sha256(team.Password.encode()).hexdigest()
+        team_key = generate_random_key()
+        db_team = Team(
+            Teamkey=team_key, 
+            **team.dict(exclude={"Password"}), 
+            Password=hashed_password, 
+            TeamLeader=user_id
         )
-    except Exception as ex:
-        raise HTTPException(status_code=422, detail=str(ex))
-    API_KEY = os.getenv("API_KEY", "default_secure_key")
+        try:
+            db.add(db_team)
+            db.commit()
+            db.refresh(db_team)
+            fixed_time = datetime(2024, 3, 20, 9, 0, tzinfo=vienna_timezone)
+            # Add and commit to the database
+            new_teampoints = TeamPoints(
+            TeamID=db_team.ID,
+            Points=0,
+            Teamname=db_team.Teamname,
+            Time=fixed_time
+        )
+            new_teampoints_users = TeamPointsUser(
+            TeamID=db_team.ID,
+            Points=0,
+            Teamname=db_team.Teamname,
+            Time=fixed_time
+        )
+            db.add(new_teampoints_users)
+            db.add(new_teampoints)
+            db.commit()
+            db.refresh(new_teampoints)
+        except IntegrityError:
+            db.rollback()
+            raise HTTPException(
+                status_code=400, detail="Team with this name already exists."
+            )
+        except Exception as ex:
+            raise HTTPException(status_code=422, detail=str(ex))
+        API_KEY = os.getenv("API_KEY", "default_secure_key")
 
-    command = f"""
-    curl -k -X POST "https://challenge.web.ctf.htl-villach.at/teamkey" \
-    -H "Authorization: Bearer {API_KEY}" \
-    -H "Content-Type: application/json" \
-    -d '{{"teamid":"{db_team.ID}", "teamkey":"{db_team.Teamkey}"}}'
-    """
+        command = f"""
+        curl -k -X POST "https://challenge.web.ctf.htl-villach.at/teamkey" \
+        -H "Authorization: Bearer {API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{{"teamid":"{db_team.ID}", "teamkey":"{db_team.Teamkey}"}}'
+        """
 
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    print(result)
-    return db_team
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print(result)
+        return db_team
 
 
 @app.put("/teams/{team_id}/{user_id}",  response_model=TeamResponse)
@@ -988,6 +990,7 @@ def create_user_made_challenge(user_made_challenge: UserMadeChallengeCreate, db:
 def update_user_made_challenge(
     user_id: str,
     challenge_id: int,
+    update_data: UserMadeChallengeUpdate,
     db: Session = Depends(get_db)
 ):
     """
@@ -1027,13 +1030,12 @@ def update_user_made_challenge(
         UserMadeChallenge.Firstblood == 1
     ).first()
 
-    if not firstblood:
+    if not firstblood and update_data.Solved == 1:
         user.Points += challenge.Points * 0.4
         team.Points += challenge.Points * 0.4
         user_made_challenge.Firstblood = 1
         team.FirstBloods += 1
 
-        # Team-Punkte aktualisieren
         new_teampoints = TeamPoints(
             TeamID=team.ID,
             Points=team.Points,
@@ -1045,8 +1047,7 @@ def update_user_made_challenge(
         db.refresh(new_teampoints)
         db.refresh(team)
 
-    # Challenge als gelöst markieren
-    user_made_challenge.Solved = 1
+    user_made_challenge.Solved = update_data.Solved
 
     db.commit()
     db.refresh(user_made_challenge)

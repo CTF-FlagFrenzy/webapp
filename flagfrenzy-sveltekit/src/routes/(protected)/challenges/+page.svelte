@@ -17,6 +17,8 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+
         },
       });
 
@@ -36,8 +38,13 @@
 
   async function loadUsermadeChallenges() {
     try {
-      const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`);
-      if (!response.ok) throw new Error("Failed to load user_made_challenges");
+const response = await fetch(`/api/teams/members?user_id=${data.username}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });      if (!response.ok) throw new Error("Failed to load user_made_challenges");
 
       user_made_challenges = await response.json();
     } catch (err) {
@@ -46,8 +53,13 @@
   }
   async function loadChallenges() {
     try {
-      const response = await fetch(`/api/challenges?id=${user.user.TeamsID}`);
-      if (!response.ok) throw new Error("Failed to load challenges");
+const response = await fetch(`/api/challenges?id=${user.user.TeamsID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });      if (!response.ok) throw new Error("Failed to load challenges");
 
       const rawChallengesByCategory = await response.json();
 

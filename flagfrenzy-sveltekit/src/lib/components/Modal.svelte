@@ -29,8 +29,13 @@
   }
   async function loadHints() {
       try {
-        const response = await fetch(`/api/challenges/hints?id=${data.ID}`);
-        if (!response.ok) throw new Error("Failed to load challenges");
+const response = await fetch(`/api/challenges/hints?id=${data.ID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });        if (!response.ok) throw new Error("Failed to load challenges");
   
         
         hints = await response.json();
@@ -44,8 +49,13 @@ async function checkChainCondition() {
       return;
     }
     try {
-        const teamResponse = await fetch(`/api/user_made_challenges/challenge?id=${user.user.TeamsID}&challenge_id=${data.Chain}`);
-        if (teamResponse.ok) {
+const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user.TeamsID}&challenge_id=${data.Chain}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });        if (teamResponse.ok) {
           const teamChallenge = await teamResponse.json();
           canSubmit = teamChallenge.solved;
         } else {
@@ -81,6 +91,7 @@ async function checkChainCondition() {
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true"
         }
       });
       checkChainCondition();
@@ -98,6 +109,7 @@ async function checkChainCondition() {
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true"
         }
       });
       if (!response.ok) {
@@ -125,6 +137,7 @@ async function checkChainCondition() {
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true"
         }
 
       });
@@ -149,6 +162,7 @@ async function checkChainCondition() {
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true"
         }
       });
       flagStatus = await response.json();
@@ -185,6 +199,7 @@ async function checkChainCondition() {
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true"
         }
       });
       flagStatus = await response.json();
@@ -210,8 +225,13 @@ async function checkChainCondition() {
   
   async function checkIfStarted() {
     try {
-      const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`);
-      if (!response.ok) throw new Error("Failed to load user_made_challenges");
+const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });      if (!response.ok) throw new Error("Failed to load user_made_challenges");
 
       user_made_challenges = await response.json();
       let challenge = user_made_challenges.find(challenge => challenge.Challenges_ID === data.ID);

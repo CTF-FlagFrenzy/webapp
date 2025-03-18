@@ -24,6 +24,7 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
         },
       });
 
@@ -50,6 +51,8 @@
           }),
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
+            "x": "true" 
+
           }
         });
       } catch (error) {

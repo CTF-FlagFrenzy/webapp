@@ -11,7 +11,13 @@
 
     try {
       errorMessageTeams, teams = '';
-      const response = await fetch('/api/teams/scoreboard');
+      const response = await fetch(`/api/teams/scoreboard`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });
       if (!response.ok) throw new Error("Failed to load teams");
 
       teams = await response.json();
@@ -23,8 +29,13 @@
     try {
 
       errorMessageTeams, teamPoints = '';
-      const response = await fetch(`/api/teampoints?id=${data.username}`);
-
+      const response = await fetch(`/api/teampoints?id=${data.username}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });
       if (!response.ok) throw new Error("Failed to load values");
       teamPoints = '';
       teamPoints = await response.json();

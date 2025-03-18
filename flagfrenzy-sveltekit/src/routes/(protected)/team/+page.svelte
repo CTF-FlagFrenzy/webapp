@@ -30,8 +30,13 @@
   async function loadTeams() {
     try {
       errorMessage, teams = '';
-      const response = await fetch('/api/teams/members/allMembers/');
-      if (!response.ok) throw new Error("Failed to load teams");
+const response = await fetch(`/api/teams/members/allMembers/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });      if (!response.ok) throw new Error("Failed to load teams");
 
       teams = await response.json();
     } catch (err) {
@@ -41,8 +46,13 @@
   async function loadTeamMember() {
     try {
       errorMessageTeamMembers, teamMembers = '';
-      const response = await fetch(`/api/teams/members?user_id=${data.username}`);
-      if (!response.ok) throw new Error("Failed to load team members");
+const response = await fetch(`/api/teams/members?user_id=${data.username}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });      if (!response.ok) throw new Error("Failed to load team members");
 
       teamMembers = await response.json();
     } catch (err) {

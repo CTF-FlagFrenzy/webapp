@@ -15,7 +15,7 @@
         try {
             const response = await fetch(`/api/anti-cheat`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json; charset=UTF-8" }
+                headers: { "Content-Type": "application/json; charset=UTF-8", "x": "true" }
             });
             if (!response.ok) throw new Error("Flags konnten nicht geladen werden.");
             allFlags = await response.json();
@@ -28,7 +28,7 @@
         try {
             const response = await fetch(`/api/user_made_challenges/challenge/notSolved`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json; charset=UTF-8" }
+                headers: { "Content-Type": "application/json; charset=UTF-8", "x": "true" }
             });
             if (!response.ok) throw new Error("NotSolved challenges konnten nicht geladen werden.");
             notSolved = await response.json();
@@ -42,7 +42,7 @@
             const response = await fetch(`/api/cluster`, {
                 method: "POST",
                 body: JSON.stringify({ UserID: entry.UserID, ChallengeID: entry.ChallengeID }),
-                headers: { "Content-Type": "application/json; charset=UTF-8" }
+                headers: { "Content-Type": "application/json; charset=UTF-8", "x": "true" }
             });
             loadNotSolved();
             if (!response.ok) throw new Error("Deprovision fehlgeschlagen.");
@@ -56,8 +56,13 @@
     async function loadGraphValue() {
         try {
             errorMessageTeams = '';
-            const response = await fetch(`/api/teampoints/admin`);
-            if (!response.ok) throw new Error("Failed to load values");
+const response = await fetch(`/api/teampoints/admin`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x": "true" 
+        },
+      });            if (!response.ok) throw new Error("Failed to load values");
             teamPoints = await response.json();
         } catch (err) {
             errorMessageTeams = err.message;
