@@ -15,7 +15,7 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });
       if (!response.ok) throw new Error("Failed to load teams");
@@ -33,7 +33,7 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });
       if (!response.ok) throw new Error("Failed to load values");

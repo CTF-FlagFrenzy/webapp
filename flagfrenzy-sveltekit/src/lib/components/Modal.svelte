@@ -33,7 +33,7 @@ const response = await fetch(`/api/challenges/hints?id=${data.ID}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });        if (!response.ok) throw new Error("Failed to load challenges");
   
@@ -53,7 +53,7 @@ const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });        if (teamResponse.ok) {
           const teamChallenge = await teamResponse.json();
@@ -91,7 +91,7 @@ const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true"
+          "x-sveltekit-fetch": "true"
         }
       });
       checkChainCondition();
@@ -109,7 +109,7 @@ const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true"
+          "x-sveltekit-fetch": "true"
         }
       });
       if (!response.ok) {
@@ -137,7 +137,7 @@ const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true"
+          "x-sveltekit-fetch": "true"
         }
 
       });
@@ -162,7 +162,7 @@ const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true"
+          "x-sveltekit-fetch": "true"
         }
       });
       flagStatus = await response.json();
@@ -199,7 +199,7 @@ const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user
         }),
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true"
+          "x-sveltekit-fetch": "true"
         }
       });
       flagStatus = await response.json();
@@ -229,7 +229,7 @@ const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });      if (!response.ok) throw new Error("Failed to load user_made_challenges");
 

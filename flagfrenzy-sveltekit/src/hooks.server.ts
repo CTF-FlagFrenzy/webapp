@@ -25,7 +25,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const url = event.url.pathname;
 
-    if (url.startsWith('/api/') && !event.request.headers.get('x')) {
+    if (url.startsWith('/api/') && !event.request.headers.get('x-sveltekit-fetch')) {
         throw error(403, 'Forbidden');
     }
 

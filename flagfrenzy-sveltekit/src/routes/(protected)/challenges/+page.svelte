@@ -17,7 +17,7 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
 
         },
       });
@@ -42,7 +42,7 @@ const response = await fetch(`/api/teams/members?user_id=${data.username}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });      if (!response.ok) throw new Error("Failed to load user_made_challenges");
 
@@ -57,7 +57,7 @@ const response = await fetch(`/api/challenges?id=${user.user.TeamsID}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });      if (!response.ok) throw new Error("Failed to load challenges");
 

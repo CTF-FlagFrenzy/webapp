@@ -24,7 +24,7 @@
         method: "GET",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
-          "x": "true" 
+          "x-sveltekit-fetch": "true" 
         },
       });
 
@@ -50,7 +50,7 @@
           }),
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
-            "x": "true" 
+            "x-sveltekit-fetch": "true" 
 
           }
         });
