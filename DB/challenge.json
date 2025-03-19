@@ -533,7 +533,7 @@
     "Hint1": "Initialization sets the stage; what changes later?",
     "Hint2": "Instruction data dictates actions; explore all paths.",
     "Hint3": "Unlocked means open; who can walk through?",
-    "Static": "",
+    "Static": "FF{e7aa71973d5c4703ef39648833eb8c892dfsdf402edc52b7a2944ad9830b22dac}",
     "FormatedChallengeName": "solana-dumb-contract",
     "Chain": 3, 
     "IsStatic": 1
