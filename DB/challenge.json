@@ -27,14 +27,14 @@
     "Hint3": "Consider trying an SQL injection.",
     "Static": "NQ^D@zd$q6",
     "FormatedChallengeName": "the-sql-heist",
-    "Chain": 0,
+    "Chain": 1,
     "IsStatic": 0
   },
   {
     "ID":  3,
     "ChallengeName": "File And Seek",
     "Categorie": "Web Challenge",
-    "Points": 250,
+    "Points": 500,
     "Description": "This is a new website created by some students from HTL Mössingerstraße. Use a tool to find a hidden file. The file contains some information about crypto; take a good look.",
     "Difficulty": "Medium",
     "Hint1": "The student provides more on their website than you might think.",
@@ -57,7 +57,7 @@
     "Hint3": "The student manipulated the IDs. Another number may provide additional information.",
     "Static": "t9gE6@W!Nz",
     "FormatedChallengeName": "shadow-files",
-    "Chain": 0,
+    "Chain": 3,
     "IsStatic": 0
     
   },
@@ -361,7 +361,7 @@
     "ID":  26,
     "ChallengeName": "The Neverending Zip",
     "Categorie": "Forensics",
-    "Points": 500,
+    "Points": 250,
     "Description": "A seemingly simple zip archive hides a secret, but it's buried deep... really deep. Can you unravel the onion and reach the core?",
     "Difficulty": "Easy",
     "Hint1": "Consider how to handle tasks that repeat.",
@@ -521,6 +521,21 @@
     "Static": "Proj3ctD3ltA!sTh3B4st@ame!",
     "FormatedChallengeName": "hidden-job",
     "Chain": 35, 
+    "IsStatic": 1
+  },
+  {
+    "ID":  37,
+    "ChallengeName": "Solana Dumb Contract",
+    "Categorie": "Others",
+    "Points": 2000,
+    "Description": "Program ID: 3v5oNYWB6uVRehvymSEHfwe6LMAA764tXdkXwduHJJMG | Network: Solana Devnet | Account Size: 65",
+    "Difficulty": "Expert",
+    "Hint1": "Initialization sets the stage; what changes later?",
+    "Hint2": "Instruction data dictates actions; explore all paths.",
+    "Hint3": "Unlocked means open; who can walk through?",
+    "Static": "",
+    "FormatedChallengeName": "solana-dumb-contract",
+    "Chain": 3, 
     "IsStatic": 1
 
   }
