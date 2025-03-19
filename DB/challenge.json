@@ -526,7 +526,7 @@
   {
     "ID":  37,
     "ChallengeName": "Solana Dumb Contract",
-    "Categorie": "Others",
+    "Categorie": "Web Challenge",
     "Points": 2000,
     "Description": "Program ID: 3v5oNYWB6uVRehvymSEHfwe6LMAA764tXdkXwduHJJMG | Network: Solana Devnet | Account Size: 65",
     "Difficulty": "Expert",
@@ -537,6 +537,5 @@
     "FormatedChallengeName": "solana-dumb-contract",
     "Chain": 3, 
     "IsStatic": 1
-
   }
 ]
