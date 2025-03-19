@@ -95,7 +95,6 @@ class IPFilterMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         try:
             client_ip = request.headers.get("X-Forwarded-For", request.client.host)
-            print(f"Client IP: {client_ip}")
             if client_ip not in ALLOWED_IPS:
                 raise HTTPException(status_code=403, detail=f"Access forbidden for {client_ip}")
 
@@ -584,7 +583,7 @@ def update_user(user_id: str, user_update:UserUpdate, db: Session = Depends(get_
 
 @app.put("/users/leaveteam/{user_id}")
 def leave_team(
-    user_id: str, db: Session = Depends(get_db)
+    user_id: str, password: str, db: Session = Depends(get_db)
 ):
     """
     Leave a team.
@@ -600,6 +599,8 @@ def leave_team(
 
         if team.TeamLeader == user_id:
             raise HTTPException(status_code=400, detail="Team Leader cannot leave the team")
+        if team.Password != hashlib.sha256(password.encode()).hexdigest():
+            raise HTTPException(status_code=400, detail="Invalid team password")
 
         team.Members -= 1
         user.TeamsID = None
@@ -611,7 +612,8 @@ def leave_team(
         raise http_ex
     except Exception as ex:
         db.rollback()
-        raise HTTPException(status_code=500, detail="An unexpected error occurred")
+      
+        raise HTTPException(status_code=500, detail=f'An unexpected error occurred {ex}')
     
     
 @app.put("/users/team/{user_id}")

@@ -70,7 +70,7 @@
   }
   async function leaveTeam() {
     try {
-        const response = await fetch(`/api/user/leave?id=${data.username}`, {
+        const response = await fetch(`/api/user/leave?id=${data.username}&password=${password}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json; charset=UTF-8",
@@ -147,7 +147,7 @@
             <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="password" placeholder="Password" bind:value={password} required on:input={() => errorMessage = ""}>
             <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 ml-4" on:click={deleteTeam}>Delete</button>
           {:else if teamdata.Members.some(member => member.ID === data.username)}
-            <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full invisible" type="password" placeholder="Password" bind:value={password} required on:input={() => errorMessage = ""}>
+            <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full " type="password" placeholder="Password" bind:value={password} required on:input={() => errorMessage = ""}>
             <button class="text-custom-200 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-1/3 ml-4" type="submit" on:click={leaveTeam}>Leave</button>
           {:else if teamdata.Members.length < 4}
             <input class="bg-custom-100 border-2 border-custom-200 rounded-2xl px-2 py-1 text-xl w-full" type="password" placeholder="Password" bind:value={password} required on:input={() => errorMessage = ""}>
