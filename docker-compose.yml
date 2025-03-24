@@ -38,7 +38,7 @@ services:
       context: ./API
       dockerfile: DockerFile
     ports:
-      - "8000:8000"
+      - "8000"
     networks:
       - webapp_net
     volumes:

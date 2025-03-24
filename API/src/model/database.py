@@ -12,5 +12,5 @@ password = os.environ.get("MYSQL_ROOT_PASSWORD")
 DATABASE_URL = f"mysql+pymysql://root:{password}@{hostname}:{port}/flagfrenzy" 
 print(DATABASE_URL)
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, pool_size=200, max_overflow=250)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

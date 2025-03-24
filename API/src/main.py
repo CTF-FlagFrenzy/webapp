@@ -102,7 +102,7 @@ class IPFilterMiddleware(BaseHTTPMiddleware):
         except Exception as e:  
             raise HTTPException(status_code=500, detail=str(e))
 
-app.add_middleware(IPFilterMiddleware)
+# app.add_middleware(IPFilterMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -1087,7 +1087,7 @@ def get_teampoints_users(user_id:str, db: Session = Depends(get_db)):
     
     if "2" in user_id or "1" in user_id:
         teamPoints = db.query(TeamPointsUser).filter(
-            cast(TeamPointsUser.Time, Time) < "11:00:00"
+            cast(TeamPointsUser.Time, Time) < "12:45:00"
         ).all()
     else:
         teamPoints = db.query(TeamPointsUser).filter(
