@@ -1356,6 +1356,16 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 
     return {"status": status}
 
+@app.get('/invalid_flags/{team_id}/{challenge_id}')
+async def get_invalid_flags(team_id: int, challenge_id: int, db: Session = Depends(get_db)):
+    # Fetch invalid flag submissions for the specified team and challenge
+    invalid_flags = db.query(FlagSubmission).filter(
+        FlagSubmission.team_id == team_id,
+        FlagSubmission.challenge_id == challenge_id,
+        FlagSubmission.status == 'invalid'
+    ).all()
+    
+    return {"invalid_flags": [flag.flag for flag in invalid_flags]}
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
