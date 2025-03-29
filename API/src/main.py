@@ -464,6 +464,22 @@ def update_team(team_id: int, user_id: str, team_update: TeamUpdate, db: Session
         db.refresh(team)
     return team
 
+@app.put("/teamsStrike/{team_id}",  response_model=TeamResponse)
+def strike_team(team_id: int, db: Session = Depends(get_db)):
+    """
+    Give the team a strike
+    """
+    team = db.query(Team).filter(Team.ID == team_id).first()
+    if team:
+        team.SharedFlag += 1
+        if team.SharedFlag == 2:
+            team.Disabled = 1
+            team.Points = 0
+        db.commit()
+        db.refresh(team)
+    else:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return team
 
 @app.delete("/teams/{team_id}/{user_id}")
 def delete_team(team_id: int, user_id: str, password: str, db: Session = Depends(get_db)):
