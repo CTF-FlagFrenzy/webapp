@@ -1380,8 +1380,11 @@ async def get_invalid_flags(team_id: int, challenge_id: int, db: Session = Depen
         FlagSubmission.challenge_id == challenge_id,
         FlagSubmission.status == 'invalid'
     ).all()
+    invalid_count = len(invalid_flags)
+    if invalid_count == 0:
+        return {"message": "No invalid flags found for this team and challenge."}
     
-    return {"invalid_flags": [flag.flag for flag in invalid_flags]}
+    return {"invalid_flags": [flag.flag for flag in invalid_flags], "invalid_count": invalid_count}   
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
