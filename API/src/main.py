@@ -464,6 +464,22 @@ def update_team(team_id: int, user_id: str, team_update: TeamUpdate, db: Session
         db.refresh(team)
     return team
 
+@app.put("/teamsStrike/{team_id}",  response_model=TeamResponse)
+def strike_team(team_id: int, db: Session = Depends(get_db)):
+    """
+    Give the team a strike
+    """
+    team = db.query(Team).filter(Team.ID == team_id).first()
+    if team:
+        team.SharedFlag += 1
+        if team.SharedFlag == 2:
+            team.Disabled = 1
+            team.Points = 0
+        db.commit()
+        db.refresh(team)
+    else:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return team
 
 @app.delete("/teams/{team_id}/{user_id}")
 def delete_team(team_id: int, user_id: str, password: str, db: Session = Depends(get_db)):
@@ -1133,7 +1149,7 @@ def get_deploy_challenge(user_id: str, challenge_id: int, db: Session = Depends(
     """
     try:
         challenge = db.query(Challenge).filter(Challenge.ID == challenge_id).first()
-        if challenge.IsStatic == 1 and not challenge.ID == 21:
+        if challenge.IsStatic == 1 and not challenge.ID == 21 and not challenge.ID == 36:
             return {"detail": "Static challenge cannot be deployed"}
         else:
             user = db.query(User).filter(User.ID == user_id).first()
@@ -1356,6 +1372,19 @@ async def submit_flag(user_id: str, challenge_id: int, flag: str, db: Session = 
 
     return {"status": status}
 
+@app.get('/invalid_flags/{team_id}/{challenge_id}')
+async def get_invalid_flags(team_id: int, challenge_id: int, db: Session = Depends(get_db)):
+    # Fetch invalid flag submissions for the specified team and challenge
+    invalid_flags = db.query(FlagSubmission).filter(
+        FlagSubmission.team_id == team_id,
+        FlagSubmission.challenge_id == challenge_id,
+        FlagSubmission.status == 'invalid'
+    ).all()
+    invalid_count = len(invalid_flags)
+    if invalid_count == 0:
+        return {"message": "No invalid flags found for this team and challenge."}
+    
+    return {"invalid_flags": [flag.flag for flag in invalid_flags], "invalid_count": invalid_count}   
 
 @app.get("/admin_panel")
 async def admin_panel(db: Session = Depends(get_db)):
