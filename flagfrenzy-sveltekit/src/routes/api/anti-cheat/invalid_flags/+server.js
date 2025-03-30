@@ -2,10 +2,10 @@ import { error } from "@sveltejs/kit";
 
 const API_BASE_URL = 'http://api:8000';
 
-export async function GET() {
+export async function GET({ request, url }) {
     try {
-        const TeamsID = url.searchParams.get('TeamsID');
-        const ChallengeID = url.searchParams.get('ChallengeID');
+        const TeamsID = url.searchParams.get('team_id');
+        const ChallengeID = url.searchParams.get('challenge_id');
         const response = await fetch(`${API_BASE_URL}/invalid_flags/${TeamsID}/${ChallengeID}`);
         if (!response.ok) {
             throw new Error('Failed to fetch flags');

@@ -1,8 +1,12 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
+  import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
   
   
   export let isOpen = false;
+  let flaghistory = false;
+  let flaghistoryData = {};
   let error = null;
   export let data;
   let localData;
@@ -72,10 +76,13 @@ const response = await fetch(`/api/user_made_challenges/challenge?id=${user.user
     checkChainCondition();
     loadHints(); 
     checkIfStarted();
+    flag_history();
     setLocal();
+    flaghistory = false;
 
     refreshInterval = setInterval(() => {
       checkIfStarted();
+      flag_history();
     }, 5000); // Alle 5 Sekunden
   } else {
     clearInterval(refreshInterval);
@@ -251,6 +258,27 @@ const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`
     }
   }
 
+  async function flag_history() {
+    try {
+      const response = await fetch(`/api/anti-cheat/invalid_flags?team_id=${user.user.TeamsID}&challenge_id=${data.ID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "x-sveltekit-fetch": "true"
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Challenge konnte nicht gestartet werden.");
+      }
+      flaghistoryData = await response.json();
+    } catch (error) {
+      console.log(error.message || "Es ist ein unbekannter Fehler aufgetreten.");
+    }
+  }
+  async function openFlaghistory() {
+    flaghistory = !flaghistory;
+  }
+  $: infoIconClass = flaghistory ? 'text-custom-200/50' : 'text-custom-200';
 </script>
 
 {#if isOpen}
@@ -270,14 +298,47 @@ const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`
         class:text-Hard={data.Difficulty === 'Hard'}
         class:text-Expert={data.Difficulty === 'Expert'}>{data.Difficulty}</span></h3>
     </div>
-    <h3 class="text-2xl">Description:</h3>
-    <p class=" text-gray-400 pb-4 text-justify">{data.Description}</p>
-    <h3 class="text-2xl pt-4 border-t border-custom-200">Hints:</h3>
-    <ul class="text-lg text-gray-400 pb-4">
-      {#if hints.Hint1}<li>- {hints.Hint1}</li>{/if}
-      {#if hints.Hint2}<li>- {hints.Hint2}</li>{/if}
-      {#if hints.Hint3}<li>- {hints.Hint3}</li>{/if}
-    </ul>
+    {#if !flaghistory}
+      <h3 class="text-2xl">Description:</h3>
+      <p class=" text-gray-400 pb-4 text-justify">{data.Description}</p>
+      <h3 class="text-2xl pt-4 border-t border-custom-200">Hints:</h3>
+      <ul class="text-lg text-gray-400 pb-4">
+        {#if hints.Hint1}<li>- {hints.Hint1}</li>{/if}
+        {#if hints.Hint2}<li>- {hints.Hint2}</li>{/if}
+        {#if hints.Hint3}<li>- {hints.Hint3}</li>{/if}
+      </ul>
+    {:else if flaghistoryData.invalid_count}
+      <div>
+        <div class="flex justify-between pb-4">
+          <h3 class="text-2xl">Flag History:</h3>
+          <h3 class="text-2xl mr-4">Next Penalty: {flaghistoryData.invalid_count < 3 ? '0%' : `-${Math.min((flaghistoryData.invalid_count - 2) * 10, 30)}%`}</h3>
+        </div>
+        <div class=" h-[210px]">
+          <div class=" h-[95%] flex-grow overflow-y-auto">
+            <table class="styled-table w-full mb-4 table-fixed">
+              <thead class="text-custom-200 text-xl border-b border-custom-200">
+                <tr>
+                  <th class="text-center w-1/6">#</th>
+                  <th class="text-center w-1/6">Penalty</th>
+                  <th class="text-center w-4/6">Flag</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-400 text-base">
+                {#each flaghistoryData.invalid_flags as flag, index}
+                  <tr class="border-b border-custom-100">
+                    <td class="pt-2 align-center text-center">{index + 1}</td>
+                    <td class="pt-2 align-center text-center">
+                      {index < 3 ? '0%' : `-${Math.min((index - 2) * 10, 30)}%`}
+                    </td>
+                    <td class="pt-2 align-top text-center break-words">{flag}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {/if}
     <div class="flex justify-between items-center gap-2 mt-auto pt-4 border-t border-custom-200">
 
       {#if data.Solved}
@@ -286,20 +347,27 @@ const response = await fetch(`/api/user_made_challenges?id=${user.user.TeamsID}`
         </div>
       {:else}
         <input class="bg-custom-100 border-2 w-2/3 rounded-full px-2 py-1 text-base transition-all duration-300 outline-none {submitFailed ? 'border-red-500' : 'border-custom-200'}" type="text" bind:value={flagToSubmit} placeholder='Enter Flag: FF&#123;...&#125;' on:input={() => submitFailed = false}>
+        <button class=" border-0 border-custom-200 rounded-full py-1" on:click={openFlaghistory}>
+          {#if !flaghistory}
+            <FontAwesomeIcon icon={faInfoCircle} class={`cursor-pointer text-3xl ${infoIconClass}`}/>
+          {:else}
+            <FontAwesomeIcon icon={faInfoCircle} class={`cursor-pointer text-3xl ${infoIconClass}`}/>
+          {/if}
+        </button>
         <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={submit} disabled={!challengeStarted}>Submit</button>
         {#if !challengeStarted}
           <button class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3" on:click={startChallenge}>Start</button>
         {:else}
-        {#if data.IsStatic == 0 || data.ID == 21}
+        {#if data.IsStatic == 0 || data.ID == 21 || data.ID == 36}
           {#if localData.URL}
             <a class="text-custom-200 border-2 border-custom-200 rounded-full px-2 py-1 text-base w-1/3 text-center" href="{localData.URL}" target="_blank">Open Challenge</a>
           {:else}
-          <button class="text-custom-200 px-2 py-1 text-base w-1/3 flex justify-center items-center" disabled>
-            <svg class="animate-spin h-7 w-7 text-custom-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M12 2a10 10 0 0110 10h-2a8 8 0 00-8-8V2z"></path>
-            </svg>
-          </button>
+            <button class="text-custom-200 px-2 py-1 text-base w-1/3 flex justify-center items-center" disabled>
+              <svg class="animate-spin h-7 w-7 text-custom-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M12 2a10 10 0 0110 10h-2a8 8 0 00-8-8V2z"></path>
+              </svg>
+            </button>
           {/if}
           {/if}
         {/if}
