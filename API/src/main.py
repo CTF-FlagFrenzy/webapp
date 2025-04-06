@@ -31,7 +31,7 @@ import json
 
 start_time = time(9, 0)  
 end_time = time(15, 0) 
-allowed_date = date(2025, 3, 20)
+allowed_date = date(2026, 3, 20)
 vienna_timezone = ZoneInfo("Europe/Vienna")
 def is_not_allowed_time():
     current_time = datetime.now(vienna_timezone).time()  
